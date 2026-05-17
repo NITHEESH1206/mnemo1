@@ -20,7 +20,7 @@ export default function DashboardPage() {
       <Sidebar />
 
       <div className="lg:pl-[240px]">
-        <TopBar />
+        <TopBar />      
 
         <main className="relative px-5 py-8 md:px-8 md:py-10">
           <div className="relative grid grid-cols-1 gap-5 lg:grid-cols-12">

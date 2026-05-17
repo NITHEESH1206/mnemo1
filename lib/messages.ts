@@ -2,70 +2,81 @@ import type { Reminder } from "./store";
 
 export function welcomeMessage(): string {
   return [
-    "👋 Hi, I'm Mnemo — your AI memory layer.",
+    "alright, your brain just got an upgrade. i'm Mnemo.",
     "",
-    "Talk to me naturally:",
-    "• \"Remind me to call James tomorrow at 3pm\"",
-    "• \"Standup prep every Friday at 9am\"",
-    "• \"Pick up dry cleaning in 2 hours\"",
+    "just tell me what to remember:",
+    "• 'remind me to call james tomorrow at 3pm'",
+    "• 'standup prep every friday at 9am'",
+    "• 'pick up groceries in 2 hours'",
     "",
-    "Type *list* to see your reminders, *cancel <number>* to remove one, or *help* anytime.",
+    "type *list* to see what's coming up, *cancel <number>* to drop one, or *help* anytime.",
   ].join("\n");
 }
 
 export function helpMessage(): string {
   return [
-    "📒 How to talk to me:",
+    "here's how we work together:",
     "",
-    "*Set a reminder*",
-    "• Remind me to <task> at 3pm",
-    "• Remind me to <task> tomorrow at 9am",
-    "• Remind me to <task> in 30 minutes",
-    "• <task> every day at 7am",
-    "• <task> every Friday at 9am",
+    "*set a reminder*",
+    "• remind me to <thing> at 3pm",
+    "• remind me to <thing> tomorrow at 9am",
+    "• remind me to <thing> in 30 minutes",
+    "• <thing> every day at 7am",
+    "• <thing> every friday at 9am",
     "",
-    "*Manage*",
-    "• list — show your reminders",
-    "• cancel <number> — cancel a specific one",
-    "• help — show this message",
+    "*housekeeping*",
+    "• list — see what's pending",
+    "• cancel <number> — drop one",
+    "• help — this menu",
   ].join("\n");
 }
 
 export function confirmationMessage(r: Reminder): string {
   const repeat =
-    r.recurrence !== "none"
-      ? `\n🔁 Repeats ${r.recurrence}`
-      : "";
-  return `✅ Got it.\n\n📌 *${r.task}*\n⏰ ${formatHuman(r.fireAt)}${repeat}`;
+    r.recurrence !== "none" ? ` · repeats ${r.recurrence}` : "";
+  return [
+    "consider it remembered.",
+    "",
+    `*${r.task}*`,
+    `${formatHuman(r.fireAt)}${repeat}`,
+    "",
+    "you can forget now.",
+  ].join("\n");
 }
 
 export function reminderFireMessage(r: Reminder): string {
   const repeatNote =
     r.recurrence !== "none"
-      ? `\n\n_(Repeats ${r.recurrence} — I'll ping you again next time.)_`
+      ? `\n_(repeats ${r.recurrence} — i'll be back next time.)_`
       : "";
-  return `⏰ Reminder: *${r.task}*${repeatNote}`;
+  return `⏰ heads up — *${r.task}*${repeatNote}`;
 }
 
 export function listMessage(reminders: Reminder[]): string {
   if (reminders.length === 0) {
-    return "You don't have any pending reminders. Try: \"Remind me to call James tomorrow at 3pm\".";
+    return "your queue is empty. living dangerously, i see. try: 'remind me to call james tomorrow at 3pm'.";
   }
   const lines = reminders.slice(0, 15).map((r, i) => {
-    const rec = r.recurrence !== "none" ? ` 🔁 ${r.recurrence}` : "";
+    const rec = r.recurrence !== "none" ? ` · repeats ${r.recurrence}` : "";
     return `${i + 1}. *${r.task}* — ${formatHuman(r.fireAt)}${rec}`;
   });
   const more =
     reminders.length > 15 ? `\n\n…and ${reminders.length - 15} more.` : "";
-  return `📋 Your reminders:\n\n${lines.join("\n")}${more}\n\n_Reply 'cancel <number>' to remove one._`;
+  return [
+    "things future-you should not forget:",
+    "",
+    lines.join("\n") + more,
+    "",
+    "reply 'cancel <number>' to drop one.",
+  ].join("\n");
 }
 
 export function cancelledMessage(r: Reminder): string {
-  return `🗑️ Cancelled: *${r.task}*`;
+  return `*${r.task}* — forgotten. you're welcome.`;
 }
 
 export function notFoundMessage(): string {
-  return "I couldn't find that reminder. Type *list* to see what's pending.";
+  return "can't find that one. type *list* to see what's actually pending.";
 }
 
 function formatHuman(iso: string): string {

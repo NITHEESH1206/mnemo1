@@ -102,7 +102,7 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     console.error("[whatsapp/webhook] error", err);
     twiml.message(
-      "😬 Something went wrong on my end. Try again in a moment, or type *help*.",
+      "my brain glitched for a sec. try that again, or type *help*.",
     );
     return twimlResponse(twiml);
   }
