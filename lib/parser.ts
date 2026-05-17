@@ -26,6 +26,12 @@ export type ParsedReminder = {
   fireAt: Date;
   recurrence: Recurrence;
   weekday?: number; // 0 = Sunday … 6 = Saturday
+  meeting?: {
+    /** Other person's name as parsed (e.g. "ashok"). null if not specified. */
+    attendee: string | null;
+    /** What the user actually said ("meet with ashok"); used as event title. */
+    summary: string;
+  };
 };
 
 export type ParseResult =
@@ -232,7 +238,33 @@ export function parseReminder(text: string, now: Date = new Date()): ParseResult
     };
   }
 
-  return { ok: true, reminder: { task: body, fireAt, recurrence, weekday } };
+  // Detect meeting intent ("meet with ashok", "google meet with ashok",
+  // "zoom with ashok", "call with ashok", "1:1 with ashok", "sync with ashok").
+  const meeting = detectMeetingIntent(body);
+
+  return {
+    ok: true,
+    reminder: { task: body, fireAt, recurrence, weekday, meeting },
+  };
+}
+
+function detectMeetingIntent(
+  body: string,
+): { attendee: string | null; summary: string } | undefined {
+  const trigger =
+    /\b(?:google\s+meet|gmeet|zoom|teams|meet|meeting|call|1:1|one\s+on\s+one|sync|catchup|catch\s+up)\s+with\s+([a-z][a-z0-9 .'_-]{0,30}?)\b/i;
+  const triggerNoAttendee =
+    /\b(?:google\s+meet|gmeet|zoom|teams|have\s+a\s+meet(?:ing)?|schedule\s+a\s+meet(?:ing)?)\b/i;
+
+  const m = body.match(trigger);
+  if (m) {
+    const attendee = (m[1] || "").trim().replace(/\s+/g, " ") || null;
+    return { attendee, summary: m[0].trim() };
+  }
+  if (triggerNoAttendee.test(body)) {
+    return { attendee: null, summary: body };
+  }
+  return undefined;
 }
 
 function parseTime(

@@ -79,6 +79,59 @@ export function notFoundMessage(): string {
   return "can't find that one. type *list* to see what's actually pending.";
 }
 
+export function connectGoogleMessage(link: string): string {
+  return [
+    "let's hook up your google calendar.",
+    "",
+    "tap this link, sign in with the gmail you want me to use, and i'll handle the rest:",
+    link,
+    "",
+    "once connected, just say things like \"meet with ashok tomorrow at 11am\" and i'll auto-create the event + a google meet link.",
+  ].join("\n");
+}
+
+export function disconnectedGoogleMessage(): string {
+  return "google calendar is unlinked. type *connect google* anytime to hook it back up.";
+}
+
+export function meetingConfirmationMessage(
+  r: Reminder,
+  meetLink: string | undefined,
+  eventLink: string | undefined,
+): string {
+  const repeat =
+    r.recurrence !== "none" ? ` · repeats ${r.recurrence}` : "";
+  const lines = [
+    "calendar event created. 🗓️",
+    "",
+    `*${r.task}*`,
+    `${formatHuman(r.fireAt)}${repeat}`,
+  ];
+  if (meetLink) {
+    lines.push("", `google meet: ${meetLink}`);
+  }
+  if (eventLink) {
+    lines.push(`event: ${eventLink}`);
+  }
+  lines.push("", "i'll also ping you here a moment before.");
+  return lines.join("\n");
+}
+
+export function meetingNeedsConnectMessage(
+  r: Reminder,
+  connectLink: string,
+): string {
+  return [
+    "consider it remembered.",
+    "",
+    `*${r.task}*`,
+    formatHuman(r.fireAt),
+    "",
+    "want me to auto-create this on google calendar with a meet link?",
+    `tap to connect: ${connectLink}`,
+  ].join("\n");
+}
+
 function formatHuman(iso: string): string {
   const d = new Date(iso);
   const timeZone = process.env.TIMEZONE_NAME || "Asia/Kolkata";
