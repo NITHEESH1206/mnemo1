@@ -25,6 +25,7 @@ import {
   createCalendarEvent,
   getTokens,
 } from "@/lib/google";
+import { transcribeTwilioMedia } from "@/lib/transcribe";
 
 // Twilio sends application/x-www-form-urlencoded and we use Node APIs.
 export const runtime = "nodejs";
@@ -55,10 +56,44 @@ export async function POST(req: NextRequest) {
   }
 
   const from = params.From;
-  const body = (params.Body || "").trim();
   if (!from) return new NextResponse("Missing From", { status: 400 });
 
+  // --- Voice note? transcribe first, then route as if it were text -----
+  let body = (params.Body || "").trim();
+  let voiceEcho: string | null = null;
+  const numMedia = parseInt(params.NumMedia || "0", 10);
+  if (numMedia > 0) {
+    const mediaType = (params.MediaContentType0 || "").toLowerCase();
+    const mediaUrl = params.MediaUrl0;
+    if (mediaUrl && mediaType.startsWith("audio/")) {
+      try {
+        const text = await transcribeTwilioMedia(mediaUrl);
+        if (text) {
+          body = text;
+          voiceEcho = text;
+        }
+      } catch (e) {
+        console.error("[whatsapp/webhook] transcription error", e);
+        const twimlErr = new MessagingResponse();
+        twimlErr.message(
+          "couldn't hear that one. mind sending it as text or trying again?",
+        );
+        return twimlResponse(twimlErr);
+      }
+    } else if (mediaUrl) {
+      // Non-audio media (image, video, etc.) — politely punt for now.
+      const twimlPunt = new MessagingResponse();
+      twimlPunt.message(
+        "i can only handle text and voice right now — image/screenshot smarts are coming soon.",
+      );
+      return twimlResponse(twimlPunt);
+    }
+  }
+
   const twiml = new MessagingResponse();
+  if (voiceEcho) {
+    twiml.message(`🎙️ heard you say: _${voiceEcho}_`);
+  }
   const lower = body.toLowerCase();
 
   try {
