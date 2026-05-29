@@ -139,11 +139,11 @@ function PricingCard({
 
       <div className="mt-5 flex items-baseline gap-2">
         <span className="text-[46px] font-extrabold tracking-tight text-ink">
-          ${price}
+          ₹{price}
         </span>
         {struckPrice !== null && (
           <span className="text-[18px] font-semibold text-ink/40 line-through">
-            ${struckPrice}
+            ₹{struckPrice}
           </span>
         )}
         <span className="text-[14px] text-ink/55">/mo</span>

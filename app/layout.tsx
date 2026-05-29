@@ -31,7 +31,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#fff8f0",
+  themeColor: "#7dd3fc",
   width: "device-width",
   initialScale: 1,
 };
@@ -43,8 +43,20 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={inter.variable}>
+      <head>
+        {/* Satoshi — premium geometric display face (Fontshare) */}
+        <link rel="preconnect" href="https://api.fontshare.com" />
+        <link
+          rel="preconnect"
+          href="https://cdn.fontshare.com"
+          crossOrigin="anonymous"
+        />
+        <link
+          href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap"
+          rel="stylesheet"
+        />
+      </head>
       <body className="bg-bg-base text-ink antialiased">
-        <div className="ambient-bg" aria-hidden="true" />
         <div className="grain-overlay" aria-hidden="true" />
         <div className="relative z-[1]">{children}</div>
       </body>

@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
-import { Star, Play, Check, MessageCircle, Mic } from "lucide-react";
+import { Star, Play, Check, MessageCircle, Mic, Sparkles } from "lucide-react";
 import { GradientButton } from "@/components/ui/GradientButton";
 import { Mascot } from "@/components/ui/Mascot";
 import { whatsappCTAUrl } from "@/lib/whatsapp";
@@ -10,48 +10,59 @@ export function Hero() {
   const reduced = useReducedMotion();
 
   return (
-    <section className="relative isolate overflow-hidden pt-36 pb-24 sm:pt-44">
-      {/* Background warm orbs */}
+    <section className="relative isolate overflow-hidden pt-36 pb-28 sm:pt-44">
+      {/* ── Blue sky stage ───────────────────────────────── */}
+      <div className="sky-stage" aria-hidden="true">
+        <div className="sky-sun" />
+        <div className="cloud cloud-1" />
+        <div className="cloud cloud-2" />
+        <div className="cloud cloud-3" />
+        <div className="cloud cloud-4" />
+      </div>
+
+      {/* Floating mascot accents (warm orbs pop against the blue) */}
       <FloatingOrbs />
 
       <div className="container-x relative z-10">
-        {/* Rating row */}
+        {/* Beta + rating row — frosted glass pills on the sky */}
         <motion.div
           initial={reduced ? false : { opacity: 0, y: 8 }}
           animate={reduced ? undefined : { opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="flex items-center justify-center gap-2.5 text-[14px]"
+          className="flex flex-wrap items-center justify-center gap-2.5"
         >
-          <div className="flex items-center gap-0.5" aria-label="Rated 4.9 out of 5">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <Star
-                key={i}
-                size={16}
-                className="fill-amber-400 text-amber-400 drop-shadow-[0_0_6px_rgba(251,191,36,0.5)]"
-              />
-            ))}
-          </div>
-          <span className="font-bold text-ink">4.9</span>
-          <span className="h-3.5 w-px bg-ink/15" />
-          <span className="text-ink/70">
-            <span className="font-semibold text-ink">50k+</span> already
-            stopped forgetting.
+          <span className="pill-glass">
+            <Sparkles size={13} className="text-flame-500" />
+            Now in public beta
+          </span>
+          <span className="pill-glass">
+            <span className="flex items-center gap-0.5" aria-label="Rated 4.9 of 5">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Star
+                  key={i}
+                  size={13}
+                  className="fill-amber-400 text-amber-400"
+                />
+              ))}
+            </span>
+            <span className="font-bold">4.9</span>
+            <span className="opacity-60">· 50k+ minds freed</span>
           </span>
         </motion.div>
 
-        {/* Headline */}
+        {/* Headline — Satoshi, white on sky with a gradient pop */}
         <motion.h1
-          initial={reduced ? false : { opacity: 0, y: 20 }}
+          initial={reduced ? false : { opacity: 0, y: 22 }}
           animate={reduced ? undefined : { opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-          className="mx-auto mt-7 max-w-5xl text-center text-hero text-ink"
+          transition={{ duration: 0.75, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
+          className="display-tight mx-auto mt-8 max-w-5xl text-center text-hero sky-text"
         >
           You weren’t built to{" "}
           <span className="relative inline-block">
-            <span className="gradient-text">remember everything</span>
+            <span className="gradient-text-bright">remember everything</span>
             <span
               aria-hidden
-              className="absolute -inset-x-2 -bottom-1 h-1.5 rounded-full bg-gradient-warm opacity-70 blur-[3px]"
+              className="absolute -inset-x-2 -bottom-1 h-1.5 rounded-full bg-gradient-warm opacity-80 blur-[3px]"
             />
           </span>
           .
@@ -62,8 +73,8 @@ export function Hero() {
         <motion.p
           initial={reduced ? false : { opacity: 0, y: 14 }}
           animate={reduced ? undefined : { opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.25 }}
-          className="mx-auto mt-7 max-w-2xl text-center text-[17px] leading-relaxed text-ink/70 sm:text-[18px]"
+          transition={{ duration: 0.6, delay: 0.24 }}
+          className="mx-auto mt-7 max-w-2xl text-center text-[17px] font-medium leading-relaxed text-white/90 sm:text-[19px] [text-shadow:0_1px_18px_rgba(12,74,110,0.35)]"
         >
           Set reminders, capture ideas, and stay in flow — across WhatsApp,
           Telegram, Email, and your web dashboard. One AI that never forgets.
@@ -73,7 +84,7 @@ export function Hero() {
         <motion.div
           initial={reduced ? false : { opacity: 0, y: 12 }}
           animate={reduced ? undefined : { opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.35 }}
+          transition={{ duration: 0.6, delay: 0.34 }}
           className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row"
         >
           <GradientButton
@@ -95,21 +106,25 @@ export function Hero() {
         <motion.p
           initial={reduced ? false : { opacity: 0 }}
           animate={reduced ? undefined : { opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.5 }}
-          className="mt-6 text-center text-[13px] text-ink/55"
+          transition={{ duration: 0.6, delay: 0.48 }}
+          className="mt-6 text-center text-[13px] font-medium text-white/75 [text-shadow:0_1px_12px_rgba(12,74,110,0.3)]"
         >
           No credit card required · Cancel anytime · Setup in 2 minutes
         </motion.p>
 
-        {/* Mockup pair */}
+        {/* Floating glass showcase */}
         <motion.div
-          initial={reduced ? false : { opacity: 0, y: 40 }}
+          initial={reduced ? false : { opacity: 0, y: 44 }}
           animate={reduced ? undefined : { opacity: 1, y: 0 }}
-          transition={{ duration: 0.9, delay: 0.45, ease: [0.22, 1, 0.36, 1] }}
-          className="relative mx-auto mt-20 grid w-full max-w-5xl grid-cols-1 items-end gap-6 md:grid-cols-[1fr_320px] md:gap-10"
+          transition={{ duration: 0.95, delay: 0.42, ease: [0.22, 1, 0.36, 1] }}
+          className="relative mx-auto mt-20 w-full max-w-5xl"
         >
-          <BrowserMockup />
-          <PhoneMockup />
+          {/* frosted tray the mockups float in front of */}
+          <div className="glass-premium absolute inset-x-6 -top-4 bottom-8 rounded-[40px] sm:inset-x-0" />
+          <div className="relative grid grid-cols-1 items-end gap-6 px-2 pt-6 md:grid-cols-[1fr_300px] md:gap-10 md:px-8">
+            <BrowserMockup />
+            <PhoneMockup />
+          </div>
         </motion.div>
       </div>
     </section>
@@ -119,36 +134,18 @@ export function Hero() {
 function FloatingOrbs() {
   return (
     <>
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -top-24 -left-24 h-[460px] w-[460px] rounded-full opacity-70 blur-[110px] animate-orb-drift"
-        style={{
-          background:
-            "radial-gradient(circle, rgba(251,191,36,0.6), transparent 60%)",
-        }}
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute top-1/3 -right-32 h-[520px] w-[520px] rounded-full opacity-60 blur-[130px] animate-orb-drift"
-        style={{
-          background:
-            "radial-gradient(circle, rgba(249,115,22,0.55), transparent 60%)",
-          animationDelay: "-7s",
-        }}
-      />
-
       {/* Decorative mascots */}
-      <div className="pointer-events-none absolute left-[6%] top-[34%] hidden animate-float-slow lg:block">
-        <Mascot variant="glasses" size={88} />
+      <div className="pointer-events-none absolute left-[5%] top-[30%] hidden animate-float-slow lg:block">
+        <Mascot variant="glasses" size={92} />
       </div>
-      <div className="pointer-events-none absolute right-[5%] top-[28%] hidden animate-float-slower lg:block">
-        <Mascot variant="goggles" size={104} hueShift={-12} />
+      <div className="pointer-events-none absolute right-[4%] top-[24%] hidden animate-float-slower lg:block">
+        <Mascot variant="goggles" size={108} hueShift={-12} />
       </div>
-      <div className="pointer-events-none absolute right-[12%] top-[64%] hidden animate-float-fast lg:block">
-        <Mascot variant="hat" size={64} />
+      <div className="pointer-events-none absolute right-[11%] top-[60%] hidden animate-float-fast lg:block">
+        <Mascot variant="hat" size={66} />
       </div>
-      <div className="pointer-events-none absolute left-[10%] bottom-[12%] hidden animate-float-slow xl:block">
-        <Mascot variant="wink" size={72} />
+      <div className="pointer-events-none absolute left-[9%] bottom-[16%] hidden animate-float-slow xl:block">
+        <Mascot variant="wink" size={74} />
       </div>
     </>
   );
@@ -157,8 +154,8 @@ function FloatingOrbs() {
 function BrowserMockup() {
   return (
     <div className="group relative animate-float-slow">
-      <div className="absolute -inset-6 rounded-3xl bg-[radial-gradient(circle_at_30%_30%,rgba(249,115,22,0.25),transparent_65%)] blur-2xl" />
-      <div className="relative overflow-hidden rounded-2xl border border-ink/8 bg-white shadow-[0_30px_70px_-25px_rgba(120,53,15,0.35)]">
+      <div className="absolute -inset-6 rounded-3xl bg-[radial-gradient(circle_at_30%_30%,rgba(56,189,248,0.4),transparent_65%)] blur-2xl" />
+      <div className="relative overflow-hidden rounded-2xl border border-white/70 bg-white shadow-[0_40px_90px_-30px_rgba(20,60,110,0.5)]">
         <div className="flex items-center gap-2 border-b border-ink/8 bg-bg-tint px-4 py-3">
           <span className="h-2.5 w-2.5 rounded-full bg-red-400" />
           <span className="h-2.5 w-2.5 rounded-full bg-yellow-400" />
@@ -230,8 +227,8 @@ function BrowserMockup() {
 function PhoneMockup() {
   return (
     <div className="relative mx-auto w-[260px] animate-float-slower">
-      <div className="absolute -inset-6 rounded-[40px] bg-[radial-gradient(circle_at_70%_30%,rgba(251,191,36,0.35),transparent_65%)] blur-2xl" />
-      <div className="relative rounded-[36px] border border-ink/10 bg-ink p-2 shadow-[0_30px_70px_-20px_rgba(0,0,0,0.35)]">
+      <div className="absolute -inset-6 rounded-[40px] bg-[radial-gradient(circle_at_70%_30%,rgba(125,211,252,0.5),transparent_65%)] blur-2xl" />
+      <div className="relative rounded-[36px] border border-white/60 bg-ink p-2 shadow-[0_40px_80px_-24px_rgba(20,60,110,0.55)]">
         <div className="relative h-[500px] overflow-hidden rounded-[28px] bg-bg-tint">
           <div className="flex items-center justify-between px-5 pt-3 text-[11px] text-ink/55">
             <span>9:41</span>

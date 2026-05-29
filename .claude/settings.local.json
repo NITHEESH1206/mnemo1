@@ -6,7 +6,9 @@
       "Bash(powershell -Command \"Get-Process node -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue\")",
       "Bash(powershell -Command \"Get-Process node -ErrorAction SilentlyContinue | Stop-Process -Force; Remove-Item -Recurse -Force .next -ErrorAction SilentlyContinue; Write-Host 'cleaned'\")",
       "Bash(xxd)",
-      "Bash(awk '/^UPSTASH/ {n=length\\($0\\); printf \"Line %d: total bytes=%d, last char code=%d \\(CR=13, LF=10\\)\\\\n\", NR, n, substr\\($0,n,1\\)~/\\\\r/?13:0}' .env.local)"
+      "Bash(awk '/^UPSTASH/ {n=length\\($0\\); printf \"Line %d: total bytes=%d, last char code=%d \\(CR=13, LF=10\\)\\\\n\", NR, n, substr\\($0,n,1\\)~/\\\\r/?13:0}' .env.local)",
+      "mcp__magic__21st_magic_component_builder",
+      "mcp__magic__logo_search"
     ]
   }
 }

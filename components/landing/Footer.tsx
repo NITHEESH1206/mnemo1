@@ -1,6 +1,7 @@
 "use client";
 
 import { Logo } from "@/components/ui/Logo";
+import { BrandLogo } from "@/components/ui/BrandLogo";
 import { FOOTER_LINKS } from "@/lib/constants";
 
 export function Footer() {
@@ -25,8 +26,11 @@ export function Footer() {
                   <li key={l.label}>
                     <a
                       href={l.href}
-                      className="text-[13.5px] font-medium text-ink/65 transition-colors hover:text-flame-700"
+                      className="inline-flex items-center gap-2 text-[13.5px] font-medium text-ink/65 transition-colors hover:text-flame-700"
                     >
+                      {group === "Integrations" && (
+                        <BrandLogo name={l.label} size={18} />
+                      )}
                       {l.label}
                     </a>
                   </li>

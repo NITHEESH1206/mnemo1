@@ -52,7 +52,7 @@ function TestimonialCard({
   quote,
   rating,
   featured,
-  seed,
+  photo,
 }: {
   name: string;
   role: string;
@@ -60,11 +60,8 @@ function TestimonialCard({
   rating: number;
   featured?: boolean;
   seed: string;
+  photo: string;
 }) {
-  const avatar = `https://api.dicebear.com/7.x/glass/svg?seed=${encodeURIComponent(
-    seed,
-  )}&backgroundColor=fb923c,f97316,fbbf24,ea580c`;
-
   return (
     <article
       className={cn(
@@ -83,11 +80,11 @@ function TestimonialCard({
           ))}
         </div>
         <Image
-          src={avatar}
-          width={44}
-          height={44}
-          alt=""
-          className="h-11 w-11 rounded-full border border-white shadow-[0_4px_12px_rgba(120,53,15,0.18)]"
+          src={photo}
+          width={48}
+          height={48}
+          alt={name}
+          className="h-12 w-12 rounded-full border-2 border-white object-cover shadow-[0_4px_14px_rgba(120,53,15,0.22)]"
           unoptimized
         />
       </div>

@@ -99,6 +99,7 @@ export const TESTIMONIALS = [
     rating: 5,
     featured: true,
     seed: "Priya",
+    photo: "https://randomuser.me/api/portraits/women/68.jpg",
   },
   {
     name: "Marcus L.",
@@ -108,6 +109,7 @@ export const TESTIMONIALS = [
     rating: 5,
     featured: false,
     seed: "Marcus",
+    photo: "https://randomuser.me/api/portraits/men/32.jpg",
   },
   {
     name: "Aiko T.",
@@ -116,6 +118,7 @@ export const TESTIMONIALS = [
     rating: 5,
     featured: false,
     seed: "Aiko",
+    photo: "https://randomuser.me/api/portraits/women/44.jpg",
   },
   {
     name: "Ravi K.",
@@ -124,6 +127,7 @@ export const TESTIMONIALS = [
     rating: 5,
     featured: false,
     seed: "Ravi",
+    photo: "https://randomuser.me/api/portraits/men/75.jpg",
   },
   {
     name: "Sofia M.",
@@ -132,6 +136,7 @@ export const TESTIMONIALS = [
     rating: 5,
     featured: false,
     seed: "Sofia",
+    photo: "https://randomuser.me/api/portraits/women/29.jpg",
   },
   {
     name: "Daniel W.",
@@ -141,6 +146,7 @@ export const TESTIMONIALS = [
     rating: 5,
     featured: false,
     seed: "Daniel",
+    photo: "https://randomuser.me/api/portraits/men/52.jpg",
   },
 ] as const;
 
@@ -172,7 +178,7 @@ export const PRICING: PricingPlan[] = [
     annual: 0,
     blurb: "Perfect for personal use.",
     features: [
-      "10 reminders per day",
+      "20 reminders per month",
       "WhatsApp or Telegram",
       "Basic recurrence",
       "Community support",
@@ -183,8 +189,8 @@ export const PRICING: PricingPlan[] = [
   {
     name: "Supernova",
     category: "Strategic Memory",
-    monthly: 12,
-    annual: 9,
+    monthly: 149,
+    annual: 104,
     blurb: "For power users and solopreneurs.",
     features: [
       "Unlimited reminders",
@@ -201,8 +207,8 @@ export const PRICING: PricingPlan[] = [
   {
     name: "Big Bang",
     category: "Executive Memory",
-    monthly: 39,
-    annual: 29,
+    monthly: 499,
+    annual: 349,
     blurb: "For teams who need to stay in sync.",
     features: [
       "Everything in Supernova",

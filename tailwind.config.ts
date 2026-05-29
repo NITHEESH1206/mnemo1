@@ -35,9 +35,20 @@ const config: Config = {
           700: "#c2410c",
           800: "#9a3412",
         },
+        sky: {
+          50: "#f0f9ff",
+          100: "#e0f2fe",
+          200: "#bae6fd",
+          300: "#7dd3fc",
+          400: "#38bdf8",
+          500: "#0ea5e9",
+          600: "#0284c7",
+          700: "#0369a1",
+        },
       },
       fontFamily: {
-        sans: ["var(--font-inter)", "Inter", "system-ui", "sans-serif"],
+        sans: ["Satoshi", "var(--font-inter)", "Inter", "system-ui", "sans-serif"],
+        display: ["Satoshi", "var(--font-inter)", "Inter", "system-ui", "sans-serif"],
       },
       backgroundImage: {
         "gradient-primary":

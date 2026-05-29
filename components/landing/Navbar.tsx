@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Menu, X, ChevronDown } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import Link from "next/link";
 import { NAV_LINKS } from "@/lib/constants";
 import { Logo } from "@/components/ui/Logo";
@@ -26,8 +26,8 @@ export function Navbar() {
       <header
         className={cn(
           "mx-auto flex max-w-3xl items-center justify-between gap-3 rounded-full px-3 py-2 transition-all duration-300",
-          "glass",
-          scrolled && "shadow-[0_20px_50px_-22px_rgba(120,53,15,0.28)]",
+          "glass-strong",
+          scrolled && "shadow-[0_24px_60px_-24px_rgba(20,60,110,0.4)]",
         )}
       >
         <Link
@@ -46,23 +46,11 @@ export function Navbar() {
             <a
               key={l.href}
               href={l.href}
-              className="group relative inline-flex items-center gap-1 rounded-full px-3.5 py-2 text-[14px] font-semibold text-ink/80 transition-colors hover:text-ink"
+              className="relative inline-flex items-center rounded-full px-3.5 py-2 text-[14px] font-semibold text-ink/80 transition-colors hover:text-ink"
             >
               {l.label}
-              {(l.label === "Features" || l.label === "How it works") && (
-                <ChevronDown
-                  size={13}
-                  className="opacity-60 transition-transform group-hover:translate-y-[1px]"
-                />
-              )}
             </a>
           ))}
-          <a
-            href="#pricing"
-            className="rounded-full px-3.5 py-2 text-[14px] font-semibold text-ink/80 hover:text-ink"
-          >
-            Pricing
-          </a>
         </nav>
 
         <div className="hidden items-center gap-2 md:flex">
