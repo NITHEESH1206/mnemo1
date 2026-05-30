@@ -3,7 +3,6 @@
 import { motion } from "framer-motion";
 import { GradientButton } from "@/components/ui/GradientButton";
 import { Mascot } from "@/components/ui/Mascot";
-import { whatsappCTAUrl } from "@/lib/whatsapp";
 
 export function FinalCTA() {
   return (
@@ -65,15 +64,12 @@ export function FinalCTA() {
             className="relative mt-10 flex flex-col items-center gap-4"
           >
             <GradientButton
-              href={whatsappCTAUrl(
-                "Hi Mnemo! I want to start — please set me up.",
-              )}
-              target="_blank"
+              href="/api/auth/google/login"
               variant="primary"
               size="lg"
               className="px-10 py-5 text-[16px]"
             >
-              Try for Free on WhatsApp — No Card Needed →
+              Try for Free — No Card Needed →
             </GradientButton>
             <p className="text-[13px] text-white/55">
               Setup takes 2 minutes. Cancel anytime.

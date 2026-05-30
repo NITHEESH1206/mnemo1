@@ -6,9 +6,9 @@ import { Check, Play } from "lucide-react";
 import { PricingToggle } from "@/components/ui/PricingToggle";
 import { FAQAccordion } from "@/components/ui/FAQAccordion";
 import { GradientButton } from "@/components/ui/GradientButton";
+import { CheckoutButton } from "@/components/ui/CheckoutButton";
 import { Mascot } from "@/components/ui/Mascot";
 import { FAQS, PRICING, type PricingPlan } from "@/lib/constants";
-import { whatsappCTAUrl } from "@/lib/whatsapp";
 import { cn } from "@/lib/utils";
 
 export function Pricing() {
@@ -190,17 +190,24 @@ function PricingCard({
       </ul>
 
       <div className="mt-7">
-        <GradientButton
-          href={whatsappCTAUrl(
-            `Hi Mnemo! I want to try the ${plan.name} plan.`,
-          )}
-          target="_blank"
-          variant={plan.highlight ? "primary" : "ink"}
-          size="md"
-          className="w-full justify-center"
-        >
-          {plan.cta} →
-        </GradientButton>
+        {price > 0 ? (
+          <CheckoutButton
+            plan={plan.name}
+            billing={billing}
+            variant={plan.highlight ? "primary" : "ink"}
+          >
+            Subscribe · ₹{price}/mo →
+          </CheckoutButton>
+        ) : (
+          <GradientButton
+            href="/api/auth/google/login"
+            variant="ink"
+            size="md"
+            className="w-full justify-center"
+          >
+            {plan.cta} →
+          </GradientButton>
+        )}
       </div>
     </div>
   );

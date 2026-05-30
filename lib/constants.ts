@@ -250,15 +250,8 @@ export const FOOTER_LINKS = {
   Product: [
     { label: "Features", href: "#features" },
     { label: "Pricing", href: "#pricing" },
-    { label: "Changelog", href: "#changelog" },
-    { label: "Roadmap", href: "#roadmap" },
   ],
-  Company: [
-    { label: "About", href: "#about" },
-    { label: "Blog", href: "#blog" },
-    { label: "Careers", href: "#careers" },
-    { label: "Press", href: "#press" },
-  ],
+  Company: [{ label: "About", href: "#about" }],
   Integrations: [
     { label: "WhatsApp", href: "#whatsapp" },
     { label: "Telegram", href: "#telegram" },

@@ -24,6 +24,11 @@ const SCOPES = [
   "https://www.googleapis.com/auth/calendar.events",
 ];
 
+// Lighter scopes for plain web sign-in (no calendar access needed).
+const LOGIN_SCOPES = ["openid", "email", "profile"];
+
+const SESSION_COOKIE = "mnemo_session";
+
 let redisCache: Redis | null = null;
 function redis(): Redis {
   if (redisCache) return redisCache;
@@ -104,6 +109,60 @@ export function authUrl(phone: string): string {
     state: buildState(phone),
   });
 }
+
+/** Generate a sign-in (login/signup) consent URL — email + profile only. */
+export function authUrlForLogin(): string {
+  const client = oauthClient();
+  return client.generateAuthUrl({
+    access_type: "online",
+    prompt: "select_account",
+    scope: LOGIN_SCOPES,
+    state: buildState("login"),
+  });
+}
+
+// ── Minimal signed session cookie (web login) ──────────────────
+function sessionSecret(): string {
+  return (
+    process.env.GOOGLE_CLIENT_SECRET ||
+    process.env.CRON_SECRET ||
+    "mnemo-dev-secret"
+  );
+}
+
+export function signSession(email: string): string {
+  const payload = Buffer.from(
+    JSON.stringify({ email, t: Date.now() }),
+  ).toString("base64url");
+  const sig = crypto
+    .createHmac("sha256", sessionSecret())
+    .update(payload)
+    .digest("base64url")
+    .slice(0, 24);
+  return `${payload}.${sig}`;
+}
+
+export function readSession(
+  cookieValue: string | undefined,
+): { email: string } | null {
+  if (!cookieValue) return null;
+  const [payload, sig] = cookieValue.split(".");
+  if (!payload || !sig) return null;
+  const expected = crypto
+    .createHmac("sha256", sessionSecret())
+    .update(payload)
+    .digest("base64url")
+    .slice(0, 24);
+  if (sig !== expected) return null;
+  try {
+    const data = JSON.parse(Buffer.from(payload, "base64url").toString());
+    return { email: data.email };
+  } catch {
+    return null;
+  }
+}
+
+export const SESSION_COOKIE_NAME = SESSION_COOKIE;
 
 /** Exchange an authorization code for tokens + the user's email. */
 export async function exchangeCodeForTokens(

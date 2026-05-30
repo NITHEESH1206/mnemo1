@@ -4,7 +4,6 @@ import { motion, useReducedMotion } from "framer-motion";
 import { Star, Play, Check, MessageCircle, Mic, Sparkles } from "lucide-react";
 import { GradientButton } from "@/components/ui/GradientButton";
 import { Mascot } from "@/components/ui/Mascot";
-import { whatsappCTAUrl } from "@/lib/whatsapp";
 
 export function Hero() {
   const reduced = useReducedMotion();
@@ -14,10 +13,18 @@ export function Hero() {
       {/* ── Blue sky stage ───────────────────────────────── */}
       <div className="sky-stage" aria-hidden="true">
         <div className="sky-sun" />
-        <div className="cloud cloud-1" />
-        <div className="cloud cloud-2" />
-        <div className="cloud cloud-3" />
-        <div className="cloud cloud-4" />
+        <div className="cloud cloud-1">
+          <CloudShape />
+        </div>
+        <div className="cloud cloud-2">
+          <CloudShape />
+        </div>
+        <div className="cloud cloud-3">
+          <CloudShape />
+        </div>
+        <div className="cloud cloud-4">
+          <CloudShape />
+        </div>
       </div>
 
       {/* Floating mascot accents (warm orbs pop against the blue) */}
@@ -87,15 +94,8 @@ export function Hero() {
           transition={{ duration: 0.6, delay: 0.34 }}
           className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row"
         >
-          <GradientButton
-            href={whatsappCTAUrl(
-              "Hi Mnemo! I'd like to try the free trial — let's start.",
-            )}
-            target="_blank"
-            variant="primary"
-            size="lg"
-          >
-            Try for Free on WhatsApp →
+          <GradientButton href="/api/auth/google/login" variant="primary" size="lg">
+            Try for Free →
           </GradientButton>
           <GradientButton href="#how-it-works" variant="glass" size="lg">
             <Play size={15} className="fill-current" />
@@ -119,9 +119,8 @@ export function Hero() {
           transition={{ duration: 0.95, delay: 0.42, ease: [0.22, 1, 0.36, 1] }}
           className="relative mx-auto mt-20 w-full max-w-5xl"
         >
-          {/* frosted tray the mockups float in front of */}
-          <div className="glass-premium absolute inset-x-6 -top-4 bottom-8 rounded-[40px] sm:inset-x-0" />
-          <div className="relative grid grid-cols-1 items-end gap-6 px-2 pt-6 md:grid-cols-[1fr_300px] md:gap-10 md:px-8">
+          {/* No frosted tray — the sky, clouds and animation stay fully visible */}
+          <div className="relative grid grid-cols-1 items-end gap-6 md:grid-cols-[1fr_300px] md:gap-10">
             <BrowserMockup />
             <PhoneMockup />
           </div>
@@ -134,20 +133,38 @@ export function Hero() {
 function FloatingOrbs() {
   return (
     <>
-      {/* Decorative mascots */}
-      <div className="pointer-events-none absolute left-[5%] top-[30%] hidden animate-float-slow lg:block">
+      {/* Decorative mascots — z-20 keeps them in front of the mockups */}
+      <div className="pointer-events-none absolute left-[5%] top-[30%] z-20 hidden animate-float-slow lg:block">
         <Mascot variant="glasses" size={92} />
       </div>
-      <div className="pointer-events-none absolute right-[4%] top-[24%] hidden animate-float-slower lg:block">
+      <div className="pointer-events-none absolute right-[4%] top-[24%] z-20 hidden animate-float-slower lg:block">
         <Mascot variant="goggles" size={108} hueShift={-12} />
       </div>
-      <div className="pointer-events-none absolute right-[11%] top-[60%] hidden animate-float-fast lg:block">
-        <Mascot variant="hat" size={66} />
+      <div className="pointer-events-none absolute right-[6%] top-[58%] z-20 hidden animate-float-fast lg:block">
+        <Mascot variant="hat" size={70} />
       </div>
-      <div className="pointer-events-none absolute left-[9%] bottom-[16%] hidden animate-float-slow xl:block">
-        <Mascot variant="wink" size={74} />
+      <div className="pointer-events-none absolute left-[7%] bottom-[14%] z-20 hidden animate-float-slow xl:block">
+        <Mascot variant="wink" size={78} />
       </div>
     </>
+  );
+}
+
+function CloudShape() {
+  return (
+    <svg viewBox="0 0 240 120" fill="none" preserveAspectRatio="xMidYMid meet">
+      <g fill="#ffffff">
+        <ellipse cx="62" cy="78" rx="48" ry="30" />
+        <ellipse cx="116" cy="58" rx="54" ry="40" />
+        <ellipse cx="166" cy="74" rx="46" ry="30" />
+        <ellipse cx="198" cy="84" rx="34" ry="22" />
+        <rect x="40" y="74" width="170" height="34" rx="17" />
+      </g>
+      {/* subtle top sheen for dimension */}
+      <g fill="#ffffff" opacity="0.65">
+        <ellipse cx="110" cy="50" rx="40" ry="22" />
+      </g>
+    </svg>
   );
 }
 

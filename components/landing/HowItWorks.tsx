@@ -134,9 +134,12 @@ function OnboardingMock() {
           </div>
         ))}
       </div>
-      <button className="btn-primary mt-6 w-full py-2.5 text-[13px]">
+      <a
+        href="/pricing"
+        className="btn-primary mt-6 w-full py-2.5 text-[13px]"
+      >
         Continue
-      </button>
+      </a>
     </div>
   );
 }
