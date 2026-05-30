@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { GradientButton } from "@/components/ui/GradientButton";
+import { whatsappCTAUrl } from "@/lib/whatsapp";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 declare global {
@@ -76,7 +77,10 @@ export function CheckoutButton({
           });
           const vd = await v.json();
           if (vd.verified) {
-            alert(`Payment successful — welcome to Mnemo ${data.plan}! 🎉`);
+            // Paid — now send them to WhatsApp to start using Mnemo.
+            window.location.href = whatsappCTAUrl(
+              `Hi Mnemo! I just subscribed to the ${data.plan} plan — let's get started.`,
+            );
           } else {
             alert(
               "We couldn't verify the payment. If money was deducted, it'll auto-refund or contact support.",

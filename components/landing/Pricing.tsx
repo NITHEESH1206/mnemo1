@@ -9,6 +9,7 @@ import { GradientButton } from "@/components/ui/GradientButton";
 import { CheckoutButton } from "@/components/ui/CheckoutButton";
 import { Mascot } from "@/components/ui/Mascot";
 import { FAQS, PRICING, type PricingPlan } from "@/lib/constants";
+import { whatsappCTAUrl } from "@/lib/whatsapp";
 import { cn } from "@/lib/utils";
 
 export function Pricing() {
@@ -200,7 +201,10 @@ function PricingCard({
           </CheckoutButton>
         ) : (
           <GradientButton
-            href="/api/auth/google/login"
+            href={whatsappCTAUrl(
+              `Hi Mnemo! I'm on the ${plan.name} plan — let's get started.`,
+            )}
+            target="_blank"
             variant="ink"
             size="md"
             className="w-full justify-center"
