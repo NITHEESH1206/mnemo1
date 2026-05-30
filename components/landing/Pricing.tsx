@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Check, Play } from "lucide-react";
 import { PricingToggle } from "@/components/ui/PricingToggle";
@@ -14,10 +14,30 @@ import { cn } from "@/lib/utils";
 
 export function Pricing() {
   const [billing, setBilling] = useState<"monthly" | "annual">("annual");
+  const [welcome, setWelcome] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    setWelcome(params.get("welcome") === "1");
+  }, []);
 
   return (
     <section id="pricing" className="section relative overflow-hidden">
       <div className="container-x relative z-10">
+        {welcome && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="mx-auto mb-10 flex max-w-2xl items-center justify-center gap-2.5 rounded-2xl border border-emerald-200 bg-emerald-50/80 px-5 py-3.5 text-center"
+          >
+            <span className="text-[15px]">✅</span>
+            <span className="text-[14.5px] font-medium text-emerald-900">
+              You’re signed in! Pick a plan below to start using Mnemo.
+            </span>
+          </motion.div>
+        )}
+
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}

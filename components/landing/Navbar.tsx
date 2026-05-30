@@ -33,6 +33,13 @@ export function Navbar() {
           href="/"
           aria-label="Mnemo home"
           className="shrink-0 pl-2.5 pr-1"
+          onClick={(e) => {
+            // If already on the homepage, smooth-scroll to top instead of reloading.
+            if (window.location.pathname === "/") {
+              e.preventDefault();
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }
+          }}
         >
           <Logo />
         </Link>

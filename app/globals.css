@@ -35,10 +35,10 @@
   --gradient-dark: linear-gradient(135deg, #292524 0%, #0c0a09 100%);
 
   /* Sky */
-  --sky-top: #1a86e0;
-  --sky-mid: #4fb0f2;
-  --sky-low: #a9def8;
-  --sky-haze: #ddf2fc;
+  --sky-top: #2a93e0;
+  --sky-mid: #6fc0f5;
+  --sky-low: #bce5fd;
+  --sky-haze: #e8f6ff;
 }
 
 * {
@@ -111,72 +111,71 @@ body {
   );
 }
 
-/* Warm sun bloom — ties the blue sky to the orange brand (softer now) */
+/* Warm sun bloom — ties the blue sky to the orange brand */
 .sky-sun {
   position: absolute;
-  top: -180px;
-  right: -100px;
-  width: 480px;
-  height: 480px;
+  top: -160px;
+  right: -80px;
+  width: 620px;
+  height: 620px;
   border-radius: 9999px;
   background: radial-gradient(
     circle,
-    rgba(255, 246, 222, 0.7) 0%,
-    rgba(255, 216, 156, 0.4) 28%,
-    rgba(251, 146, 60, 0.16) 52%,
-    transparent 72%
+    rgba(255, 244, 214, 0.95) 0%,
+    rgba(255, 214, 153, 0.6) 24%,
+    rgba(251, 146, 60, 0.28) 46%,
+    transparent 70%
   );
-  filter: blur(4px);
+  filter: blur(6px);
   pointer-events: none;
 }
 
-/* Crisp SVG cloud shapes — clearly visible, no blur */
+/* Soft, blurred cloud puffs */
 .cloud {
   position: absolute;
   pointer-events: none;
+  background:
+    radial-gradient(circle at 30% 60%, #fff 0%, rgba(255, 255, 255, 0.92) 38%, transparent 70%),
+    radial-gradient(circle at 60% 45%, #fff 0%, rgba(255, 255, 255, 0.9) 42%, transparent 72%),
+    radial-gradient(circle at 48% 70%, #fff 0%, rgba(255, 255, 255, 0.88) 46%, transparent 74%);
+  filter: blur(16px);
+  opacity: 0.9;
   will-change: transform;
-}
-.cloud svg {
-  width: 100%;
-  height: 100%;
-  display: block;
-  filter: drop-shadow(0 10px 22px rgba(30, 80, 140, 0.14));
 }
 
 .cloud-1 {
-  top: 15%;
-  left: -12%;
-  width: 300px;
-  height: 130px;
-  opacity: 0.98;
-  animation: cloudDrift 70s linear infinite;
+  top: 14%;
+  left: -10%;
+  width: 360px;
+  height: 150px;
+  animation: cloudDrift 64s linear infinite;
 }
 .cloud-2 {
-  top: 32%;
-  left: 28%;
-  width: 380px;
-  height: 165px;
-  opacity: 0.92;
-  animation: cloudDrift 96s linear infinite;
-  animation-delay: -24s;
+  top: 30%;
+  left: 30%;
+  width: 480px;
+  height: 180px;
+  opacity: 0.8;
+  animation: cloudDrift 90s linear infinite;
+  animation-delay: -20s;
 }
 .cloud-3 {
-  top: 10%;
-  left: 60%;
-  width: 250px;
-  height: 110px;
-  opacity: 0.9;
-  animation: cloudDrift 82s linear infinite;
-  animation-delay: -44s;
+  top: 9%;
+  left: 62%;
+  width: 300px;
+  height: 120px;
+  opacity: 0.75;
+  animation: cloudDrift 78s linear infinite;
+  animation-delay: -40s;
 }
 .cloud-4 {
-  top: 50%;
-  left: 6%;
-  width: 340px;
-  height: 145px;
-  opacity: 0.85;
-  animation: cloudDrift 116s linear infinite;
-  animation-delay: -68s;
+  top: 48%;
+  left: 8%;
+  width: 420px;
+  height: 160px;
+  opacity: 0.55;
+  animation: cloudDrift 110s linear infinite;
+  animation-delay: -65s;
 }
 
 @keyframes cloudDrift {

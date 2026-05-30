@@ -13,18 +13,10 @@ export function Hero() {
       {/* ── Blue sky stage ───────────────────────────────── */}
       <div className="sky-stage" aria-hidden="true">
         <div className="sky-sun" />
-        <div className="cloud cloud-1">
-          <CloudShape />
-        </div>
-        <div className="cloud cloud-2">
-          <CloudShape />
-        </div>
-        <div className="cloud cloud-3">
-          <CloudShape />
-        </div>
-        <div className="cloud cloud-4">
-          <CloudShape />
-        </div>
+        <div className="cloud cloud-1" />
+        <div className="cloud cloud-2" />
+        <div className="cloud cloud-3" />
+        <div className="cloud cloud-4" />
       </div>
 
       {/* Floating mascot accents (warm orbs pop against the blue) */}
@@ -150,23 +142,6 @@ function FloatingOrbs() {
   );
 }
 
-function CloudShape() {
-  return (
-    <svg viewBox="0 0 240 120" fill="none" preserveAspectRatio="xMidYMid meet">
-      <g fill="#ffffff">
-        <ellipse cx="62" cy="78" rx="48" ry="30" />
-        <ellipse cx="116" cy="58" rx="54" ry="40" />
-        <ellipse cx="166" cy="74" rx="46" ry="30" />
-        <ellipse cx="198" cy="84" rx="34" ry="22" />
-        <rect x="40" y="74" width="170" height="34" rx="17" />
-      </g>
-      {/* subtle top sheen for dimension */}
-      <g fill="#ffffff" opacity="0.65">
-        <ellipse cx="110" cy="50" rx="40" ry="22" />
-      </g>
-    </svg>
-  );
-}
 
 function BrowserMockup() {
   return (
