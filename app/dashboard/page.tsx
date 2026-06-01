@@ -1,3 +1,5 @@
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { TopBar } from "@/components/dashboard/TopBar";
 import {
@@ -8,13 +10,22 @@ import { ChannelsCard } from "@/components/dashboard/ChannelsCard";
 import { CalendarStrip } from "@/components/dashboard/CalendarStrip";
 import { ActivityFeed } from "@/components/dashboard/ActivityFeed";
 import { StatsCard } from "@/components/dashboard/StatsCard";
+import { readSession, SESSION_COOKIE_NAME } from "@/lib/google";
 
 export const metadata = {
   title: "Dashboard — Mnemo",
   description: "Your AI memory layer at a glance.",
 };
 
+export const dynamic = "force-dynamic";
+
 export default function DashboardPage() {
+  // Gate: only signed-in users can see the dashboard.
+  const session = readSession(cookies().get(SESSION_COOKIE_NAME)?.value);
+  if (!session) {
+    redirect("/api/auth/google/login");
+  }
+
   return (
     <div className="min-h-screen">
       <Sidebar />

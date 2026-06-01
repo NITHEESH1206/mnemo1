@@ -21,13 +21,15 @@ export type ReminderStatus = "pending" | "sent" | "cancelled";
 
 export type Reminder = {
   id: string;
-  userPhone: string;
+  userPhone: string; // who created it
   task: string;
   fireAt: string; // ISO timestamp
   recurrence: Recurrence;
   weekday?: number;
   status: ReminderStatus;
   createdAt: string;
+  recipientPhone?: string; // friend-to-friend: who gets pinged (defaults to creator)
+  recipientName?: string; // display name of the friend
 };
 
 let cached: Redis | null = null;
@@ -55,6 +57,8 @@ export async function createReminder(input: {
   fireAt: Date;
   recurrence: Recurrence;
   weekday?: number;
+  recipientPhone?: string;
+  recipientName?: string;
 }): Promise<Reminder> {
   const id = crypto.randomBytes(8).toString("hex");
   const r: Reminder = {
@@ -66,6 +70,8 @@ export async function createReminder(input: {
     weekday: input.weekday,
     status: "pending",
     createdAt: new Date().toISOString(),
+    recipientPhone: input.recipientPhone,
+    recipientName: input.recipientName,
   };
   const ts = input.fireAt.getTime();
   const client = redis();
@@ -140,4 +146,69 @@ export async function cancelReminderForUser(
   await client.set(reminderKey(target.id), r);
   await client.zrem(DUE_KEY, target.id);
   return r;
+}
+
+// ── Contacts (for friend-to-friend reminders) ──────────────────
+// Stored as a Redis hash per user: contacts:<userPhone> { name -> phone }
+
+const contactsKey = (phone: string) => `contacts:${phone}`;
+
+export async function addContact(
+  ownerPhone: string,
+  name: string,
+  contactPhone: string,
+): Promise<void> {
+  await redis().hset(contactsKey(ownerPhone), {
+    [name.toLowerCase()]: contactPhone,
+  });
+}
+
+export async function getContacts(
+  ownerPhone: string,
+): Promise<Record<string, string>> {
+  const all = await redis().hgetall<Record<string, string>>(
+    contactsKey(ownerPhone),
+  );
+  return all ?? {};
+}
+
+export async function findContact(
+  ownerPhone: string,
+  name: string,
+): Promise<string | null> {
+  const all = await getContacts(ownerPhone);
+  return all[name.toLowerCase()] ?? null;
+}
+
+export async function removeContact(
+  ownerPhone: string,
+  name: string,
+): Promise<boolean> {
+  const key = contactsKey(ownerPhone);
+  const exists = await redis().hget(key, name.toLowerCase());
+  if (exists === null || exists === undefined) return false;
+  await redis().hdel(key, name.toLowerCase());
+  return true;
+}
+
+// ── Subscriptions (payment log) ────────────────────────────────
+
+export type Subscription = {
+  plan: string;
+  billing: string;
+  email?: string;
+  orderId: string;
+  paymentId: string;
+  amount: number;
+  createdAt: string;
+};
+
+export async function recordSubscription(sub: Subscription): Promise<void> {
+  const client = redis();
+  await client.set(`subscription:${sub.orderId}`, sub);
+  // Keep a chronological index for easy admin lookups.
+  await client.zadd("subscriptions", {
+    score: Date.now(),
+    member: sub.orderId,
+  });
 }

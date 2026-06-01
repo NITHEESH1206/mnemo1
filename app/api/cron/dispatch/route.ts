@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { findDue, markSentOrReschedule } from "@/lib/store";
 import { sendWhatsApp } from "@/lib/twilio";
-import { reminderFireMessage } from "@/lib/messages";
+import { reminderFireMessage, friendReminderFireMessage } from "@/lib/messages";
 import { nextOccurrence } from "@/lib/scheduler";
 
 export const runtime = "nodejs";
@@ -32,7 +32,12 @@ export async function GET(req: NextRequest) {
 
   for (const r of due) {
     try {
-      await sendWhatsApp({ to: r.userPhone, body: reminderFireMessage(r) });
+      // Friend-to-friend reminders fire to the recipient; otherwise the creator.
+      const to = r.recipientPhone || r.userPhone;
+      const body = r.recipientPhone
+        ? friendReminderFireMessage(r, r.recipientName)
+        : reminderFireMessage(r);
+      await sendWhatsApp({ to, body });
       const next = nextOccurrence(r);
       await markSentOrReschedule(r.id, next);
       results.push({ id: r.id, status: "sent" });

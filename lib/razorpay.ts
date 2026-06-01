@@ -64,6 +64,24 @@ export async function createOrder(
   return (await res.json()) as RazorpayOrder;
 }
 
+/** Fetch an order (to read its amount + notes after payment). */
+export async function fetchOrder(orderId: string): Promise<{
+  amount: number;
+  notes?: Record<string, string>;
+} | null> {
+  const { id, secret } = creds();
+  const auth = Buffer.from(`${id}:${secret}`).toString("base64");
+  const res = await fetch(`https://api.razorpay.com/v1/orders/${orderId}`, {
+    headers: { Authorization: `Basic ${auth}` },
+  });
+  if (!res.ok) return null;
+  const data = (await res.json()) as {
+    amount: number;
+    notes?: Record<string, string>;
+  };
+  return { amount: data.amount, notes: data.notes };
+}
+
 /**
  * Verify the signature Razorpay returns after a successful checkout.
  * signature = HMAC_SHA256(order_id + "|" + payment_id, key_secret)

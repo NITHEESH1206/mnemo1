@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { verifyPaymentSignature } from "@/lib/razorpay";
+import { fetchOrder, verifyPaymentSignature } from "@/lib/razorpay";
+import { recordSubscription } from "@/lib/store";
+import { readSession, SESSION_COOKIE_NAME } from "@/lib/google";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -40,7 +42,25 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ verified: false }, { status: 400 });
     }
 
-    // TODO: mark this user as subscribed in your store here.
+    // Record the verified payment (best-effort — never block the user on it).
+    try {
+      const order = await fetchOrder(razorpay_order_id);
+      const session = readSession(
+        req.cookies.get(SESSION_COOKIE_NAME)?.value,
+      );
+      await recordSubscription({
+        plan: order?.notes?.plan ?? "unknown",
+        billing: order?.notes?.billing ?? "unknown",
+        email: session?.email,
+        orderId: razorpay_order_id,
+        paymentId: razorpay_payment_id,
+        amount: order?.amount ?? 0,
+        createdAt: new Date().toISOString(),
+      });
+    } catch (recErr) {
+      console.error("[razorpay/verify] record failed", recErr);
+    }
+
     return NextResponse.json({ verified: true });
   } catch (err) {
     const msg = err instanceof Error ? err.message : "Verification failed";

@@ -32,6 +32,8 @@ export type ParsedReminder = {
     /** What the user actually said ("meet with ashok"); used as event title. */
     summary: string;
   };
+  /** Friend-to-friend: the person who should receive this reminder, if any. */
+  recipientName?: string;
 };
 
 export type ParseResult =
@@ -100,10 +102,29 @@ export function parseReminder(text: string, now: Date = new Date()): ParseResult
     };
   }
 
-  let body = original
-    .replace(/^remind\s+me\s+to\s+/i, "")
-    .replace(/^remind\s+me\s+/i, "")
-    .replace(/^remind\s+/i, "")
+  // Detect a recipient: "remind <name> to <task>" / "remind <name> at <time> …"
+  // ("me" / "myself" mean self.)
+  let recipientName: string | undefined;
+  let working = original;
+
+  const meMatch = working.match(/^remind\s+(me|myself)\b\s*/i);
+  if (meMatch) {
+    working = working.slice(meMatch[0].length);
+  } else {
+    const nameMatch = working.match(
+      /^remind\s+([a-z][a-z'.-]+(?:\s+[a-z][a-z'.-]+)?)\s+(to|at|by|in|on|tomorrow|today|every|next|about)\b/i,
+    );
+    if (nameMatch && !isTaskVerb(nameMatch[1])) {
+      recipientName = nameMatch[1].trim();
+      // strip "remind <name> " but keep the connector word for time/task parsing
+      working = working.replace(/^remind\s+[^]*?(?=\b(to|at|by|in|on|tomorrow|today|every|next|about)\b)/i, "");
+    } else {
+      working = working.replace(/^remind\s+/i, "");
+    }
+  }
+
+  let body = working
+    .replace(/^to\s+/i, "")
     .trim();
 
   let recurrence: Recurrence = "none";
@@ -244,8 +265,42 @@ export function parseReminder(text: string, now: Date = new Date()): ParseResult
 
   return {
     ok: true,
-    reminder: { task: body, fireAt, recurrence, weekday, meeting },
+    reminder: { task: body, fireAt, recurrence, weekday, meeting, recipientName },
   };
+}
+
+// Words that look like a name slot but are really the task verb, so
+// "remind me to call" / "remind to buy milk" aren't read as a recipient.
+const TASK_VERBS = new Set([
+  "call",
+  "buy",
+  "pay",
+  "send",
+  "pick",
+  "drink",
+  "go",
+  "add",
+  "review",
+  "check",
+  "email",
+  "text",
+  "message",
+  "book",
+  "submit",
+  "finish",
+  "start",
+  "water",
+  "take",
+  "bring",
+  "get",
+  "do",
+  "wish",
+  "renew",
+  "schedule",
+]);
+
+function isTaskVerb(word: string): boolean {
+  return TASK_VERBS.has(word.trim().split(/\s+/)[0].toLowerCase());
 }
 
 function detectMeetingIntent(

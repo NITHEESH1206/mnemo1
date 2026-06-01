@@ -2,19 +2,30 @@ import { NextRequest, NextResponse } from "next/server";
 import twilio from "twilio";
 import { parseReminder } from "@/lib/parser";
 import {
+  addContact,
   cancelReminderForUser,
   createReminder,
+  findContact,
+  getContacts,
   listForUser,
+  removeContact,
 } from "@/lib/store";
 import {
+  badAddMessage,
   cancelledMessage,
   confirmationMessage,
   connectGoogleMessage,
+  contactAddedMessage,
+  contactForgottenMessage,
+  contactNotFoundMessage,
+  contactsListMessage,
   disconnectedGoogleMessage,
+  friendConfirmationMessage,
   helpMessage,
   listMessage,
   meetingConfirmationMessage,
   meetingNeedsConnectMessage,
+  needContactMessage,
   notFoundMessage,
   welcomeMessage,
 } from "@/lib/messages";
@@ -119,6 +130,37 @@ export async function POST(req: NextRequest) {
       return twimlResponse(twiml);
     }
 
+    // --- Contacts (for friend-to-friend reminders) ----------------------
+    if (/^(contacts|people)\b/.test(lower)) {
+      const contacts = await getContacts(from);
+      twiml.message(contactsListMessage(contacts));
+      return twimlResponse(twiml);
+    }
+    const addMatch = body.match(
+      /^add\s+([a-z][a-z'.\- ]*?)\s+(\+?\d[\d\s-]{6,})\s*$/i,
+    );
+    if (/^add\b/i.test(lower)) {
+      if (!addMatch) {
+        twiml.message(badAddMessage());
+        return twimlResponse(twiml);
+      }
+      const name = addMatch[1].trim();
+      const digits = addMatch[2].replace(/[^\d+]/g, "");
+      const e164 = digits.startsWith("+") ? digits : `+${digits}`;
+      await addContact(from, name, `whatsapp:${e164}`);
+      twiml.message(contactAddedMessage(name, e164));
+      return twimlResponse(twiml);
+    }
+    const forgetMatch = body.match(/^forget\s+([a-z][a-z'.\- ]*?)\s*$/i);
+    if (forgetMatch) {
+      const name = forgetMatch[1].trim();
+      const ok = await removeContact(from, name);
+      twiml.message(
+        ok ? contactForgottenMessage(name) : contactNotFoundMessage(name),
+      );
+      return twimlResponse(twiml);
+    }
+
     // --- Google integration commands ------------------------------------
     if (/^connect\s+google\b/.test(lower) || /^connect\s+gcal\b/.test(lower)) {
       const base =
@@ -141,6 +183,26 @@ export async function POST(req: NextRequest) {
       return twimlResponse(twiml);
     }
     const r = parsed.reminder;
+
+    // Friend-to-friend: "remind <name> to <task> at <time>"
+    if (r.recipientName) {
+      const contactPhone = await findContact(from, r.recipientName);
+      if (!contactPhone) {
+        twiml.message(needContactMessage(r.recipientName));
+        return twimlResponse(twiml);
+      }
+      const friendReminder = await createReminder({
+        userPhone: from,
+        task: r.task,
+        fireAt: r.fireAt,
+        recurrence: r.recurrence,
+        weekday: r.weekday,
+        recipientPhone: contactPhone,
+        recipientName: r.recipientName,
+      });
+      twiml.message(friendConfirmationMessage(friendReminder, r.recipientName));
+      return twimlResponse(twiml);
+    }
 
     // Always store a Mnemo reminder so we ping the user at fire time.
     const created = await createReminder({

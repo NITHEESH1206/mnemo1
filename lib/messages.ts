@@ -24,6 +24,11 @@ export function helpMessage(): string {
     "• <thing> every day at 7am",
     "• <thing> every friday at 9am",
     "",
+    "*nudge a friend*",
+    "• add james +919876543210 — save a contact",
+    "• remind james to call me at 6pm",
+    "• contacts — see your people · forget <name>",
+    "",
     "*housekeeping*",
     "• list — see what's pending",
     "• cancel <number> — drop one",
@@ -77,6 +82,82 @@ export function cancelledMessage(r: Reminder): string {
 
 export function notFoundMessage(): string {
   return "can't find that one. type *list* to see what's actually pending.";
+}
+
+// ── Friend-to-friend + contacts ──────────────────────────────
+
+export function friendConfirmationMessage(
+  r: Reminder,
+  recipientName: string,
+): string {
+  const repeat =
+    r.recurrence !== "none" ? ` · repeats ${r.recurrence}` : "";
+  const who = capitalize(recipientName);
+  return [
+    `done — i'll nudge *${who}* for you.`,
+    "",
+    `*${r.task}*`,
+    `${formatHuman(r.fireAt)}${repeat}`,
+  ].join("\n");
+}
+
+export function friendReminderFireMessage(
+  r: Reminder,
+  recipientName?: string,
+): string {
+  const repeatNote =
+    r.recurrence !== "none"
+      ? `\n_(repeats ${r.recurrence})_`
+      : "";
+  return `⏰ a friendly nudge${recipientName ? `, ${capitalize(recipientName)}` : ""} — *${r.task}*\n\n_(set for you by a friend via Mnemo)_${repeatNote}`;
+}
+
+export function needContactMessage(name: string): string {
+  const who = capitalize(name);
+  return [
+    `i don't have ${who}'s number yet.`,
+    "",
+    `add them first: *add ${name.toLowerCase()} +91XXXXXXXXXX*`,
+    "then try your reminder again.",
+  ].join("\n");
+}
+
+export function contactAddedMessage(name: string, phone: string): string {
+  return `saved *${capitalize(name)}* (${phone}). now you can say "remind ${name.toLowerCase()} to call me at 6pm".`;
+}
+
+export function contactsListMessage(contacts: Record<string, string>): string {
+  const entries = Object.entries(contacts);
+  if (entries.length === 0) {
+    return "no contacts yet. add one: *add james +91XXXXXXXXXX*";
+  }
+  const lines = entries.map(
+    ([name, phone], i) => `${i + 1}. *${capitalize(name)}* — ${phone}`,
+  );
+  return ["your people:", "", lines.join("\n"), "", "remove one: *forget <name>*"].join(
+    "\n",
+  );
+}
+
+export function contactForgottenMessage(name: string): string {
+  return `removed *${capitalize(name)}* from your contacts.`;
+}
+
+export function contactNotFoundMessage(name: string): string {
+  return `i don't have anyone called *${capitalize(name)}*. type *contacts* to see who i know.`;
+}
+
+export function badAddMessage(): string {
+  return [
+    "to add a contact: *add <name> <phone>*",
+    "example: *add james +919876543210*",
+    "(include the country code with +)",
+  ].join("\n");
+}
+
+function capitalize(s: string): string {
+  if (!s) return s;
+  return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
 export function connectGoogleMessage(link: string): string {
