@@ -148,6 +148,77 @@ export async function cancelReminderForUser(
   return r;
 }
 
+export async function getReminderById(id: string): Promise<Reminder | null> {
+  return (await redis().get<Reminder>(reminderKey(id))) ?? null;
+}
+
+/** Mark a reminder complete (done) — removes it from the due queue. */
+export async function completeReminder(id: string): Promise<Reminder | null> {
+  const client = redis();
+  const r = await client.get<Reminder>(reminderKey(id));
+  if (!r) return null;
+  r.status = "sent";
+  await client.set(reminderKey(id), r);
+  await client.zrem(DUE_KEY, id);
+  return r;
+}
+
+/** Push a reminder to a new time. */
+export async function snoozeReminder(
+  id: string,
+  newDate: Date,
+): Promise<Reminder | null> {
+  const client = redis();
+  const r = await client.get<Reminder>(reminderKey(id));
+  if (!r) return null;
+  r.fireAt = newDate.toISOString();
+  r.status = "pending";
+  const ts = newDate.getTime();
+  await client.set(reminderKey(id), r);
+  await client.zadd(DUE_KEY, { score: ts, member: id });
+  await client.zadd(userKey(r.userPhone), { score: ts, member: id });
+  return r;
+}
+
+/** Update an existing reminder's task / time / recurrence. */
+export async function updateReminder(
+  id: string,
+  fields: {
+    task?: string;
+    fireAt?: Date;
+    recurrence?: Recurrence;
+    weekday?: number;
+  },
+): Promise<Reminder | null> {
+  const client = redis();
+  const r = await client.get<Reminder>(reminderKey(id));
+  if (!r) return null;
+  if (fields.task !== undefined) r.task = fields.task;
+  if (fields.recurrence !== undefined) r.recurrence = fields.recurrence;
+  if (fields.weekday !== undefined) r.weekday = fields.weekday;
+  if (fields.fireAt) {
+    r.fireAt = fields.fireAt.toISOString();
+    r.status = "pending";
+    const ts = fields.fireAt.getTime();
+    await client.zadd(DUE_KEY, { score: ts, member: id });
+    await client.zadd(userKey(r.userPhone), { score: ts, member: id });
+  }
+  await client.set(reminderKey(id), r);
+  return r;
+}
+
+// Track the reminder most recently delivered to an address, so the recipient
+// can reply "done" / "snooze" without a number.
+const lastFiredKey = (addr: string) => `lastfired:${addr}`;
+
+export async function setLastFired(addr: string, id: string): Promise<void> {
+  await redis().set(lastFiredKey(addr), id, { ex: 60 * 60 * 24 });
+}
+
+export async function getLastFired(addr: string): Promise<string | null> {
+  return (await redis().get<string>(lastFiredKey(addr))) ?? null;
+}
+
 // ── Contacts (for friend-to-friend reminders) ──────────────────
 // Stored as a Redis hash per user: contacts:<userPhone> { name -> phone }
 
