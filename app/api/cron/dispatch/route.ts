@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { findDue, markSentOrReschedule } from "@/lib/store";
-import { sendWhatsApp } from "@/lib/twilio";
+import { sendMessage } from "@/lib/notify";
 import { reminderFireMessage, friendReminderFireMessage } from "@/lib/messages";
 import { nextOccurrence } from "@/lib/scheduler";
 
@@ -37,7 +37,7 @@ export async function GET(req: NextRequest) {
       const body = r.recipientPhone
         ? friendReminderFireMessage(r, r.recipientName)
         : reminderFireMessage(r);
-      await sendWhatsApp({ to, body });
+      await sendMessage(to, body);
       const next = nextOccurrence(r);
       await markSentOrReschedule(r.id, next);
       results.push({ id: r.id, status: "sent" });

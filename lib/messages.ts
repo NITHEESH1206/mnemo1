@@ -155,6 +155,64 @@ export function badAddMessage(): string {
   ].join("\n");
 }
 
+// ── Plan linking + free-tier limit ───────────────────────────
+
+export function linkedPlanMessage(plan: string): string {
+  return [
+    `🎉 your *${capitalize(plan)}* plan is now active on this number.`,
+    "",
+    "unlimited reminders unlocked. go wild.",
+  ].join("\n");
+}
+
+export function badLinkMessage(): string {
+  return "that activation code didn't work or has expired. grab a fresh one from the pricing page after subscribing.";
+}
+
+export function connectNotionMessage(link: string): string {
+  return [
+    "let's connect notion — your memory trunk. 📒",
+    "",
+    "tap this link, then pick a page or database to share with mnemo:",
+    link,
+    "",
+    "after that, your reminders + notes get saved there automatically.",
+  ].join("\n");
+}
+
+export function disconnectedNotionMessage(): string {
+  return "notion is unlinked. type *connect notion* anytime to hook it back up.";
+}
+
+export function noteSavedMessage(text: string): string {
+  const short = text.length > 60 ? text.slice(0, 57) + "…" : text;
+  return `📝 saved to notion: *${short}*`;
+}
+
+export function noteUsageMessage(): string {
+  return "tell me what to note. try: *note pick up the parcel tomorrow*";
+}
+
+export function notionNotConnectedMessage(): string {
+  return "connect notion first: type *connect notion*.";
+}
+
+export function notionNoTargetMessage(): string {
+  return "i'm connected to notion but couldn't find a page to write to. open notion → share a page (or database) with the Mnemo integration, then try again.";
+}
+
+export function limitReachedMessage(): string {
+  const base = process.env.NEXT_PUBLIC_BASE_URL?.replace(/\/$/, "") || "";
+  const link = base ? `${base}/pricing` : "the pricing page";
+  return [
+    "you've used all *20* free reminders this month. 😅",
+    "",
+    `upgrade for unlimited reminders + every channel: ${link}`,
+    "",
+    "(your free reminders reset next month.)",
+  ].join("\n");
+}
+
 function capitalize(s: string): string {
   if (!s) return s;
   return s.charAt(0).toUpperCase() + s.slice(1);
@@ -175,10 +233,26 @@ export function disconnectedGoogleMessage(): string {
   return "google calendar is unlinked. type *connect google* anytime to hook it back up.";
 }
 
+export function connectOutlookMessage(link: string): string {
+  return [
+    "let's hook up your outlook calendar.",
+    "",
+    "tap this link and sign in with your microsoft account:",
+    link,
+    "",
+    "once connected, say \"meet with ashok tomorrow at 11am\" and i'll create the event + a teams link.",
+  ].join("\n");
+}
+
+export function disconnectedOutlookMessage(): string {
+  return "outlook calendar is unlinked. type *connect outlook* anytime to hook it back up.";
+}
+
 export function meetingConfirmationMessage(
   r: Reminder,
   meetLink: string | undefined,
   eventLink: string | undefined,
+  videoLabel = "video call",
 ): string {
   const repeat =
     r.recurrence !== "none" ? ` · repeats ${r.recurrence}` : "";
@@ -189,7 +263,7 @@ export function meetingConfirmationMessage(
     `${formatHuman(r.fireAt)}${repeat}`,
   ];
   if (meetLink) {
-    lines.push("", `google meet: ${meetLink}`);
+    lines.push("", `${videoLabel}: ${meetLink}`);
   }
   if (eventLink) {
     lines.push(`event: ${eventLink}`);
@@ -200,7 +274,8 @@ export function meetingConfirmationMessage(
 
 export function meetingNeedsConnectMessage(
   r: Reminder,
-  connectLink: string,
+  googleLink: string,
+  outlookLink: string,
 ): string {
   return [
     "consider it remembered.",
@@ -208,8 +283,9 @@ export function meetingNeedsConnectMessage(
     `*${r.task}*`,
     formatHuman(r.fireAt),
     "",
-    "want me to auto-create this on google calendar with a meet link?",
-    `tap to connect: ${connectLink}`,
+    "want me to auto-create this on your calendar with a video link?",
+    `• google: ${googleLink}`,
+    `• outlook: ${outlookLink}`,
   ].join("\n");
 }
 

@@ -212,3 +212,72 @@ export async function recordSubscription(sub: Subscription): Promise<void> {
     member: sub.orderId,
   });
 }
+
+// ── Plans, account linking & monthly usage ─────────────────────
+
+export const FREE_MONTHLY_LIMIT = 20;
+
+const planKey = (phone: string) => `plan:${phone}`;
+const emailKey = (phone: string) => `email:${phone}`;
+const linkTokenKey = (token: string) => `linktoken:${token}`;
+const monthKey = (phone: string, ym: string) => `rcount:${phone}:${ym}`;
+
+function yyyymm(d: Date = new Date()): string {
+  return `${d.getUTCFullYear()}${String(d.getUTCMonth() + 1).padStart(2, "0")}`;
+}
+
+/** Returns the plan name for a phone, or "free" if unlinked. */
+export async function getPlan(phone: string): Promise<string> {
+  return (await redis().get<string>(planKey(phone))) ?? "free";
+}
+
+export async function setPlan(
+  phone: string,
+  plan: string,
+  email?: string,
+): Promise<void> {
+  await redis().set(planKey(phone), plan);
+  if (email) await redis().set(emailKey(phone), email);
+}
+
+/** True for any paid tier (anything that isn't the free/Origin plan). */
+export function isPaidPlan(plan: string): boolean {
+  const p = plan.trim().toLowerCase();
+  return p !== "" && p !== "free" && p !== "origin";
+}
+
+/** Create a one-time link code that activates a plan on a WhatsApp number. */
+export async function createLinkToken(
+  plan: string,
+  email?: string,
+): Promise<string> {
+  const token = crypto.randomBytes(4).toString("hex").toUpperCase(); // 8 chars
+  await redis().set(
+    linkTokenKey(token),
+    { plan, email: email ?? null },
+    { ex: 60 * 60 * 24 }, // 24h
+  );
+  return token;
+}
+
+export async function consumeLinkToken(
+  token: string,
+): Promise<{ plan: string; email?: string } | null> {
+  const key = linkTokenKey(token.trim().toUpperCase());
+  const data = await redis().get<{ plan: string; email?: string }>(key);
+  if (!data) return null;
+  await redis().del(key);
+  return data;
+}
+
+export async function getMonthlyCount(phone: string): Promise<number> {
+  const c = await redis().get<number>(monthKey(phone, yyyymm()));
+  return c ?? 0;
+}
+
+export async function incrMonthlyCount(phone: string): Promise<number> {
+  const key = monthKey(phone, yyyymm());
+  const n = await redis().incr(key);
+  if (n === 1) await redis().expire(key, 60 * 60 * 24 * 40); // ~40 days
+  return n;
+}

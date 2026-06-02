@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { fetchOrder, verifyPaymentSignature } from "@/lib/razorpay";
-import { recordSubscription } from "@/lib/store";
+import { createLinkToken, recordSubscription } from "@/lib/store";
 import { readSession, SESSION_COOKIE_NAME } from "@/lib/google";
 
 export const runtime = "nodejs";
@@ -42,14 +42,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ verified: false }, { status: 400 });
     }
 
-    // Record the verified payment (best-effort — never block the user on it).
+    // Record the verified payment + mint an activation code (best-effort).
+    let linkToken: string | null = null;
+    let plan = "unknown";
     try {
       const order = await fetchOrder(razorpay_order_id);
       const session = readSession(
         req.cookies.get(SESSION_COOKIE_NAME)?.value,
       );
+      plan = order?.notes?.plan ?? "Supernova";
       await recordSubscription({
-        plan: order?.notes?.plan ?? "unknown",
+        plan,
         billing: order?.notes?.billing ?? "unknown",
         email: session?.email,
         orderId: razorpay_order_id,
@@ -57,11 +60,12 @@ export async function POST(req: NextRequest) {
         amount: order?.amount ?? 0,
         createdAt: new Date().toISOString(),
       });
+      linkToken = await createLinkToken(plan, session?.email);
     } catch (recErr) {
       console.error("[razorpay/verify] record failed", recErr);
     }
 
-    return NextResponse.json({ verified: true });
+    return NextResponse.json({ verified: true, linkToken, plan });
   } catch (err) {
     const msg = err instanceof Error ? err.message : "Verification failed";
     console.error("[razorpay/verify]", msg);

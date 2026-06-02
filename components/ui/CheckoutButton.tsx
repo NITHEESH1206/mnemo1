@@ -77,10 +77,17 @@ export function CheckoutButton({
           });
           const vd = await v.json();
           if (vd.verified) {
-            // Paid — now send them to WhatsApp to start using Mnemo.
-            window.location.href = whatsappCTAUrl(
-              `Hi Mnemo! I just subscribed to the ${data.plan} plan — let's get started.`,
-            );
+            // Paid — send them to the activation page (shows the link code
+            // + WhatsApp button to unlock the plan on their number).
+            if (vd.linkToken) {
+              window.location.href = `/activate?token=${encodeURIComponent(
+                vd.linkToken,
+              )}&plan=${encodeURIComponent(vd.plan || data.plan)}`;
+            } else {
+              window.location.href = whatsappCTAUrl(
+                `Hi Mnemo! I just subscribed to the ${data.plan} plan.`,
+              );
+            }
           } else {
             alert(
               "We couldn't verify the payment. If money was deducted, it'll auto-refund or contact support.",
