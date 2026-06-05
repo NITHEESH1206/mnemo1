@@ -10,22 +10,22 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://mnemo.ai"),
+  metadataBase: new URL("https://feru.ai"),
   title: {
-    default: "Mnemo — Your AI memory layer. Everywhere you work.",
-    template: "%s · Mnemo",
+    default: "Feru AI — Your AI memory layer. Everywhere you work.",
+    template: "%s · Feru AI",
   },
   description:
     "Set reminders, capture ideas, and stay in flow — across WhatsApp, Telegram, Email, and your web dashboard. One AI that never forgets.",
   openGraph: {
-    title: "Mnemo — Your AI memory layer.",
+    title: "Feru AI — Your AI memory layer.",
     description:
       "One AI that never forgets. Across WhatsApp, Telegram, Email, and your web dashboard.",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Mnemo — Your AI memory layer.",
+    title: "Feru AI — Your AI memory layer.",
     description: "One AI that never forgets.",
   },
 };

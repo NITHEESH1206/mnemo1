@@ -79,7 +79,7 @@ export function LiveReminders({
         </div>
         <p className="mt-2 text-[14px] text-ink/65">
           Your reminders live on WhatsApp. After you subscribe, send the
-          activation code to Mnemo on WhatsApp to link this account — then
+          activation code to Feru AI on WhatsApp to link this account — then
           they’ll show up here, live.
         </p>
         <a
@@ -128,7 +128,7 @@ export function LiveReminders({
 
         {items.length === 0 ? (
           <p className="text-[14px] text-ink/55">
-            All clear. Add one above, or just text Mnemo on WhatsApp.
+            All clear. Add one above, or just text Feru AI on WhatsApp.
           </p>
         ) : (
           <ul className="space-y-2">

@@ -53,7 +53,7 @@ export function FinalCTA() {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="relative mx-auto mt-6 max-w-xl text-[17px] text-white/70"
           >
-            Join 50,000+ people who let Mnemo handle their memory.
+            Join 50,000+ people who let Feru AI handle their memory.
           </motion.p>
 
           <motion.div

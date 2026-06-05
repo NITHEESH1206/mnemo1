@@ -1,8 +1,8 @@
-# Mnemo
+# Feru AI
 
 > Your AI memory layer. Everywhere you work.
 
-A premium SaaS landing page and WhatsApp reminder bot for **Mnemo** — a calm, intelligent AI memory layer that captures reminders, ideas, and tasks across WhatsApp, Telegram, Email, and the web.
+A premium SaaS landing page and WhatsApp reminder bot for **Feru AI** — a calm, intelligent AI memory layer that captures reminders, ideas, and tasks across WhatsApp, Telegram, Email, and the web.
 
 Built with Next.js 14 (App Router), TypeScript, Tailwind CSS, Framer Motion, and **Twilio Programmable Messaging** for the WhatsApp bot.
 

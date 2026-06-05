@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
   const title = sp.get("title")?.trim() || "Reminder";
   const startRaw = sp.get("start") || "";
   const dur = parseInt(sp.get("dur") || "30", 10);
-  const desc = sp.get("desc") || "Created by Mnemo";
+  const desc = sp.get("desc") || "Created by Feru AI";
 
   let startISO: string;
   const asNum = Number(startRaw);
@@ -39,7 +39,7 @@ export async function GET(req: NextRequest) {
     status: 200,
     headers: {
       "Content-Type": "text/calendar; charset=utf-8",
-      "Content-Disposition": 'attachment; filename="mnemo-event.ics"',
+      "Content-Disposition": 'attachment; filename="feru-event.ics"',
     },
   });
 }

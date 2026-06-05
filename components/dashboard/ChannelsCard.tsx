@@ -12,7 +12,7 @@ export function ChannelsCard() {
           Connected Channels
         </div>
         <div className="text-[12.5px] text-ink/55">
-          Mnemo listens here and replies on the same channel.
+          Feru AI listens here and replies on the same channel.
         </div>
       </div>
 

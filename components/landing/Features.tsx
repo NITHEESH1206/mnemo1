@@ -19,7 +19,7 @@ const CARDS: FeatureCard[] = [
   {
     title: "Unlimited reminders",
     blurb:
-      "Daily, weekly, monthly, or custom. Set it once and Mnemo handles it forever.",
+      "Daily, weekly, monthly, or custom. Set it once and Feru AI handles it forever.",
     mascot: "glasses",
     tone: "amber",
   },
@@ -33,7 +33,7 @@ const CARDS: FeatureCard[] = [
   {
     title: "Memory everywhere",
     blurb:
-      "WhatsApp, Telegram, Email, Web — Mnemo answers wherever you happen to be.",
+      "WhatsApp, Telegram, Email, Web — Feru AI answers wherever you happen to be.",
     mascot: "goggles",
     tone: "ink",
   },
@@ -47,14 +47,14 @@ const CARDS: FeatureCard[] = [
   {
     title: "Friend reminders",
     blurb:
-      "Send reminders to people you care about. They get a friendly nudge from Mnemo.",
+      "Send reminders to people you care about. They get a friendly nudge from Feru AI.",
     mascot: "hat",
     tone: "flame",
   },
   {
     title: "Voice-to-action",
     blurb:
-      "Just speak. Mnemo transcribes, understands, and acts — in any language.",
+      "Just speak. Feru AI transcribes, understands, and acts — in any language.",
     mascot: "headphones",
     tone: "amber",
     hueShift: 10,
@@ -99,7 +99,7 @@ export function Features() {
               that can’t do it all.
             </h2>
             <p className="mt-5 max-w-xl text-[17px] text-ink/65">
-              Mnemo sits quietly across all your tools, capturing what matters
+              Feru AI sits quietly across all your tools, capturing what matters
               and surfacing it exactly when you need it.
             </p>
           </motion.div>

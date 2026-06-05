@@ -33,7 +33,7 @@ export function Pricing() {
           >
             <span className="text-[15px]">✅</span>
             <span className="text-[14.5px] font-medium text-emerald-900">
-              You’re signed in! Pick a plan below to start using Mnemo.
+              You’re signed in! Pick a plan below to start using Feru AI.
             </span>
           </motion.div>
         )}
@@ -222,7 +222,7 @@ function PricingCard({
         ) : (
           <GradientButton
             href={whatsappCTAUrl(
-              `Hi Mnemo! I'm on the ${plan.name} plan — let's get started.`,
+              `Hi Feru AI! I'm on the ${plan.name} plan — let's get started.`,
             )}
             target="_blank"
             variant="ink"

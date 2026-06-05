@@ -10,7 +10,7 @@ export function ActivityFeed() {
           Recent Activity
         </div>
         <div className="text-[12.5px] text-ink/55">
-          Last actions Mnemo took on your behalf.
+          Last actions Feru AI took on your behalf.
         </div>
       </div>
 

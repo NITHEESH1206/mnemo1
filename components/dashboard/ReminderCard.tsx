@@ -109,7 +109,7 @@ export function QuickAddCard() {
       <div className="mb-4">
         <div className="text-[15.5px] font-extrabold text-ink">Quick Add</div>
         <div className="text-[12.5px] text-ink/55">
-          Speak or type in plain English — Mnemo figures out the rest.
+          Speak or type in plain English — Feru AI figures out the rest.
         </div>
       </div>
       <div className="flex items-center gap-2 rounded-xl border border-ink/8 bg-bg-tint/60 p-2">

@@ -337,7 +337,7 @@ export async function handleIncomingMessage(params: {
   if (/^note\b/i.test(lower)) {
     const noteText = body.replace(/^note\s*/i, "").trim();
     if (!noteText) return noteUsageMessage();
-    const result = await notionSave(from, noteText, "Captured via Mnemo.");
+    const result = await notionSave(from, noteText, "Captured via Feru AI.");
     if (result.ok) return noteSavedMessage(noteText);
     if (result.reason === "not_connected") return notionNotConnectedMessage();
     if (result.reason === "no_target") return notionNoTargetMessage();
@@ -403,7 +403,7 @@ export async function handleIncomingMessage(params: {
         if (!auth) throw new Error("not_connected");
         const event = await createCalendarEvent(from, {
           summary,
-          description: "Created from chat by Mnemo.",
+          description: "Created from chat by Feru AI.",
           startISO: r.fireAt.toISOString(),
           durationMinutes: 60,
         });
@@ -452,7 +452,7 @@ export async function handleIncomingMessage(params: {
       await notionSave(
         from,
         created.task,
-        `Reminder · ${new Date(created.fireAt).toISOString()} · via Mnemo`,
+        `Reminder · ${new Date(created.fireAt).toISOString()} · via Feru AI`,
       );
     }
   } catch (e) {

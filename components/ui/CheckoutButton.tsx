@@ -66,7 +66,7 @@ export function CheckoutButton({
         order_id: data.orderId,
         amount: data.amount,
         currency: data.currency,
-        name: "Mnemo",
+        name: "Feru AI",
         description: `${data.plan} plan · billed ${data.billing}`,
         theme: { color: "#f97316" },
         handler: async (resp: Record<string, string>) => {
@@ -85,7 +85,7 @@ export function CheckoutButton({
               )}&plan=${encodeURIComponent(vd.plan || data.plan)}`;
             } else {
               window.location.href = whatsappCTAUrl(
-                `Hi Mnemo! I just subscribed to the ${data.plan} plan.`,
+                `Hi Feru AI! I just subscribed to the ${data.plan} plan.`,
               );
             }
           } else {

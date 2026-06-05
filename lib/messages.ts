@@ -2,7 +2,7 @@ import type { Reminder } from "./store";
 
 export function welcomeMessage(): string {
   return [
-    "alright, your brain just got an upgrade. i'm Mnemo.",
+    "alright, your brain just got an upgrade. i'm Feru AI.",
     "",
     "just tell me what to remember:",
     "• 'remind me to call james tomorrow at 3pm'",
@@ -142,7 +142,7 @@ export function friendReminderFireMessage(
     r.recurrence !== "none"
       ? `\n_(repeats ${r.recurrence})_`
       : "";
-  return `⏰ a friendly nudge${recipientName ? `, ${capitalize(recipientName)}` : ""} — *${r.task}*\n\n_(set for you by a friend via Mnemo)_${repeatNote}\n\n_reply *done* or *snooze 30m*_`;
+  return `⏰ a friendly nudge${recipientName ? `, ${capitalize(recipientName)}` : ""} — *${r.task}*\n\n_(set for you by a friend via Feru AI)_${repeatNote}\n\n_reply *done* or *snooze 30m*_`;
 }
 
 export function needContactMessage(name: string): string {
@@ -206,7 +206,7 @@ export function connectNotionMessage(link: string): string {
   return [
     "let's connect notion — your memory trunk. 📒",
     "",
-    "tap this link, then pick a page or database to share with mnemo:",
+    "tap this link, then pick a page or database to share with Feru AI:",
     link,
     "",
     "after that, your reminders + notes get saved there automatically.",
@@ -231,7 +231,7 @@ export function notionNotConnectedMessage(): string {
 }
 
 export function notionNoTargetMessage(): string {
-  return "i'm connected to notion but couldn't find a page to write to. open notion → share a page (or database) with the Mnemo integration, then try again.";
+  return "i'm connected to notion but couldn't find a page to write to. open notion → share a page (or database) with the Feru AI integration, then try again.";
 }
 
 export function limitReachedMessage(): string {

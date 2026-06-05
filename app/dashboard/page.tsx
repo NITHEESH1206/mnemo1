@@ -11,7 +11,7 @@ import { readSession, SESSION_COOKIE_NAME } from "@/lib/google";
 import { getPhoneForEmail, listForUser } from "@/lib/store";
 
 export const metadata = {
-  title: "Dashboard — Mnemo",
+  title: "Dashboard — Feru AI",
   description: "Your AI memory layer at a glance.",
 };
 

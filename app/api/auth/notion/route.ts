@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
   const phone = req.nextUrl.searchParams.get("phone");
   if (!phone) {
     return new NextResponse(
-      "Missing `phone`. Open this link from your Mnemo chat.",
+      "Missing `phone`. Open this link from your Feru AI chat.",
       { status: 400 },
     );
   }

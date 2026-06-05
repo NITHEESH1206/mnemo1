@@ -3,7 +3,7 @@
  *
  * Required env:
  *   RESEND_API_KEY   (https://resend.com → API Keys)
- *   EMAIL_FROM       e.g. "Mnemo <mnemo@yourdomain.com>" (verified domain)
+ *   EMAIL_FROM       e.g. "Feru AI <feru@yourdomain.com>" (verified domain)
  */
 
 export async function sendEmail(

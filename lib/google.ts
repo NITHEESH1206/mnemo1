@@ -271,7 +271,7 @@ export async function createCalendarEvent(
     requestBody: {
       summary: input.summary,
       description:
-        (input.description ?? "") + "\n\n(created by mnemo)",
+        (input.description ?? "") + "\n\n(created by Feru AI)",
       start: { dateTime: start.toISOString(), timeZone: tz },
       end: { dateTime: end.toISOString(), timeZone: tz },
       attendees: input.attendeeEmails?.map((email) => ({ email })),

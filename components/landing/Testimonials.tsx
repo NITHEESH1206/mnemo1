@@ -23,7 +23,7 @@ export function Testimonials() {
             who finally stopped forgetting.
           </h2>
           <p className="mx-auto mt-5 max-w-xl text-[17px] text-ink/65">
-            Real words from real people who let Mnemo handle their memory.
+            Real words from real people who let Feru AI handle their memory.
           </p>
         </motion.div>
 

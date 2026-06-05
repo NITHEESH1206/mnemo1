@@ -31,7 +31,7 @@ export function Navbar() {
       >
         <Link
           href="/"
-          aria-label="Mnemo home"
+          aria-label="Feru AI home"
           className="shrink-0 pl-2.5 pr-1"
           onClick={(e) => {
             // If already on the homepage, smooth-scroll to top instead of reloading.

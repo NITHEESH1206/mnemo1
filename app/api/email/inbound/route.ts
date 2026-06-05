@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic";
  *   - application/json    ({ from, subject, text })
  *
  * Optional shared secret: ?secret=<INBOUND_EMAIL_TOKEN>.
- * Replies to the sender via Resend with Mnemo's answer.
+ * Replies to the sender via Resend with Feru AI's answer.
  */
 export async function POST(req: NextRequest) {
   const secret = process.env.INBOUND_EMAIL_TOKEN;
@@ -53,13 +53,13 @@ export async function POST(req: NextRequest) {
 
   try {
     const reply = await handleIncomingMessage({ from, text: command, baseUrl });
-    await sendEmail(addr, "Re: Mnemo", reply);
+    await sendEmail(addr, "Re: Feru AI", reply);
   } catch (err) {
     console.error("[email/inbound] error", err);
     try {
       await sendEmail(
         addr,
-        "Re: Mnemo",
+        "Re: Feru AI",
         "my brain glitched for a sec. try that again, or reply 'help'.",
       );
     } catch {

@@ -17,7 +17,7 @@ export async function sendMessage(to: string, body: string): Promise<void> {
   }
   if (to.startsWith("email:")) {
     const addr = to.slice("email:".length);
-    await sendEmail(addr, "Your Mnemo reminder", body);
+    await sendEmail(addr, "Your Feru AI reminder", body);
     return;
   }
   // Default to WhatsApp (handles "whatsapp:+..." addresses).

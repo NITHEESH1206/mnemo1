@@ -91,7 +91,7 @@ export default function ActivatePage() {
 
         <p className="mt-6 text-[12.5px] leading-relaxed text-ink/55">
           On WhatsApp, send <span className="font-semibold">{command}</span> to
-          Mnemo to unlock unlimited reminders on your number.
+          Feru AI to unlock unlimited reminders on your number.
         </p>
       </div>
     </main>

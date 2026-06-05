@@ -18,7 +18,7 @@ export function whatsappCTAUrl(prefilled?: string): string {
   const joinCode = process.env.NEXT_PUBLIC_WHATSAPP_JOIN_CODE;
   const text = joinCode
     ? `join ${joinCode}`
-    : prefilled || "Hi Mnemo! I'd like to get started.";
+    : prefilled || "Hi Feru AI! I'd like to get started.";
   return `https://wa.me/${num}?text=${encodeURIComponent(text)}`;
 }
 

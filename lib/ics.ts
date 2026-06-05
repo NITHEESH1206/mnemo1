@@ -42,7 +42,7 @@ export function buildICS(opts: {
   return [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
-    "PRODID:-//Mnemo//Reminder//EN",
+    "PRODID:-//Feru AI//Reminder//EN",
     "CALSCALE:GREGORIAN",
     "METHOD:PUBLISH",
     "BEGIN:VEVENT",

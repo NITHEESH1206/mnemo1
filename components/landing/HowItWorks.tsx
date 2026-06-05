@@ -151,7 +151,7 @@ function ChatMock() {
         <div className="grid h-9 w-9 place-items-center rounded-full bg-gradient-primary text-[12px] font-extrabold text-white shadow-[0_4px_14px_rgba(249,115,22,0.4)]">
           M
         </div>
-        <div className="text-[13px] font-extrabold text-ink">Mnemo</div>
+        <div className="text-[13px] font-extrabold text-ink">Feru AI</div>
         <span className="ml-auto text-[10.5px] font-semibold text-emerald-600">
           ● online
         </span>

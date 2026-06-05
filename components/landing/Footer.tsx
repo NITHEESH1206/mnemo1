@@ -42,7 +42,7 @@ export function Footer() {
 
         <div className="mt-16 flex flex-col items-center justify-between gap-5 border-t border-ink/8 pt-8 md:flex-row">
           <p className="text-[12.5px] text-ink/60">
-            © 2026 Mnemo. Built for humans who have better things to remember.
+            © 2026 Feru AI. Built for humans who have better things to remember.
           </p>
           <div className="flex items-center gap-3">
             <a

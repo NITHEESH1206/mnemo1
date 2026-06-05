@@ -66,7 +66,7 @@ export function Hero() {
           </span>
           .
           <br className="hidden sm:block" />
-          Mnemo is.
+          Feru AI is.
         </motion.h1>
 
         <motion.p
@@ -153,7 +153,7 @@ function BrowserMockup() {
           <span className="h-2.5 w-2.5 rounded-full bg-yellow-400" />
           <span className="h-2.5 w-2.5 rounded-full bg-emerald-400" />
           <div className="ml-3 flex h-6 flex-1 items-center rounded-md border border-ink/8 bg-white px-3 text-[11px] text-ink/55">
-            app.mnemo.ai/dashboard
+            app.feru.ai/dashboard
           </div>
         </div>
 
@@ -231,7 +231,7 @@ function PhoneMockup() {
               M
             </div>
             <div>
-              <div className="text-[12px] font-semibold text-ink">Mnemo</div>
+              <div className="text-[12px] font-semibold text-ink">Feru AI</div>
               <div className="text-[10px] text-emerald-600">online</div>
             </div>
           </div>
@@ -253,7 +253,7 @@ function PhoneMockup() {
 
           <div className="absolute inset-x-3 bottom-3 flex items-center gap-2 rounded-full border border-ink/10 bg-white px-3 py-2 text-[11px] text-ink/55">
             <MessageCircle size={12} />
-            Message Mnemo…
+            Message Feru AI…
             <Mic size={12} className="ml-auto text-flame-500" />
           </div>
         </div>

@@ -1,5 +1,5 @@
 export const SITE = {
-  name: "Mnemo",
+  name: "Feru AI",
   tagline: "Your AI memory layer. Everywhere you work.",
   subTagline:
     "Set reminders, capture ideas, and stay in flow — across WhatsApp, Telegram, Email, and your web dashboard. One AI that never forgets.",
@@ -40,7 +40,7 @@ export const FEATURES = [
     icon: "🔁",
     title: "Smart Recurrence",
     description:
-      "Daily, weekly, monthly, or custom. Set it once and Mnemo handles the rest forever.",
+      "Daily, weekly, monthly, or custom. Set it once and Feru AI handles the rest forever.",
   },
   {
     icon: "📅",
@@ -58,7 +58,7 @@ export const FEATURES = [
     icon: "🎙️",
     title: "Voice-to-Action",
     description:
-      "Just speak. Mnemo transcribes, understands, and acts — in any language.",
+      "Just speak. Feru AI transcribes, understands, and acts — in any language.",
   },
 ] as const;
 
@@ -73,7 +73,7 @@ export const STEPS = [
     num: "02",
     title: "Just talk to it",
     description:
-      "Type or speak naturally. ‘Remind me to call James tomorrow at 3pm’ or ‘Add oat milk to my shopping list’ — Mnemo gets it.",
+      "Type or speak naturally. ‘Remind me to call James tomorrow at 3pm’ or ‘Add oat milk to my shopping list’ — Feru AI gets it.",
   },
   {
     num: "03",
@@ -95,7 +95,7 @@ export const TESTIMONIALS = [
     name: "Priya S.",
     role: "Founder, Hexa Labs",
     quote:
-      "I used to miss follow-ups constantly. Mnemo changed that in day one.",
+      "I used to miss follow-ups constantly. Feru AI changed that in day one.",
     rating: 5,
     featured: true,
     seed: "Priya",

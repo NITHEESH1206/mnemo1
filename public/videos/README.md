@@ -1,4 +1,4 @@
-# Mnemo Video Backgrounds
+# Feru AI Video Backgrounds
 
 Drop the following `.mp4` files in this directory:
 

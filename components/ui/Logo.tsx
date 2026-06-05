@@ -36,8 +36,8 @@ export function Logo({
         </svg>
       </span>
       {showText && (
-        <span className="text-[19px] font-extrabold tracking-tight text-ink lowercase">
-          mnemo
+        <span className="text-[19px] font-extrabold tracking-tight text-ink">
+          Feru AI
         </span>
       )}
     </span>
