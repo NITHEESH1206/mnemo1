@@ -29,21 +29,32 @@ export function helpMessage(): string {
     "• remind james to call me at 6pm",
     "• contacts — see your people · forget <name>",
     "",
+    "*lists*",
+    "• add milk to shopping list",
+    "• show shopping list · lists · clear shopping list",
+    "",
+    "*capture a note* (saved to Notion if connected)",
+    "• note pick up the parcel tomorrow",
+    "",
     "*housekeeping*",
     "• list — see what's pending",
+    "• done — check off the last one (or *done 2*)",
+    "• snooze 30m — push it back (or *snooze 2 1h*)",
+    "• edit 2 call James at 5pm — change one",
     "• cancel <number> — drop one",
+    "• timezone <city> — set your timezone",
     "• help — this menu",
   ].join("\n");
 }
 
-export function confirmationMessage(r: Reminder): string {
+export function confirmationMessage(r: Reminder, tz?: string): string {
   const repeat =
     r.recurrence !== "none" ? ` · repeats ${r.recurrence}` : "";
   return [
     "consider it remembered.",
     "",
     `*${r.task}*`,
-    `${formatHuman(r.fireAt)}${repeat}`,
+    `${formatHuman(r.fireAt, tz)}${repeat}`,
     "",
     "you can forget now.",
   ].join("\n");
@@ -54,16 +65,16 @@ export function reminderFireMessage(r: Reminder): string {
     r.recurrence !== "none"
       ? `\n_(repeats ${r.recurrence} — i'll be back next time.)_`
       : "";
-  return `⏰ heads up — *${r.task}*${repeatNote}`;
+  return `⏰ heads up — *${r.task}*${repeatNote}\n\n_reply *done* or *snooze 30m*_`;
 }
 
-export function listMessage(reminders: Reminder[]): string {
+export function listMessage(reminders: Reminder[], tz?: string): string {
   if (reminders.length === 0) {
     return "your queue is empty. living dangerously, i see. try: 'remind me to call james tomorrow at 3pm'.";
   }
   const lines = reminders.slice(0, 15).map((r, i) => {
     const rec = r.recurrence !== "none" ? ` · repeats ${r.recurrence}` : "";
-    return `${i + 1}. *${r.task}* — ${formatHuman(r.fireAt)}${rec}`;
+    return `${i + 1}. *${r.task}* — ${formatHuman(r.fireAt, tz)}${rec}`;
   });
   const more =
     reminders.length > 15 ? `\n\n…and ${reminders.length - 15} more.` : "";
@@ -80,6 +91,27 @@ export function cancelledMessage(r: Reminder): string {
   return `*${r.task}* — forgotten. you're welcome.`;
 }
 
+export function doneMessage(r: Reminder): string {
+  return `✅ nice — *${r.task}* checked off.`;
+}
+
+export function snoozedMessage(r: Reminder, tz?: string): string {
+  return `😴 snoozed *${r.task}* → ${formatHuman(r.fireAt, tz)}.`;
+}
+
+export function editedMessage(r: Reminder, tz?: string): string {
+  const repeat = r.recurrence !== "none" ? ` · repeats ${r.recurrence}` : "";
+  return `✏️ updated:\n\n*${r.task}*\n${formatHuman(r.fireAt, tz)}${repeat}`;
+}
+
+export function nothingToActMessage(): string {
+  return "nothing recent to act on. reply *list* and use the number, e.g. *done 2*.";
+}
+
+export function editUsageMessage(): string {
+  return "to edit: *edit <number> <new reminder>* — e.g. *edit 2 call James at 5pm*. type *list* for numbers.";
+}
+
 export function notFoundMessage(): string {
   return "can't find that one. type *list* to see what's actually pending.";
 }
@@ -89,6 +121,7 @@ export function notFoundMessage(): string {
 export function friendConfirmationMessage(
   r: Reminder,
   recipientName: string,
+  tz?: string,
 ): string {
   const repeat =
     r.recurrence !== "none" ? ` · repeats ${r.recurrence}` : "";
@@ -97,7 +130,7 @@ export function friendConfirmationMessage(
     `done — i'll nudge *${who}* for you.`,
     "",
     `*${r.task}*`,
-    `${formatHuman(r.fireAt)}${repeat}`,
+    `${formatHuman(r.fireAt, tz)}${repeat}`,
   ].join("\n");
 }
 
@@ -109,7 +142,7 @@ export function friendReminderFireMessage(
     r.recurrence !== "none"
       ? `\n_(repeats ${r.recurrence})_`
       : "";
-  return `⏰ a friendly nudge${recipientName ? `, ${capitalize(recipientName)}` : ""} — *${r.task}*\n\n_(set for you by a friend via Mnemo)_${repeatNote}`;
+  return `⏰ a friendly nudge${recipientName ? `, ${capitalize(recipientName)}` : ""} — *${r.task}*\n\n_(set for you by a friend via Mnemo)_${repeatNote}\n\n_reply *done* or *snooze 30m*_`;
 }
 
 export function needContactMessage(name: string): string {
@@ -253,6 +286,7 @@ export function meetingConfirmationMessage(
   meetLink: string | undefined,
   eventLink: string | undefined,
   videoLabel = "video call",
+  tz?: string,
 ): string {
   const repeat =
     r.recurrence !== "none" ? ` · repeats ${r.recurrence}` : "";
@@ -260,7 +294,7 @@ export function meetingConfirmationMessage(
     "calendar event created. 🗓️",
     "",
     `*${r.task}*`,
-    `${formatHuman(r.fireAt)}${repeat}`,
+    `${formatHuman(r.fireAt, tz)}${repeat}`,
   ];
   if (meetLink) {
     lines.push("", `${videoLabel}: ${meetLink}`);
@@ -276,12 +310,13 @@ export function meetingNeedsConnectMessage(
   r: Reminder,
   googleLink: string,
   outlookLink: string,
+  tz?: string,
 ): string {
   return [
     "consider it remembered.",
     "",
     `*${r.task}*`,
-    formatHuman(r.fireAt),
+    formatHuman(r.fireAt, tz),
     "",
     "want me to auto-create this on your calendar with a video link?",
     `• google: ${googleLink}`,
@@ -289,9 +324,88 @@ export function meetingNeedsConnectMessage(
   ].join("\n");
 }
 
-function formatHuman(iso: string): string {
+// ── Timezone ─────────────────────────────────────────────────
+export function timezoneSetMessage(zone: string, localTime: string): string {
+  return `🌍 timezone set to *${zone}*. it's *${localTime}* for you now. reminders will use this from here on.`;
+}
+export function timezoneCurrentMessage(zone: string, localTime: string): string {
+  return [
+    `your timezone is *${zone}* (currently ${localTime}).`,
+    "",
+    "change it: *timezone Europe/London* (or a city, or IST/EST/PST).",
+  ].join("\n");
+}
+export function timezoneBadMessage(): string {
+  return "i didn't recognise that timezone. try a city like *timezone Asia/Kolkata*, or *timezone EST*.";
+}
+
+// ── Lists ────────────────────────────────────────────────────
+export function listAddedMessage(item: string, name: string): string {
+  return `🧺 added *${item}* to your *${name}* list.`;
+}
+export function listShowMessage(name: string, items: string[]): string {
+  if (items.length === 0) {
+    return `your *${name}* list is empty. add something: *add milk to ${name} list*.`;
+  }
+  const lines = items.map((it, i) => `${i + 1}. ${it}`);
+  return [`📋 your *${name}* list:`, "", lines.join("\n")].join("\n");
+}
+export function listRemovedMessage(item: string, name: string): string {
+  return `removed *${item}* from your *${name}* list.`;
+}
+export function listItemNotFoundMessage(item: string, name: string): string {
+  return `couldn't find *${item}* in your *${name}* list.`;
+}
+export function listClearedMessage(name: string): string {
+  return `cleared your *${name}* list.`;
+}
+export function listsOverviewMessage(names: string[]): string {
+  if (names.length === 0) {
+    return "no lists yet. try: *add milk to shopping list*.";
+  }
+  return [
+    "your lists:",
+    "",
+    names.map((n) => `• ${n}`).join("\n"),
+    "",
+    "show one: *show shopping list*",
+  ].join("\n");
+}
+
+// ── Daily digest ─────────────────────────────────────────────
+export function digestMessage(
+  reminders: Reminder[],
+  tz?: string,
+): string {
+  if (reminders.length === 0) {
+    return "☀️ good morning! nothing on the books today. enjoy the clear runway.";
+  }
+  const lines = reminders.map(
+    (r) => `• ${formatTimeOnly(r.fireAt, tz)} — *${r.task}*`,
+  );
+  const count = reminders.length;
+  return [
+    `☀️ good morning! you've got *${count}* ${count === 1 ? "thing" : "things"} today:`,
+    "",
+    lines.join("\n"),
+    "",
+    "_reply *done* as you go, or *snooze* to push one._",
+  ].join("\n");
+}
+
+function formatTimeOnly(iso: string, tz?: string): string {
   const d = new Date(iso);
-  const timeZone = process.env.TIMEZONE_NAME || "Asia/Kolkata";
+  const timeZone = tz || process.env.TIMEZONE_NAME || "Asia/Kolkata";
+  return d.toLocaleTimeString("en-US", {
+    timeZone,
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
+
+function formatHuman(iso: string, tz?: string): string {
+  const d = new Date(iso);
+  const timeZone = tz || process.env.TIMEZONE_NAME || "Asia/Kolkata";
   return d.toLocaleString("en-US", {
     timeZone,
     weekday: "short",

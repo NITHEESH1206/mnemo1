@@ -74,8 +74,8 @@ function dateInTimezone(
   hour: number,
   minute: number,
   dayOffset = 0,
+  offMin: number = tzOffsetMin(),
 ): Date {
-  const offMin = tzOffsetMin();
   const offMs = offMin * 60 * 1000;
 
   // Shift `now` so that its UTC components reflect local-time components.
@@ -92,7 +92,11 @@ function dateInTimezone(
 
 // --- Parser -------------------------------------------------------------
 
-export function parseReminder(text: string, now: Date = new Date()): ParseResult {
+export function parseReminder(
+  text: string,
+  now: Date = new Date(),
+  offsetMin: number = tzOffsetMin(),
+): ParseResult {
   const original = text.trim();
   if (!original) {
     return {
@@ -170,9 +174,9 @@ export function parseReminder(text: string, now: Date = new Date()): ParseResult
   if (!fireAt && tmrMatch) {
     if (tmrMatch[1]) {
       const t = parseTime(tmrMatch[1], tmrMatch[2], tmrMatch[3]);
-      fireAt = dateInTimezone(now, t.h, t.m, 1);
+      fireAt = dateInTimezone(now, t.h, t.m, 1, offsetMin);
     } else {
-      fireAt = dateInTimezone(now, 9, 0, 1); // tomorrow 9am
+      fireAt = dateInTimezone(now, 9, 0, 1, offsetMin); // tomorrow 9am
     }
     body = body.replace(tmrMatch[0], "").trim();
   }
@@ -183,7 +187,7 @@ export function parseReminder(text: string, now: Date = new Date()): ParseResult
   );
   if (!fireAt && tdyMatch && tdyMatch[1]) {
     const t = parseTime(tdyMatch[1], tdyMatch[2], tdyMatch[3]);
-    fireAt = dateInTimezone(now, t.h, t.m, 0);
+    fireAt = dateInTimezone(now, t.h, t.m, 0, offsetMin);
     body = body.replace(tdyMatch[0], "").trim();
   }
 
@@ -191,8 +195,8 @@ export function parseReminder(text: string, now: Date = new Date()): ParseResult
   const atMatch = body.match(/\bat\s+(\d{1,2})(?::(\d{2}))?\s*(am|pm)?\b/i);
   if (!fireAt && atMatch) {
     const t = parseTime(atMatch[1], atMatch[2], atMatch[3]);
-    let candidate = dateInTimezone(now, t.h, t.m, 0);
-    if (candidate <= now) candidate = dateInTimezone(now, t.h, t.m, 1);
+    let candidate = dateInTimezone(now, t.h, t.m, 0, offsetMin);
+    if (candidate <= now) candidate = dateInTimezone(now, t.h, t.m, 1, offsetMin);
     fireAt = candidate;
     body = body.replace(atMatch[0], "").trim();
   }
@@ -204,7 +208,7 @@ export function parseReminder(text: string, now: Date = new Date()): ParseResult
     let m: number;
     if (fireAt) {
       // Read back the time-of-day in the target timezone.
-      const tzShifted = new Date(fireAt.getTime() + tzOffsetMin() * 60 * 1000);
+      const tzShifted = new Date(fireAt.getTime() + offsetMin * 60 * 1000);
       h = tzShifted.getUTCHours();
       m = tzShifted.getUTCMinutes();
     } else {
@@ -213,28 +217,28 @@ export function parseReminder(text: string, now: Date = new Date()): ParseResult
     }
 
     // Find the weekday of "now" in the target timezone.
-    const tzNow = new Date(now.getTime() + tzOffsetMin() * 60 * 1000);
+    const tzNow = new Date(now.getTime() + offsetMin * 60 * 1000);
     const currentDay = tzNow.getUTCDay();
     let diff = (weekday - currentDay + 7) % 7;
 
-    let candidate = dateInTimezone(now, h, m, diff);
+    let candidate = dateInTimezone(now, h, m, diff, offsetMin);
     if (candidate <= now) {
       diff = diff === 0 ? 7 : diff;
-      candidate = dateInTimezone(now, h, m, diff);
+      candidate = dateInTimezone(now, h, m, diff, offsetMin);
     }
     fireAt = candidate;
   }
 
   // Daily/monthly without an explicit time → 9am next slot.
   if ((recurrence === "daily" || recurrence === "monthly") && !fireAt) {
-    let candidate = dateInTimezone(now, 9, 0, 0);
+    let candidate = dateInTimezone(now, 9, 0, 0, offsetMin);
     if (candidate <= now) {
       if (recurrence === "daily") {
-        candidate = dateInTimezone(now, 9, 0, 1);
+        candidate = dateInTimezone(now, 9, 0, 1, offsetMin);
       } else {
         // Approximate monthly by adding 30 days; the scheduler advances
         // properly on each fire via nextOccurrence().
-        candidate = dateInTimezone(now, 9, 0, 30);
+        candidate = dateInTimezone(now, 9, 0, 30, offsetMin);
       }
     }
     fireAt = candidate;

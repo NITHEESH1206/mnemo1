@@ -352,3 +352,82 @@ export async function incrMonthlyCount(phone: string): Promise<number> {
   if (n === 1) await redis().expire(key, 60 * 60 * 24 * 40); // ~40 days
   return n;
 }
+
+// ── Active users (for the digest) ──────────────────────────────
+export async function registerUser(addr: string): Promise<void> {
+  await redis().sadd("users", addr);
+}
+export async function allUsers(): Promise<string[]> {
+  return (await redis().smembers("users")) ?? [];
+}
+
+const digestKey = (addr: string, ymd: string) => `digest:${addr}:${ymd}`;
+export async function wasDigestSent(
+  addr: string,
+  ymd: string,
+): Promise<boolean> {
+  return (await redis().get(digestKey(addr, ymd))) !== null;
+}
+export async function markDigestSent(addr: string, ymd: string): Promise<void> {
+  await redis().set(digestKey(addr, ymd), 1, { ex: 60 * 60 * 36 });
+}
+
+// ── Per-user timezone (IANA name) ──────────────────────────────
+const tzKey = (addr: string) => `tz:${addr}`;
+export async function getUserZone(addr: string): Promise<string> {
+  return (await redis().get<string>(tzKey(addr))) ?? "Asia/Kolkata";
+}
+export async function setUserZone(addr: string, zone: string): Promise<void> {
+  await redis().set(tzKey(addr), zone);
+}
+
+// ── Email ↔ phone link (for the web dashboard) ─────────────────
+const phoneByEmailKey = (email: string) => `phoneByEmail:${email.toLowerCase()}`;
+export async function setPhoneForEmail(
+  email: string,
+  phone: string,
+): Promise<void> {
+  await redis().set(phoneByEmailKey(email), phone);
+}
+export async function getPhoneForEmail(
+  email: string,
+): Promise<string | null> {
+  return (await redis().get<string>(phoneByEmailKey(email))) ?? null;
+}
+
+// ── Lists (shopping list, etc.) ────────────────────────────────
+const listKey = (addr: string, name: string) =>
+  `list:${addr}:${name.toLowerCase()}`;
+const listsSetKey = (addr: string) => `lists:${addr}`;
+
+export async function addToList(
+  addr: string,
+  name: string,
+  item: string,
+): Promise<void> {
+  const client = redis();
+  await client.rpush(listKey(addr, name), item);
+  await client.sadd(listsSetKey(addr), name.toLowerCase());
+}
+export async function getList(addr: string, name: string): Promise<string[]> {
+  return (await redis().lrange<string>(listKey(addr, name), 0, -1)) ?? [];
+}
+export async function removeFromList(
+  addr: string,
+  name: string,
+  item: string,
+): Promise<boolean> {
+  const items = await getList(addr, name);
+  const match = items.find((x) => x.toLowerCase() === item.toLowerCase());
+  if (!match) return false;
+  await redis().lrem(listKey(addr, name), 1, match);
+  return true;
+}
+export async function clearList(addr: string, name: string): Promise<void> {
+  const client = redis();
+  await client.del(listKey(addr, name));
+  await client.srem(listsSetKey(addr), name.toLowerCase());
+}
+export async function allListNames(addr: string): Promise<string[]> {
+  return (await redis().smembers(listsSetKey(addr))) ?? [];
+}

@@ -8,23 +8,38 @@
  * is naturally scoped per user per channel.
  */
 
-import { parseReminder } from "./parser";
+import { parseMessage } from "./llm-parser";
 import {
   addContact,
+  addToList,
+  allListNames,
   cancelReminderForUser,
+  clearList,
+  completeReminder,
   consumeLinkToken,
   createReminder,
   findContact,
   getContacts,
+  getLastFired,
+  getList,
   getMonthlyCount,
   getPlan,
+  getUserZone,
   incrMonthlyCount,
   isPaidPlan,
   listForUser,
+  registerUser,
   removeContact,
+  removeFromList,
+  setLastFired,
+  setPhoneForEmail,
   setPlan,
+  setUserZone,
+  snoozeReminder,
+  updateReminder,
   FREE_MONTHLY_LIMIT,
 } from "./store";
+import { offsetForZone, resolveZone } from "./timezone";
 import {
   badAddMessage,
   badLinkMessage,
@@ -40,6 +55,9 @@ import {
   disconnectedGoogleMessage,
   disconnectedNotionMessage,
   disconnectedOutlookMessage,
+  doneMessage,
+  editUsageMessage,
+  editedMessage,
   friendConfirmationMessage,
   helpMessage,
   limitReachedMessage,
@@ -53,7 +71,18 @@ import {
   noteUsageMessage,
   notionNoTargetMessage,
   notionNotConnectedMessage,
+  nothingToActMessage,
+  snoozedMessage,
   welcomeMessage,
+  timezoneSetMessage,
+  timezoneCurrentMessage,
+  timezoneBadMessage,
+  listAddedMessage,
+  listShowMessage,
+  listRemovedMessage,
+  listItemNotFoundMessage,
+  listClearedMessage,
+  listsOverviewMessage,
 } from "./messages";
 import {
   authedClientFor,
@@ -71,6 +100,22 @@ import { clearNotion, getNotionToken, notionSave } from "./notion";
 function capitalize(s: string): string {
   if (!s) return s;
   return s[0].toUpperCase() + s.slice(1);
+}
+
+/** Parse a snooze duration like "30m", "2 hours", "1d", "tomorrow". */
+function parseSnooze(text: string, now: Date = new Date()): Date {
+  const t = text.trim().toLowerCase();
+  const m = t.match(/(\d+)\s*(m|min|minute|h|hr|hour|d|day)/);
+  if (m) {
+    const n = parseInt(m[1], 10);
+    const unit = m[2];
+    if (unit.startsWith("m")) return new Date(now.getTime() + n * 60_000);
+    if (unit.startsWith("h")) return new Date(now.getTime() + n * 3_600_000);
+    if (unit.startsWith("d")) return new Date(now.getTime() + n * 86_400_000);
+  }
+  if (/\btomorrow\b/.test(t)) return new Date(now.getTime() + 86_400_000);
+  // default: 10 minutes
+  return new Date(now.getTime() + 10 * 60_000);
 }
 
 function icsLink(baseUrl: string, title: string, fireAt: Date): string {
@@ -91,21 +136,140 @@ export async function handleIncomingMessage(params: {
   const body = (params.text || "").trim();
   const lower = body.toLowerCase();
 
+  // Track the user (for the digest) + resolve their timezone.
+  await registerUser(from).catch(() => {});
+  const zone = await getUserZone(from);
+  const offsetMin = offsetForZone(zone) ?? 330;
+  const nowLocal = () =>
+    new Date().toLocaleTimeString("en-US", {
+      timeZone: zone,
+      hour: "numeric",
+      minute: "2-digit",
+    });
+
   // --- Quick commands -------------------------------------------------
   if (!body || /^(hi|hello|hey|start|menu)\b/.test(lower)) {
     return welcomeMessage();
+  }
+
+  // --- Timezone -------------------------------------------------------
+  if (/^(timezone|tz)\b/.test(lower)) {
+    const arg = body.replace(/^(timezone|tz)\s*/i, "").trim();
+    if (!arg) return timezoneCurrentMessage(zone, nowLocal());
+    const resolved = resolveZone(arg);
+    if (!resolved) return timezoneBadMessage();
+    await setUserZone(from, resolved);
+    const t = new Date().toLocaleTimeString("en-US", {
+      timeZone: resolved,
+      hour: "numeric",
+      minute: "2-digit",
+    });
+    return timezoneSetMessage(resolved, t);
+  }
+
+  // --- Lists ----------------------------------------------------------
+  // "add milk to shopping list" / "add milk to my shopping list"
+  const listAdd = body.match(
+    /^add\s+(.+?)\s+to\s+(?:my\s+)?(.+?)\s+list\b/i,
+  );
+  if (listAdd) {
+    const item = listAdd[1].trim();
+    const name = listAdd[2].trim();
+    await addToList(from, name, item);
+    return listAddedMessage(item, name);
+  }
+  const listRemove = body.match(
+    /^remove\s+(.+?)\s+from\s+(?:my\s+)?(.+?)\s+list\b/i,
+  );
+  if (listRemove) {
+    const item = listRemove[1].trim();
+    const name = listRemove[2].trim();
+    const ok = await removeFromList(from, name, item);
+    return ok
+      ? listRemovedMessage(item, name)
+      : listItemNotFoundMessage(item, name);
+  }
+  const listShow = body.match(
+    /^(?:show|view)\s+(?:my\s+)?(.+?)\s+list\b/i,
+  );
+  if (listShow) {
+    const name = listShow[1].trim();
+    return listShowMessage(name, await getList(from, name));
+  }
+  const listClear = body.match(/^clear\s+(?:my\s+)?(.+?)\s+list\b/i);
+  if (listClear) {
+    const name = listClear[1].trim();
+    await clearList(from, name);
+    return listClearedMessage(name);
+  }
+  if (/^lists\b/.test(lower)) {
+    return listsOverviewMessage(await allListNames(from));
   }
   if (/^help\b/.test(lower)) {
     return helpMessage();
   }
   if (/^(list|reminders|show)\b/.test(lower)) {
-    return listMessage(await listForUser(from));
+    return listMessage(await listForUser(from), zone);
   }
   const cancelMatch = lower.match(/^(?:cancel|delete|remove)\s+(\d+)\b/);
   if (cancelMatch) {
     const n = parseInt(cancelMatch[1], 10);
     const cancelled = await cancelReminderForUser(from, n);
     return cancelled ? cancelledMessage(cancelled) : notFoundMessage();
+  }
+
+  // --- Done -----------------------------------------------------------
+  if (/^(done|complete|completed|finished)\b/.test(lower)) {
+    const numMatch = lower.match(/\b(\d+)\b/);
+    if (numMatch) {
+      const pending = await listForUser(from);
+      const target = pending[parseInt(numMatch[1], 10) - 1];
+      if (!target) return notFoundMessage();
+      const r = await completeReminder(target.id);
+      return r ? doneMessage(r) : notFoundMessage();
+    }
+    const lastId = await getLastFired(from);
+    if (!lastId) return nothingToActMessage();
+    const r = await completeReminder(lastId);
+    return r ? doneMessage(r) : nothingToActMessage();
+  }
+
+  // --- Snooze ---------------------------------------------------------
+  if (/^snooze\b/.test(lower)) {
+    const numMatch = lower.match(/^snooze\s+(\d+)\s+(.+)$/);
+    let targetId: string | null = null;
+    let durText: string;
+    if (numMatch) {
+      const pending = await listForUser(from);
+      targetId = pending[parseInt(numMatch[1], 10) - 1]?.id ?? null;
+      durText = numMatch[2];
+    } else {
+      targetId = await getLastFired(from);
+      durText = body.replace(/^snooze\s*/i, "").trim();
+    }
+    if (!targetId) return nothingToActMessage();
+    const when = parseSnooze(durText);
+    const r = await snoozeReminder(targetId, when);
+    if (r) await setLastFired(from, r.id);
+    return r ? snoozedMessage(r, zone) : notFoundMessage();
+  }
+
+  // --- Edit -----------------------------------------------------------
+  const editMatch = body.match(/^edit\s+(\d+)\s+(.+)$/i);
+  if (/^edit\b/i.test(lower)) {
+    if (!editMatch) return editUsageMessage();
+    const pending = await listForUser(from);
+    const target = pending[parseInt(editMatch[1], 10) - 1];
+    if (!target) return notFoundMessage();
+    const reparse = await parseMessage(editMatch[2], new Date(), offsetMin);
+    if (!reparse.ok) return reparse.reason;
+    const updated = await updateReminder(target.id, {
+      task: reparse.reminder.task,
+      fireAt: reparse.reminder.fireAt,
+      recurrence: reparse.reminder.recurrence,
+      weekday: reparse.reminder.weekday,
+    });
+    return updated ? editedMessage(updated, zone) : notFoundMessage();
   }
 
   // --- Contacts -------------------------------------------------------
@@ -136,6 +300,8 @@ export async function handleIncomingMessage(params: {
     const data = await consumeLinkToken(linkMatch[1]);
     if (!data) return badLinkMessage();
     await setPlan(from, data.plan, data.email);
+    // Link email → this phone so the web dashboard can show their reminders.
+    if (data.email) await setPhoneForEmail(data.email, from);
     return linkedPlanMessage(data.plan);
   }
 
@@ -179,7 +345,7 @@ export async function handleIncomingMessage(params: {
   }
 
   // --- Natural-language reminder / meeting ----------------------------
-  const parsed = parseReminder(body);
+  const parsed = await parseMessage(body, new Date(), offsetMin);
   if (!parsed.ok) return parsed.reason;
   const r = parsed.reminder;
 
@@ -206,7 +372,7 @@ export async function handleIncomingMessage(params: {
       recipientName: r.recipientName,
     });
     await incrMonthlyCount(from);
-    return friendConfirmationMessage(friendReminder, r.recipientName);
+    return friendConfirmationMessage(friendReminder, r.recipientName, zone);
   }
 
   const created = await createReminder({
@@ -227,7 +393,7 @@ export async function handleIncomingMessage(params: {
     if (!googleTokens && !msTokens) {
       const gLink = `${baseUrl}/api/auth/google?phone=${encodeURIComponent(from)}`;
       const mLink = `${baseUrl}/api/auth/microsoft?phone=${encodeURIComponent(from)}`;
-      return meetingNeedsConnectMessage(created, gLink, mLink);
+      return meetingNeedsConnectMessage(created, gLink, mLink, zone);
     }
 
     // Prefer Google when both are connected.
@@ -246,11 +412,12 @@ export async function handleIncomingMessage(params: {
           event.meetLink,
           event.htmlLink,
           "google meet",
+          zone,
         );
       } catch (calErr) {
         console.error("[handle] google calendar error", calErr);
         return (
-          confirmationMessage(created) +
+          confirmationMessage(created, zone) +
           "\n\n(couldn't reach google calendar this time — reminder is still set.)"
         );
       }
@@ -268,11 +435,12 @@ export async function handleIncomingMessage(params: {
         event.joinUrl,
         event.webLink,
         "teams meeting",
+        zone,
       );
     } catch (calErr) {
       console.error("[handle] outlook calendar error", calErr);
       return (
-        confirmationMessage(created) +
+        confirmationMessage(created, zone) +
         "\n\n(couldn't reach outlook this time — reminder is still set.)"
       );
     }
@@ -293,7 +461,7 @@ export async function handleIncomingMessage(params: {
 
   // Normal reminder — confirmation + universal add-to-calendar link
   return (
-    confirmationMessage(created) +
+    confirmationMessage(created, zone) +
     `\n\n🗓️ add to calendar: ${icsLink(baseUrl, created.task, new Date(created.fireAt))}`
   );
 }

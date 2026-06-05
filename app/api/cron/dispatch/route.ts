@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { findDue, markSentOrReschedule } from "@/lib/store";
+import { findDue, markSentOrReschedule, setLastFired } from "@/lib/store";
 import { sendMessage } from "@/lib/notify";
 import { reminderFireMessage, friendReminderFireMessage } from "@/lib/messages";
 import { nextOccurrence } from "@/lib/scheduler";
@@ -38,6 +38,8 @@ export async function GET(req: NextRequest) {
         ? friendReminderFireMessage(r, r.recipientName)
         : reminderFireMessage(r);
       await sendMessage(to, body);
+      // Let the recipient reply "done" / "snooze" without a number.
+      await setLastFired(to, r.id);
       const next = nextOccurrence(r);
       await markSentOrReschedule(r.id, next);
       results.push({ id: r.id, status: "sent" });

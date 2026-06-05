@@ -27,8 +27,8 @@ function openai(): OpenAI {
   return cached;
 }
 
-/** Fetch audio bytes from a Twilio media URL (Basic auth required). */
-async function fetchTwilioMedia(url: string): Promise<{
+/** Fetch media bytes from a Twilio media URL (Basic auth required). */
+export async function fetchTwilioMedia(url: string): Promise<{
   buffer: Buffer;
   contentType: string;
 }> {

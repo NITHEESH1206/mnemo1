@@ -59,8 +59,11 @@ type LlmOut = {
   isMeeting: boolean;
 };
 
-async function llmParse(text: string, now: Date): Promise<ParseResult> {
-  const off = tzOffsetMin();
+async function llmParse(
+  text: string,
+  now: Date,
+  off: number,
+): Promise<ParseResult> {
   const localNow = localNowString(now, off);
 
   const system = [
@@ -137,13 +140,14 @@ async function llmParse(text: string, now: Date): Promise<ParseResult> {
 export async function parseMessage(
   text: string,
   now: Date = new Date(),
+  offsetMin: number = tzOffsetMin(),
 ): Promise<ParseResult> {
   if (process.env.OPENAI_API_KEY) {
     try {
-      return await llmParse(text, now);
+      return await llmParse(text, now, offsetMin);
     } catch (e) {
       console.error("[llm-parser] falling back to regex:", e);
     }
   }
-  return parseReminder(text, now);
+  return parseReminder(text, now, offsetMin);
 }

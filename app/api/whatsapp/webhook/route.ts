@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import twilio from "twilio";
 import { validateTwilioSignature } from "@/lib/twilio";
-import { transcribeTwilioMedia } from "@/lib/transcribe";
+import { transcribeTwilioMedia, fetchTwilioMedia } from "@/lib/transcribe";
+import { extractReminderFromImage } from "@/lib/vision";
 import { handleIncomingMessage } from "@/lib/handle";
 
 // Twilio sends application/x-www-form-urlencoded and we use Node APIs.
@@ -41,6 +42,7 @@ export async function POST(req: NextRequest) {
   // --- Voice note? transcribe first ----------------------------------
   let body = (params.Body || "").trim();
   let voiceEcho: string | null = null;
+  let echoLabel = "🎙️ heard you say";
   const numMedia = parseInt(params.NumMedia || "0", 10);
   if (numMedia > 0) {
     const mediaType = (params.MediaContentType0 || "").toLowerCase();
@@ -58,16 +60,35 @@ export async function POST(req: NextRequest) {
           "couldn't hear that one. mind sending it as text or trying again?",
         );
       }
+    } else if (mediaUrl && mediaType.startsWith("image/")) {
+      try {
+        const { buffer, contentType } = await fetchTwilioMedia(mediaUrl);
+        const extracted = await extractReminderFromImage(buffer, contentType);
+        if (extracted) {
+          body = extracted;
+          voiceEcho = extracted;
+          echoLabel = "📸 from your image";
+        } else {
+          return twimlReply(
+            "i looked but couldn't find anything to remind you about in that image. try sending it as text?",
+          );
+        }
+      } catch (e) {
+        console.error("[whatsapp/webhook] vision error", e);
+        return twimlReply(
+          "couldn't read that image. mind sending it as text?",
+        );
+      }
     } else if (mediaUrl) {
       return twimlReply(
-        "i can only handle text and voice right now — image/screenshot smarts are coming soon.",
+        "i can handle text, voice notes, and screenshots — that file type isn't supported yet.",
       );
     }
   }
 
   try {
     const reply = await handleIncomingMessage({ from, text: body, baseUrl });
-    const full = voiceEcho ? `🎙️ heard you say: _${voiceEcho}_\n\n${reply}` : reply;
+    const full = voiceEcho ? `${echoLabel}: _${voiceEcho}_\n\n${reply}` : reply;
     return twimlReply(full);
   } catch (err) {
     console.error("[whatsapp/webhook] error", err);
