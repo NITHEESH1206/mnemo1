@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
-import { Star, Play, Check, MessageCircle, Mic, Sparkles } from "lucide-react";
+import { Star, Play, Check, MessageCircle, Mic } from "lucide-react";
 import { GradientButton } from "@/components/ui/GradientButton";
 import { Mascot } from "@/components/ui/Mascot";
 
@@ -23,17 +23,13 @@ export function Hero() {
       <FloatingOrbs />
 
       <div className="container-x relative z-10">
-        {/* Beta + rating row — frosted glass pills on the sky */}
+        {/* Rating row — frosted glass pill on the sky */}
         <motion.div
           initial={reduced ? false : { opacity: 0, y: 8 }}
           animate={reduced ? undefined : { opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
           className="flex flex-wrap items-center justify-center gap-2.5"
         >
-          <span className="pill-glass">
-            <Sparkles size={13} className="text-flame-500" />
-            Now in public beta
-          </span>
           <span className="pill-glass">
             <span className="flex items-center gap-0.5" aria-label="Rated 4.9 of 5">
               {Array.from({ length: 5 }).map((_, i) => (
@@ -63,8 +59,8 @@ export function Hero() {
               aria-hidden
               className="absolute -inset-x-2 -bottom-1 h-1.5 rounded-full bg-gradient-warm opacity-80 blur-[3px]"
             />
+            <span aria-hidden>.</span>
           </span>
-          .
           <br className="hidden sm:block" />
           Feru AI is.
         </motion.h1>

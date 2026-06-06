@@ -6,10 +6,8 @@ import { Check } from "lucide-react";
 import { PricingToggle } from "@/components/ui/PricingToggle";
 import { FAQAccordion } from "@/components/ui/FAQAccordion";
 import { GradientButton } from "@/components/ui/GradientButton";
-import { CheckoutButton } from "@/components/ui/CheckoutButton";
 import { Mascot } from "@/components/ui/Mascot";
 import { FAQS, PRICING, type PricingPlan } from "@/lib/constants";
-import { whatsappCTAUrl } from "@/lib/whatsapp";
 import { cn } from "@/lib/utils";
 
 export function Pricing() {
@@ -75,22 +73,6 @@ export function Pricing() {
             </motion.div>
           ))}
         </div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="mx-auto mt-10 max-w-3xl rounded-2xl border border-emerald-200 bg-emerald-50/70 px-5 py-4 text-center"
-        >
-          <span className="text-[14px] font-semibold text-emerald-800">
-            ✓ 14-day money-back guarantee.
-          </span>{" "}
-          <span className="text-[14px] text-emerald-900/80">
-            Try it free. Then you have a full 14 days to request a complete
-            refund. No questions, no forms.
-          </span>
-        </motion.div>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -190,27 +172,14 @@ function PricingCard({
       </ul>
 
       <div className="mt-7">
-        {price > 0 ? (
-          <CheckoutButton
-            plan={plan.name}
-            billing={billing}
-            variant={plan.highlight ? "primary" : "ink"}
-          >
-            Subscribe · ₹{price}/mo →
-          </CheckoutButton>
-        ) : (
-          <GradientButton
-            href={whatsappCTAUrl(
-              `Hi Feru AI! I'm on the ${plan.name} plan — let's get started.`,
-            )}
-            target="_blank"
-            variant="ink"
-            size="md"
-            className="w-full justify-center"
-          >
-            {plan.cta} →
-          </GradientButton>
-        )}
+        <GradientButton
+          href="/api/auth/google/login"
+          variant={plan.highlight ? "primary" : "ink"}
+          size="md"
+          className="w-full justify-center"
+        >
+          Start for free →
+        </GradientButton>
       </div>
     </div>
   );

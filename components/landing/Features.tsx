@@ -3,7 +3,6 @@
 import { useRef } from "react";
 import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
-import { GradientButton } from "@/components/ui/GradientButton";
 import { Mascot, type MascotVariant } from "@/components/ui/Mascot";
 import { cn } from "@/lib/utils";
 
@@ -142,11 +141,6 @@ export function Features() {
           </div>
         </div>
 
-        <div className="mt-10 flex justify-center">
-          <GradientButton href="#all-features" variant="primary" size="lg">
-            Discover all the superpowers →
-          </GradientButton>
-        </div>
       </div>
     </section>
   );

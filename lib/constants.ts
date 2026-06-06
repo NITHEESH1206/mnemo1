@@ -18,7 +18,6 @@ export const INTEGRATIONS = [
   "Gmail",
   "Google Calendar",
   "Notion",
-  "Slack",
   "Apple Calendar",
   "Outlook",
 ] as const;
