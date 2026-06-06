@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Check, Play } from "lucide-react";
+import { Check } from "lucide-react";
 import { PricingToggle } from "@/components/ui/PricingToggle";
 import { FAQAccordion } from "@/components/ui/FAQAccordion";
 import { GradientButton } from "@/components/ui/GradientButton";
@@ -176,28 +176,7 @@ function PricingCard({
         )}
       </div>
 
-      {/* Watch in action preview pill */}
-      <a
-        href="#demo"
-        className="mt-6 flex items-center gap-3 rounded-2xl border border-ink/8 bg-bg-tint/60 p-2 transition-colors hover:border-flame-300 hover:bg-flame-50"
-      >
-        <span className="relative grid h-12 w-20 shrink-0 place-items-center overflow-hidden rounded-xl bg-gradient-dark">
-          <span
-            aria-hidden
-            className="absolute inset-0 opacity-50"
-            style={{
-              background:
-                "radial-gradient(circle at 30% 30%, rgba(251,191,36,0.4), transparent 60%)",
-            }}
-          />
-          <Play size={14} className="relative z-10 fill-white text-white" />
-        </span>
-        <span className="text-[13px] font-semibold text-ink">
-          Watch <span className="text-flame-700">{plan.name}</span> in action
-        </span>
-      </a>
-
-      <ul className="mt-6 space-y-3">
+      <ul className="mt-7 space-y-3">
         {plan.features.map((f) => (
           <li key={f} className="flex items-start gap-2.5">
             <span className="mt-[2px] grid h-4 w-4 shrink-0 place-items-center rounded-full bg-gradient-primary shadow-[0_2px_6px_rgba(249,115,22,0.4)]">

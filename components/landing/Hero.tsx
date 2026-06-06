@@ -228,7 +228,7 @@ function PhoneMockup() {
           </div>
           <div className="mt-2 flex items-center gap-2 border-b border-ink/8 px-4 pb-3">
             <div className="grid h-8 w-8 place-items-center rounded-full bg-gradient-primary text-[12px] font-bold text-white shadow-[0_4px_14px_rgba(249,115,22,0.4)]">
-              M
+              F
             </div>
             <div>
               <div className="text-[12px] font-semibold text-ink">Feru AI</div>

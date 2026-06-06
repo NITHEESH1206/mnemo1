@@ -113,24 +113,12 @@ function OnboardingMock() {
         ].map((ch) => (
           <div
             key={ch.n}
-            className="flex items-center justify-between rounded-xl border border-ink/8 bg-bg-tint/60 px-3.5 py-3"
+            className="flex items-center gap-2.5 rounded-xl border border-ink/8 bg-bg-tint/60 px-3.5 py-3"
           >
-            <div className="flex items-center gap-2.5">
-              <span className="grid h-7 w-7 place-items-center rounded-md bg-gradient-primary text-[11px] font-extrabold text-white">
-                {ch.n[0]}
-              </span>
-              <span className="text-[13px] font-semibold text-ink">{ch.n}</span>
-            </div>
-            <span
-              className={cn(
-                "rounded-full px-2 py-0.5 text-[10.5px] font-semibold",
-                ch.c
-                  ? "border border-emerald-300 bg-emerald-50 text-emerald-700"
-                  : "border border-ink/10 bg-white text-ink/55",
-              )}
-            >
-              {ch.c ? "Connected" : "Connect"}
+            <span className="grid h-7 w-7 place-items-center rounded-md bg-gradient-primary text-[11px] font-extrabold text-white">
+              {ch.n[0]}
             </span>
+            <span className="text-[13px] font-semibold text-ink">{ch.n}</span>
           </div>
         ))}
       </div>
@@ -149,7 +137,7 @@ function ChatMock() {
     <div className="flex h-[360px] flex-col p-5">
       <div className="flex items-center gap-2.5 border-b border-ink/8 pb-3">
         <div className="grid h-9 w-9 place-items-center rounded-full bg-gradient-primary text-[12px] font-extrabold text-white shadow-[0_4px_14px_rgba(249,115,22,0.4)]">
-          M
+          F
         </div>
         <div className="text-[13px] font-extrabold text-ink">Feru AI</div>
         <span className="ml-auto text-[10.5px] font-semibold text-emerald-600">

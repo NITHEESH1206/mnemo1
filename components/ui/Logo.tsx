@@ -16,23 +16,25 @@ export function Logo({
           viewBox="0 0 32 32"
           fill="none"
           aria-hidden="true"
-          className="drop-shadow-[0_0_12px_rgba(249,115,22,0.55)]"
+          className="drop-shadow-[0_4px_12px_rgba(249,115,22,0.45)]"
         >
           <defs>
-            <linearGradient id="mnemo-grad" x1="0" y1="0" x2="32" y2="32">
+            <linearGradient id="feru-grad" x1="0" y1="0" x2="32" y2="32">
               <stop offset="0%" stopColor="#fbbf24" />
               <stop offset="50%" stopColor="#fb923c" />
               <stop offset="100%" stopColor="#ea580c" />
             </linearGradient>
           </defs>
-          <path
-            d="M5 25V8.5C5 7.67 5.67 7 6.5 7c.55 0 1.06.3 1.32.78L13.5 18 19.18 7.78A1.5 1.5 0 0 1 20.5 7c.83 0 1.5.67 1.5 1.5V25"
-            stroke="url(#mnemo-grad)"
-            strokeWidth="2.6"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          <circle cx="26.5" cy="8.5" r="3" fill="url(#mnemo-grad)" />
+          {/* rounded gradient tile */}
+          <rect width="32" height="32" rx="9" fill="url(#feru-grad)" />
+          {/* subtle top sheen */}
+          <rect width="32" height="16" rx="9" fill="#fff" opacity="0.12" />
+          {/* F monogram */}
+          <rect x="10" y="8" width="3.2" height="16" rx="1.6" fill="#fff" />
+          <rect x="10" y="8" width="12" height="3.2" rx="1.6" fill="#fff" />
+          <rect x="10" y="14.4" width="8.5" height="3.2" rx="1.6" fill="#fff" />
+          {/* memory spark */}
+          <circle cx="23.6" cy="22.6" r="2.1" fill="#fff" />
         </svg>
       </span>
       {showText && (

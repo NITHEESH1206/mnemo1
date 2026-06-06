@@ -92,61 +92,67 @@ export const STATS = [
 
 export const TESTIMONIALS = [
   {
-    name: "Priya S.",
+    name: "Priya Sharma",
     role: "Founder, Hexa Labs",
     quote:
       "I used to miss follow-ups constantly. Feru AI changed that in day one.",
     rating: 5,
     featured: true,
-    seed: "Priya",
-    photo: "https://randomuser.me/api/portraits/women/68.jpg",
+    seed: "Priya Sharma",
+    photo:
+      "https://images.unsplash.com/photo-1619895862022-09114b41f16f?w=200&h=200&fit=crop&crop=faces&auto=format&q=75",
   },
   {
-    name: "Marcus L.",
+    name: "Arjun Mehta",
     role: "Product Lead, Quill",
     quote:
       "The multi-channel support is unreal. I get reminded on WhatsApp while my team sees it in the dashboard.",
     rating: 5,
     featured: false,
-    seed: "Marcus",
-    photo: "https://randomuser.me/api/portraits/men/32.jpg",
+    seed: "Arjun Mehta",
+    photo:
+      "https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=200&h=200&fit=crop&crop=faces&auto=format&q=75",
   },
   {
-    name: "Aiko T.",
+    name: "Ananya Iyer",
     role: "Freelance Designer",
     quote: "Setup took 90 seconds. I've been using it every day for 6 months.",
     rating: 5,
     featured: false,
-    seed: "Aiko",
-    photo: "https://randomuser.me/api/portraits/women/44.jpg",
+    seed: "Ananya Iyer",
+    photo:
+      "https://images.unsplash.com/photo-1648486656752-89e2c9c0a6f6?w=200&h=200&fit=crop&crop=faces&auto=format&q=75",
   },
   {
-    name: "Ravi K.",
+    name: "Rohan Verma",
     role: "Startup Operator",
     quote: "Finally an AI tool that works how my brain works.",
     rating: 5,
     featured: false,
-    seed: "Ravi",
-    photo: "https://randomuser.me/api/portraits/men/75.jpg",
+    seed: "Rohan Verma",
+    photo:
+      "https://images.unsplash.com/photo-1640960543409-dbe56ccc30e2?w=200&h=200&fit=crop&crop=faces&auto=format&q=75",
   },
   {
-    name: "Sofia M.",
+    name: "Sneha Reddy",
     role: "Executive Assistant",
     quote: "The voice input on Telegram is witchcraft. It just works.",
     rating: 5,
     featured: false,
-    seed: "Sofia",
-    photo: "https://randomuser.me/api/portraits/women/29.jpg",
+    seed: "Sneha Reddy",
+    photo:
+      "https://images.unsplash.com/photo-1614283233556-f35b0c801ef1?w=200&h=200&fit=crop&crop=faces&auto=format&q=75",
   },
   {
-    name: "Daniel W.",
+    name: "Vikram Nair",
     role: "Engineering Manager",
     quote:
       "Switched our whole team over. The shared reminders feature alone is worth it.",
     rating: 5,
     featured: false,
-    seed: "Daniel",
-    photo: "https://randomuser.me/api/portraits/men/52.jpg",
+    seed: "Vikram Nair",
+    photo:
+      "https://images.unsplash.com/photo-1568602471122-7832951cc4c5?w=200&h=200&fit=crop&crop=faces&auto=format&q=75",
   },
 ] as const;
 
@@ -172,26 +178,26 @@ export type PricingPlan = {
 
 export const PRICING: PricingPlan[] = [
   {
-    name: "Origin",
-    category: "Operational Memory",
+    name: "Free",
+    category: "For personal use",
     monthly: 0,
     annual: 0,
-    blurb: "Perfect for personal use.",
+    blurb: "Everything you need to get started.",
     features: [
       "20 reminders per month",
       "WhatsApp or Telegram",
       "Basic recurrence",
       "Community support",
     ],
-    cta: "Try for Free",
+    cta: "Get started free",
     mascot: "glasses",
   },
   {
-    name: "Supernova",
-    category: "Strategic Memory",
+    name: "Pro",
+    category: "For power users",
     monthly: 149,
     annual: 104,
-    blurb: "For power users and solopreneurs.",
+    blurb: "For solopreneurs who run on reminders.",
     features: [
       "Unlimited reminders",
       "All channels (WhatsApp, Telegram, Email, Web)",
@@ -200,25 +206,25 @@ export const PRICING: PricingPlan[] = [
       "Priority support",
       "Early access to new features",
     ],
-    cta: "Try for Free",
+    cta: "Start Pro",
     mascot: "goggles",
     highlight: true,
   },
   {
-    name: "Big Bang",
-    category: "Executive Memory",
+    name: "Team",
+    category: "For teams",
     monthly: 499,
     annual: 349,
-    blurb: "For teams who need to stay in sync.",
+    blurb: "Keep everyone in sync, automatically.",
     features: [
-      "Everything in Supernova",
+      "Everything in Pro",
       "Up to 25 team members",
       "Shared reminder spaces",
       "Team dashboard + analytics",
       "Admin controls & SSO",
       "Dedicated support",
     ],
-    cta: "Try for Free",
+    cta: "Start Team",
     mascot: "headphones",
   },
 ];
@@ -251,7 +257,7 @@ export const FOOTER_LINKS = {
     { label: "Features", href: "#features" },
     { label: "Pricing", href: "#pricing" },
   ],
-  Company: [{ label: "About", href: "#about" }],
+  Company: [{ label: "About", href: "/about" }],
   Integrations: [
     { label: "WhatsApp", href: "#whatsapp" },
     { label: "Telegram", href: "#telegram" },
@@ -260,9 +266,9 @@ export const FOOTER_LINKS = {
     { label: "Notion", href: "#notion" },
   ],
   Legal: [
-    { label: "Privacy", href: "#privacy" },
-    { label: "Terms", href: "#terms" },
-    { label: "Cookie Policy", href: "#cookies" },
+    { label: "Privacy", href: "/privacy" },
+    { label: "Terms", href: "/terms" },
+    { label: "Cookie Policy", href: "/cookies" },
   ],
 } as const;
 

@@ -1,10 +1,15 @@
 "use client";
 
-import Image from "next/image";
 import { motion } from "framer-motion";
 import { Star } from "lucide-react";
 import { TESTIMONIALS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
+
+function fallbackAvatar(name: string) {
+  return `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(
+    name,
+  )}&backgroundColor=fb923c,f97316,ea580c&textColor=ffffff`;
+}
 
 export function Testimonials() {
   return (
@@ -79,13 +84,17 @@ function TestimonialCard({
             />
           ))}
         </div>
-        <Image
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
           src={photo}
           width={48}
           height={48}
           alt={name}
+          loading="lazy"
+          onError={(e) => {
+            (e.currentTarget as HTMLImageElement).src = fallbackAvatar(name);
+          }}
           className="h-12 w-12 rounded-full border-2 border-white object-cover shadow-[0_4px_14px_rgba(120,53,15,0.22)]"
-          unoptimized
         />
       </div>
 
