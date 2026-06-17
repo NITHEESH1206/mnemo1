@@ -6,7 +6,7 @@ import {
   signSession,
   SESSION_COOKIE_NAME,
 } from "@/lib/google";
-import { sendWhatsApp } from "@/lib/twilio";
+import { sendCloudText } from "@/lib/whatsapp-cloud";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -62,12 +62,12 @@ export async function GET(req: NextRequest) {
     await saveTokens(phone, tokens);
 
     try {
-      await sendWhatsApp({
-        to: phone,
-        body: `google calendar connected${tokens.email ? ` (${tokens.email})` : ""}.\n\ntry: "meet with ashok tomorrow at 11am" and i'll auto-create the event + meet link.`,
-      });
-    } catch (twilioErr) {
-      console.error("[auth/google/callback] twilio send failed", twilioErr);
+      await sendCloudText(
+        phone,
+        `google calendar connected${tokens.email ? ` (${tokens.email})` : ""}.\n\ntry: "meet with ashok tomorrow at 11am" and i'll auto-create the event + meet link.`,
+      );
+    } catch (waErr) {
+      console.error("[auth/google/callback] whatsapp send failed", waErr);
     }
 
     return resultPage(

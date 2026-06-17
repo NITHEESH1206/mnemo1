@@ -9,9 +9,12 @@ import { Logo } from "@/components/ui/Logo";
 import { GradientButton } from "@/components/ui/GradientButton";
 import { cn } from "@/lib/utils";
 
+type User = { name: string; email: string };
+
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 16);
@@ -19,6 +22,21 @@ export function Navbar() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  useEffect(() => {
+    let active = true;
+    fetch("/api/me")
+      .then((r) => r.json())
+      .then((d) => {
+        if (active && d.loggedIn) setUser({ name: d.name, email: d.email });
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const initial = user?.name?.charAt(0).toUpperCase() || "U";
 
   return (
     <div className="fixed inset-x-0 top-4 z-50 px-4">
@@ -34,7 +52,6 @@ export function Navbar() {
           aria-label="Feru AI home"
           className="shrink-0 pl-2.5 pr-1"
           onClick={(e) => {
-            // If already on the homepage, smooth-scroll to top instead of reloading.
             if (window.location.pathname === "/") {
               e.preventDefault();
               window.scrollTo({ top: 0, behavior: "smooth" });
@@ -44,11 +61,8 @@ export function Navbar() {
           <Logo />
         </Link>
 
-        <nav
-          className="hidden items-center gap-1 md:flex"
-          aria-label="Primary"
-        >
-          {NAV_LINKS.slice(0, 3).map((l) => (
+        <nav className="hidden items-center gap-1 md:flex" aria-label="Primary">
+          {NAV_LINKS.map((l) => (
             <a
               key={l.href}
               href={l.href}
@@ -59,21 +73,46 @@ export function Navbar() {
           ))}
         </nav>
 
+        {/* Right side — auth aware */}
         <div className="hidden items-center gap-2 md:flex">
-          <a
-            href="/api/auth/google/login"
-            className="rounded-full px-3 py-2 text-[14px] font-semibold text-ink/80 hover:text-ink"
-          >
-            Log in
-          </a>
-          <GradientButton
-            href="/api/auth/google/login"
-            variant="primary"
-            size="sm"
-            className="text-[13.5px]"
-          >
-            Try for Free
-          </GradientButton>
+          {user ? (
+            <>
+              <a
+                href="/api/auth/logout"
+                className="rounded-full px-3 py-2 text-[13.5px] font-semibold text-ink/55 transition-colors hover:text-ink"
+              >
+                Log out
+              </a>
+              <Link
+                href="/dashboard"
+                className="flex items-center gap-2 rounded-full bg-white/70 py-1 pl-1 pr-3.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_4px_14px_-6px_rgba(20,60,110,0.3)] ring-1 ring-white/70 transition-transform hover:-translate-y-[1px]"
+              >
+                <span className="grid h-7 w-7 place-items-center rounded-full bg-gradient-primary text-[12px] font-extrabold text-white">
+                  {initial}
+                </span>
+                <span className="max-w-[120px] truncate text-[13.5px] font-bold text-ink">
+                  {user.name}
+                </span>
+              </Link>
+            </>
+          ) : (
+            <>
+              <a
+                href="/api/auth/google/login"
+                className="rounded-full px-3 py-2 text-[14px] font-semibold text-ink/80 hover:text-ink"
+              >
+                Log in
+              </a>
+              <GradientButton
+                href="/api/auth/google/login"
+                variant="primary"
+                size="sm"
+                className="text-[13.5px]"
+              >
+                Try for Free
+              </GradientButton>
+            </>
+          )}
         </div>
 
         <button
@@ -106,22 +145,56 @@ export function Navbar() {
                 </a>
               ))}
               <div className="mt-3 flex flex-col gap-2 border-t border-ink/10 pt-3">
-                <GradientButton
-                  href="/api/auth/google/login"
-                  variant="glass"
-                  size="md"
-                  className="w-full justify-center"
-                >
-                  Log in
-                </GradientButton>
-                <GradientButton
-                  href="/api/auth/google/login"
-                  variant="primary"
-                  size="md"
-                  className="w-full justify-center"
-                >
-                  Try for Free
-                </GradientButton>
+                {user ? (
+                  <>
+                    <div className="flex items-center gap-2.5 px-2 py-1">
+                      <span className="grid h-9 w-9 place-items-center rounded-full bg-gradient-primary text-[13px] font-extrabold text-white">
+                        {initial}
+                      </span>
+                      <div className="min-w-0">
+                        <div className="truncate text-[14px] font-bold text-ink">
+                          {user.name}
+                        </div>
+                        <div className="truncate text-[12px] text-ink/55">
+                          {user.email}
+                        </div>
+                      </div>
+                    </div>
+                    <GradientButton
+                      href="/dashboard"
+                      variant="primary"
+                      size="md"
+                      className="w-full justify-center"
+                    >
+                      Open dashboard
+                    </GradientButton>
+                    <a
+                      href="/api/auth/logout"
+                      className="rounded-full px-4 py-2.5 text-center text-[14px] font-semibold text-ink/60 hover:text-ink"
+                    >
+                      Log out
+                    </a>
+                  </>
+                ) : (
+                  <>
+                    <GradientButton
+                      href="/api/auth/google/login"
+                      variant="glass"
+                      size="md"
+                      className="w-full justify-center"
+                    >
+                      Log in
+                    </GradientButton>
+                    <GradientButton
+                      href="/api/auth/google/login"
+                      variant="primary"
+                      size="md"
+                      className="w-full justify-center"
+                    >
+                      Try for Free
+                    </GradientButton>
+                  </>
+                )}
               </div>
             </div>
           </motion.div>

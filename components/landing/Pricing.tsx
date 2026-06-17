@@ -66,7 +66,7 @@ export function Pricing() {
               transition={{ duration: 0.55, delay: i * 0.08 }}
               className={cn(
                 "relative",
-                plan.highlight && "md:-my-3 md:scale-[1.03]",
+                plan.highlight && "mt-5 md:mt-0 md:-my-3 md:scale-[1.03]",
               )}
             >
               <PricingCard plan={plan} billing={billing} />
@@ -107,15 +107,15 @@ function PricingCard({
   return (
     <div
       className={cn(
-        "relative h-full overflow-hidden rounded-[28px] p-7",
+        "relative h-full rounded-[28px] p-7",
         plan.highlight
           ? "gradient-border bg-white shadow-[0_30px_70px_-20px_rgba(234,88,12,0.35)]"
           : "card-soft hover:-translate-y-[2px] transition-transform duration-300",
       )}
     >
       {plan.highlight && (
-        <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-gradient-primary px-3 py-1 text-[11px] font-extrabold uppercase tracking-[0.14em] text-white shadow-[0_8px_24px_-6px_rgba(234,88,12,0.55)]">
+        <div className="absolute -top-3.5 left-1/2 z-10 -translate-x-1/2">
+          <span className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-gradient-primary px-3 py-1 text-[11px] font-extrabold uppercase tracking-[0.14em] text-white shadow-[0_8px_24px_-6px_rgba(234,88,12,0.55)]">
             ★ Most Popular
           </span>
         </div>

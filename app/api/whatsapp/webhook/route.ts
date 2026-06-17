@@ -1,116 +1,128 @@
 import { NextRequest, NextResponse } from "next/server";
-import twilio from "twilio";
-import { validateTwilioSignature } from "@/lib/twilio";
-import { transcribeTwilioMedia, fetchTwilioMedia } from "@/lib/transcribe";
+import {
+  sendCloudText,
+  verifyMetaSignature,
+  getCloudMedia,
+} from "@/lib/whatsapp-cloud";
+import { transcribeBuffer } from "@/lib/transcribe";
 import { extractReminderFromImage } from "@/lib/vision";
 import { handleIncomingMessage } from "@/lib/handle";
 
-// Twilio sends application/x-www-form-urlencoded and we use Node APIs.
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const { MessagingResponse } = twilio.twiml;
+/**
+ * GET /api/whatsapp/webhook
+ * Meta's one-time webhook verification handshake. Echoes hub.challenge
+ * back when the verify token matches WHATSAPP_VERIFY_TOKEN.
+ */
+export async function GET(req: NextRequest) {
+  const sp = req.nextUrl.searchParams;
+  const mode = sp.get("hub.mode");
+  const token = sp.get("hub.verify_token");
+  const challenge = sp.get("hub.challenge");
+  if (mode === "subscribe" && token === process.env.WHATSAPP_VERIFY_TOKEN) {
+    return new NextResponse(challenge || "", { status: 200 });
+  }
+  return new NextResponse("Forbidden", { status: 403 });
+}
 
+/**
+ * POST /api/whatsapp/webhook
+ * Inbound messages from the WhatsApp Cloud API (JSON). We parse the message,
+ * run it through the shared handler, and reply by calling the Graph API.
+ */
 export async function POST(req: NextRequest) {
-  const formData = await req.formData();
-  const params: Record<string, string> = {};
-  formData.forEach((v, k) => {
-    params[k] = String(v);
-  });
-
-  // Validate the request is genuinely from Twilio.
-  const skip = process.env.TWILIO_SKIP_VALIDATION === "true";
-  if (!skip) {
-    const proto = req.headers.get("x-forwarded-proto") || "https";
-    const host = req.headers.get("host") || req.nextUrl.host;
-    const url = `${proto}://${host}${req.nextUrl.pathname}`;
-    const ok = validateTwilioSignature({
-      signature: req.headers.get("x-twilio-signature"),
-      url,
-      params,
-    });
-    if (!ok) return new NextResponse("Invalid Twilio signature", { status: 403 });
+  // Read the raw body so we can verify Meta's signature over the exact bytes.
+  const raw = await req.text();
+  if (!verifyMetaSignature(raw, req.headers.get("x-hub-signature-256"))) {
+    return new NextResponse("Invalid signature", { status: 403 });
   }
 
-  const from = params.From;
-  if (!from) return new NextResponse("Missing From", { status: 400 });
+  let data: any;
+  try {
+    data = JSON.parse(raw);
+  } catch {
+    return NextResponse.json({ ok: true }); // not JSON we understand
+  }
 
+  const value = data?.entry?.[0]?.changes?.[0]?.value;
+  const msg = value?.messages?.[0];
+
+  // Status callbacks (delivered/read) and other events have no `messages`.
+  if (!msg) return NextResponse.json({ ok: true });
+
+  const fromDigits: string = msg.from; // e.g. "919361092458"
+  const from = `whatsapp:+${fromDigits}`;
   const baseUrl =
     process.env.NEXT_PUBLIC_BASE_URL?.replace(/\/$/, "") ||
     `${req.headers.get("x-forwarded-proto") || "https"}://${req.headers.get("host")}`;
 
-  // --- Voice note? transcribe first ----------------------------------
-  let body = (params.Body || "").trim();
-  let voiceEcho: string | null = null;
+  let body = "";
+  let echo: string | null = null;
   let echoLabel = "🎙️ heard you say";
-  const numMedia = parseInt(params.NumMedia || "0", 10);
-  if (numMedia > 0) {
-    const mediaType = (params.MediaContentType0 || "").toLowerCase();
-    const mediaUrl = params.MediaUrl0;
-    if (mediaUrl && mediaType.startsWith("audio/")) {
-      try {
-        const text = await transcribeTwilioMedia(mediaUrl);
-        if (text) {
-          body = text;
-          voiceEcho = text;
-        }
-      } catch (e) {
-        console.error("[whatsapp/webhook] transcription error", e);
-        return twimlReply(
+
+  try {
+    if (msg.type === "text") {
+      body = (msg.text?.body || "").trim();
+    } else if (msg.type === "audio" || msg.type === "voice") {
+      const mediaId = msg.audio?.id || msg.voice?.id;
+      const { buffer, contentType } = await getCloudMedia(mediaId);
+      const text = await transcribeBuffer(buffer, contentType);
+      if (text) {
+        body = text;
+        echo = text;
+      } else {
+        await sendCloudText(
+          fromDigits,
           "couldn't hear that one. mind sending it as text or trying again?",
         );
+        return NextResponse.json({ ok: true });
       }
-    } else if (mediaUrl && mediaType.startsWith("image/")) {
-      try {
-        const { buffer, contentType } = await fetchTwilioMedia(mediaUrl);
-        const extracted = await extractReminderFromImage(buffer, contentType);
-        if (extracted) {
-          body = extracted;
-          voiceEcho = extracted;
-          echoLabel = "📸 from your image";
-        } else {
-          return twimlReply(
-            "i looked but couldn't find anything to remind you about in that image. try sending it as text?",
-          );
-        }
-      } catch (e) {
-        console.error("[whatsapp/webhook] vision error", e);
-        return twimlReply(
-          "couldn't read that image. mind sending it as text?",
+    } else if (msg.type === "image") {
+      const { buffer, contentType } = await getCloudMedia(msg.image?.id);
+      const extracted = await extractReminderFromImage(buffer, contentType);
+      if (extracted) {
+        body = extracted;
+        echo = extracted;
+        echoLabel = "📸 from your image";
+      } else {
+        await sendCloudText(
+          fromDigits,
+          "i looked but couldn't find anything to remind you about in that image. try sending it as text?",
         );
+        return NextResponse.json({ ok: true });
       }
-    } else if (mediaUrl) {
-      return twimlReply(
-        "i can handle text, voice notes, and screenshots — that file type isn't supported yet.",
+    } else if (msg.type === "interactive") {
+      // Button/list replies — use the selected title/id as the command.
+      body = (
+        msg.interactive?.button_reply?.title ||
+        msg.interactive?.list_reply?.title ||
+        msg.interactive?.button_reply?.id ||
+        ""
+      ).trim();
+    } else {
+      await sendCloudText(
+        fromDigits,
+        "i can handle text, voice notes, and screenshots — that type isn't supported yet.",
       );
+      return NextResponse.json({ ok: true });
+    }
+
+    const reply = await handleIncomingMessage({ from, text: body, baseUrl });
+    const full = echo ? `${echoLabel}: _${echo}_\n\n${reply}` : reply;
+    await sendCloudText(fromDigits, full);
+  } catch (err) {
+    console.error("[whatsapp/webhook] error", err);
+    try {
+      await sendCloudText(
+        fromDigits,
+        "my brain glitched for a sec. try that again, or type *help*.",
+      );
+    } catch {
+      /* swallow */
     }
   }
 
-  try {
-    const reply = await handleIncomingMessage({ from, text: body, baseUrl });
-    const full = voiceEcho ? `${echoLabel}: _${voiceEcho}_\n\n${reply}` : reply;
-    return twimlReply(full);
-  } catch (err) {
-    console.error("[whatsapp/webhook] error", err);
-    return twimlReply(
-      "my brain glitched for a sec. try that again, or type *help*.",
-    );
-  }
-}
-
-export async function GET() {
-  return NextResponse.json({
-    ok: true,
-    endpoint: "/api/whatsapp/webhook",
-    method: "POST (Twilio inbound)",
-  });
-}
-
-function twimlReply(message: string): NextResponse {
-  const twiml = new MessagingResponse();
-  twiml.message(message);
-  return new NextResponse(twiml.toString(), {
-    status: 200,
-    headers: { "Content-Type": "text/xml; charset=utf-8" },
-  });
+  return NextResponse.json({ ok: true });
 }

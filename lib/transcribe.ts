@@ -79,6 +79,20 @@ export async function transcribeTwilioMedia(
   return (res.text || "").trim();
 }
 
+/** Transcribe raw audio bytes (e.g. media downloaded from WhatsApp Cloud API). */
+export async function transcribeBuffer(
+  buffer: Buffer,
+  contentType = "audio/ogg",
+): Promise<string> {
+  const ext = extFromContentType(contentType);
+  const file = await toFile(buffer, `voice.${ext}`, { type: contentType });
+  const out = await openai().audio.transcriptions.create({
+    file,
+    model: "whisper-1",
+  });
+  return (out.text || "").trim();
+}
+
 /** Transcribe audio from any public URL (e.g. a Telegram file URL). */
 export async function transcribeFromUrl(url: string): Promise<string> {
   const res = await fetch(url, { redirect: "follow" });
