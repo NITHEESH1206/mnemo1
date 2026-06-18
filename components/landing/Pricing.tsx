@@ -109,8 +109,8 @@ function PricingCard({
       className={cn(
         "relative h-full rounded-[28px] p-7",
         plan.highlight
-          ? "gradient-border bg-white shadow-[0_30px_70px_-20px_rgba(234,88,12,0.35)]"
-          : "card-soft hover:-translate-y-[2px] transition-transform duration-300",
+          ? "gradient-border card-glass shadow-[0_40px_90px_-24px_rgba(234,88,12,0.4)]"
+          : "card-glass",
       )}
     >
       {plan.highlight && (

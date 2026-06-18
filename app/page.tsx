@@ -3,6 +3,7 @@ import { Hero } from "@/components/landing/Hero";
 import { IntegrationStrip } from "@/components/landing/IntegrationStrip";
 import { Features } from "@/components/landing/Features";
 import { HowItWorks } from "@/components/landing/HowItWorks";
+import { WhyFeru } from "@/components/landing/WhyFeru";
 import { Stats } from "@/components/landing/Stats";
 import { Testimonials } from "@/components/landing/Testimonials";
 import { Pricing } from "@/components/landing/Pricing";
@@ -18,6 +19,7 @@ export default function HomePage() {
         <IntegrationStrip />
         <Features />
         <HowItWorks />
+        <WhyFeru />
         <Stats />
         <Testimonials />
         <Pricing />
