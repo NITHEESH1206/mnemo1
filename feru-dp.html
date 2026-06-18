@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Feru AI — WhatsApp profile photo</title>
+<style>
+  body { margin: 0; background: #faf7f2; color: #1c1917; font: 16px/1.5 system-ui, -apple-system, sans-serif; padding: 32px 16px; }
+  h1 { font-size: 22px; font-weight: 800; text-align: center; margin: 0 0 4px; }
+  p.sub { text-align: center; color: #78716c; margin: 0 0 28px; }
+  .row { display: flex; flex-wrap: wrap; gap: 28px; justify-content: center; }
+  .card { background: #fff; border: 1px solid #e7e2da; border-radius: 20px; padding: 22px; width: 320px; text-align: center; box-shadow: 0 18px 40px -24px rgba(120,53,15,.25); }
+  .label { font-weight: 700; margin: 0 0 14px; font-size: 15px; }
+  .previews { display: flex; align-items: center; justify-content: center; gap: 18px; }
+  .sq canvas { width: 160px; height: 160px; display: block; border-radius: 20px; border: 1px solid #eee; }
+  .ci { width: 116px; height: 116px; border-radius: 50%; overflow: hidden; box-shadow: 0 0 0 4px #f1ece5; }
+  .ci canvas { width: 116px; height: 116px; }
+  .cap { font-size: 12px; color: #a8a29e; margin-top: 8px; }
+  button { margin-top: 18px; width: 100%; border: 0; cursor: pointer; padding: 12px 16px; border-radius: 12px; font-size: 14.5px; font-weight: 700; color: #fff; background: linear-gradient(135deg,#fb923c,#ea580c); }
+  button:hover { filter: brightness(1.04); }
+</style>
+</head>
+<body>
+  <h1>Feru AI — WhatsApp profile photo (640×640)</h1>
+  <p class="sub">Pick a version, click download, then upload it in WhatsApp Manager → Profile.</p>
+
+  <div class="row">
+    <div class="card">
+      <p class="label">Your logo — orange F on cream</p>
+      <div class="previews">
+        <div class="sq"><canvas id="a1" width="640" height="640"></canvas></div>
+        <div class="ci"><canvas id="a2" width="640" height="640"></canvas></div>
+      </div>
+      <div class="cap">square · circle crop (how WhatsApp shows it)</div>
+      <button onclick="dl('a1','feru-dp.png')">Download PNG</button>
+    </div>
+
+    <div class="card">
+      <p class="label">Bold alt — white F on orange</p>
+      <div class="previews">
+        <div class="sq"><canvas id="b1" width="640" height="640"></canvas></div>
+        <div class="ci"><canvas id="b2" width="640" height="640"></canvas></div>
+      </div>
+      <div class="cap">square · circle crop (how WhatsApp shows it)</div>
+      <button onclick="dl('b1','feru-dp-orange-bg.png')">Download PNG</button>
+    </div>
+  </div>
+
+<script>
+  function draw(id, opts) {
+    var c = document.getElementById(id);
+    var x = c.getContext('2d');
+    var W = 640;
+    if (opts.gradient) {
+      var g = x.createLinearGradient(0, 0, W, W);
+      g.addColorStop(0, '#ffb05a');
+      g.addColorStop(0.55, '#f97316');
+      g.addColorStop(1, '#e8590c');
+      x.fillStyle = g;
+    } else {
+      x.fillStyle = opts.bg;
+    }
+    x.fillRect(0, 0, W, W);
+
+    x.strokeStyle = opts.fg;
+    x.fillStyle = opts.fg;
+    x.lineWidth = 104;
+    x.lineCap = 'round';
+    x.lineJoin = 'round';
+    if (opts.shadow) {
+      x.shadowColor = opts.shadow;
+      x.shadowBlur = 24;
+      x.shadowOffsetY = 10;
+    }
+    x.beginPath(); x.moveTo(212, 196); x.lineTo(212, 470); x.stroke();
+    x.beginPath(); x.moveTo(212, 196); x.lineTo(372, 196); x.stroke();
+    x.beginPath(); x.moveTo(212, 330); x.lineTo(328, 330); x.stroke();
+    x.beginPath(); x.arc(446, 164, 48, 0, Math.PI * 2); x.fill();
+    x.shadowColor = 'transparent'; x.shadowBlur = 0; x.shadowOffsetY = 0;
+  }
+
+  function dl(id, name) {
+    document.getElementById(id).toBlob(function (b) {
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(b);
+      a.download = name;
+      a.click();
+    }, 'image/png');
+  }
+
+  var cream = { gradient: false, bg: '#fbf3ea', fg: '#f4801d', shadow: 'rgba(244,128,29,0.22)' };
+  var bold = { gradient: true, fg: '#ffffff', shadow: 'rgba(120,40,10,0.30)' };
+  draw('a1', cream); draw('a2', cream);
+  draw('b1', bold); draw('b2', bold);
+</script>
+</body>
+</html>
