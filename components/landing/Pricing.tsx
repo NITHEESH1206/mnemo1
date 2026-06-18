@@ -7,7 +7,6 @@ import { PricingToggle } from "@/components/ui/PricingToggle";
 import { FAQAccordion } from "@/components/ui/FAQAccordion";
 import { GradientButton } from "@/components/ui/GradientButton";
 import { Mascot } from "@/components/ui/Mascot";
-import { whatsappCTAUrl } from "@/lib/whatsapp";
 import { FAQS, PRICING, type PricingPlan } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
@@ -174,8 +173,7 @@ function PricingCard({
 
       <div className="mt-7">
         <GradientButton
-          href={whatsappCTAUrl()}
-          target="_blank"
+          href="/api/auth/google/login?next=wa"
           variant={plan.highlight ? "primary" : "ink"}
           size="md"
           className="w-full justify-center"

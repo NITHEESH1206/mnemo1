@@ -110,14 +110,20 @@ export function authUrl(phone: string): string {
   });
 }
 
-/** Generate a sign-in (login/signup) consent URL — email + profile only. */
-export function authUrlForLogin(): string {
+/**
+ * Generate a sign-in (login/signup) consent URL — email + profile only.
+ * `dest` controls where the callback sends the user after sign-in:
+ *   "wa"   → WhatsApp (the "Try for Free" funnel)
+ *   else   → the web dashboard ("Log in")
+ */
+export function authUrlForLogin(dest?: string): string {
   const client = oauthClient();
+  const statePayload = dest === "wa" ? "login:wa" : "login";
   return client.generateAuthUrl({
     access_type: "online",
     prompt: "select_account",
     scope: LOGIN_SCOPES,
-    state: buildState("login"),
+    state: buildState(statePayload),
   });
 }
 

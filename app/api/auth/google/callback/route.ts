@@ -31,8 +31,10 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  // ── Web login / signup flow → send them to pricing ───────
-  if (decoded === "login") {
+  // ── Web login / signup flow ──────────────────────────────
+  // "login"     → dashboard (the "Log in" button)
+  // "login:wa"  → WhatsApp  (the "Try for Free" funnel)
+  if (decoded === "login" || decoded === "login:wa") {
     try {
       const tokens = await exchangeCodeForTokens(code);
       const email = tokens.email ?? "your Google account";
@@ -40,7 +42,22 @@ export async function GET(req: NextRequest) {
       const base =
         process.env.NEXT_PUBLIC_BASE_URL?.replace(/\/$/, "") ||
         req.nextUrl.origin;
-      const res = NextResponse.redirect(`${base}/dashboard`);
+
+      let destination = `${base}/dashboard`;
+      if (decoded === "login:wa") {
+        const waNum = (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "").replace(
+          /\D/g,
+          "",
+        );
+        if (waNum) {
+          const text = encodeURIComponent(
+            "Hi Feru AI! I'd like to get started.",
+          );
+          destination = `https://wa.me/${waNum}?text=${text}`;
+        }
+      }
+
+      const res = NextResponse.redirect(destination);
       res.cookies.set(SESSION_COOKIE_NAME, signSession(email), {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
