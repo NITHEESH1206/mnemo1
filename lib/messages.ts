@@ -238,11 +238,22 @@ export function limitReachedMessage(): string {
   const base = process.env.NEXT_PUBLIC_BASE_URL?.replace(/\/$/, "") || "";
   const link = base ? `${base}/pricing` : "the pricing page";
   return [
-    "you've used all *20* free reminders this month. 😅",
+    "you've used all *10* free reminders this month. 😅",
     "",
     `upgrade for unlimited reminders + every channel: ${link}`,
     "",
     "(your free reminders reset next month.)",
+  ].join("\n");
+}
+
+export function trialOverMessage(pricingUrl: string): string {
+  return [
+    "your *7-day free trial* is over. ⏳",
+    "",
+    "i'd love to keep remembering things for you — subscribe to continue:",
+    pricingUrl,
+    "",
+    "once you're in, send *link <code>* here to unlock your number.",
   ].join("\n");
 }
 

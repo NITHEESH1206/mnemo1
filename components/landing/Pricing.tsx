@@ -48,8 +48,8 @@ export function Pricing() {
             Pick the memory <span className="gradient-text">that fits you.</span>
           </h2>
           <p className="mt-5 text-[17px] text-ink/65">
-            No hidden limits. No surprise paywalls. 14-day money-back guarantee
-            on every paid plan.
+            Start free with 10 reminders a month — or try Pro free for 7 days.
+            No card required.
           </p>
           <div className="mt-8 flex justify-center">
             <PricingToggle billing={billing} onChange={setBilling} />

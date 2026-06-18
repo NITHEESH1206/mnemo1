@@ -27,6 +27,7 @@ import {
   getUserZone,
   incrMonthlyCount,
   isPaidPlan,
+  isTrialExpired,
   listForUser,
   registerUser,
   removeContact,
@@ -61,6 +62,7 @@ import {
   friendConfirmationMessage,
   helpMessage,
   limitReachedMessage,
+  trialOverMessage,
   linkedPlanMessage,
   listMessage,
   meetingConfirmationMessage,
@@ -138,6 +140,19 @@ export async function handleIncomingMessage(params: {
 
   // Track the user (for the digest) + resolve their timezone.
   await registerUser(from).catch(() => {});
+
+  // 7-day free trial gate. After the trial, unpaid users must subscribe.
+  // We still let them through to link a paid plan, pay, or ask for help.
+  const isUnlockCmd = /^(link|pay|subscribe|upgrade|help)\b/i.test(lower);
+  const currentPlan = await getPlan(from);
+  if (
+    !isPaidPlan(currentPlan) &&
+    !isUnlockCmd &&
+    (await isTrialExpired(from))
+  ) {
+    return trialOverMessage(`${baseUrl}/pricing`);
+  }
+
   const zone = await getUserZone(from);
   const offsetMin = offsetForZone(zone) ?? 330;
   const nowLocal = () =>

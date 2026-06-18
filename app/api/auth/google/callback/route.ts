@@ -7,6 +7,7 @@ import {
   SESSION_COOKIE_NAME,
 } from "@/lib/google";
 import { sendCloudText } from "@/lib/whatsapp-cloud";
+import { recordUserLogin } from "@/lib/store";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -38,6 +39,11 @@ export async function GET(req: NextRequest) {
     try {
       const tokens = await exchangeCodeForTokens(code);
       const email = tokens.email ?? "your Google account";
+
+      // Persist the login (email, first/last seen, login count) in Redis.
+      if (tokens.email) {
+        await recordUserLogin(tokens.email).catch(() => {});
+      }
 
       const base =
         process.env.NEXT_PUBLIC_BASE_URL?.replace(/\/$/, "") ||

@@ -182,7 +182,7 @@ export const PRICING: PricingPlan[] = [
     annual: 0,
     blurb: "Everything you need to get started.",
     features: [
-      "20 reminders per month",
+      "10 reminders per month",
       "WhatsApp or Telegram",
       "Basic recurrence",
       "Community support",
@@ -193,10 +193,11 @@ export const PRICING: PricingPlan[] = [
   {
     name: "Pro",
     category: "For power users",
-    monthly: 149,
-    annual: 104,
+    monthly: 299,
+    annual: 209,
     blurb: "For solopreneurs who run on reminders.",
     features: [
+      "7-day free trial included",
       "Unlimited reminders",
       "All channels (WhatsApp, Telegram, Email, Web)",
       "Voice input in any language",
@@ -211,8 +212,8 @@ export const PRICING: PricingPlan[] = [
   {
     name: "Team",
     category: "For teams",
-    monthly: 499,
-    annual: 349,
+    monthly: 799,
+    annual: 559,
     blurb: "Keep everyone in sync, automatically.",
     features: [
       "Everything in Pro",
@@ -233,8 +234,8 @@ export const FAQS = [
     a: "Yes — upgrade, downgrade, or cancel at any time from your dashboard. Changes prorate automatically, and your data follows you between plans.",
   },
   {
-    q: "Is there a free trial for paid plans?",
-    a: "Pro and Team both include a 14-day free trial with full access to every feature. No card required to start.",
+    q: "Is there a free trial?",
+    a: "Yes — Pro includes a 7-day free trial with full access, no card required. After the trial, subscribe to keep going. The Free plan gives you 10 reminders a month, always free.",
   },
   {
     q: "What channels are supported?",

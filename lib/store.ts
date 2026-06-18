@@ -286,7 +286,59 @@ export async function recordSubscription(sub: Subscription): Promise<void> {
 
 // ── Plans, account linking & monthly usage ─────────────────────
 
-export const FREE_MONTHLY_LIMIT = 20;
+export const FREE_MONTHLY_LIMIT = 10;
+
+// ── 7-day free trial (tracked per WhatsApp/Telegram/email address) ──
+export const TRIAL_DAYS = 7;
+const firstSeenKey = (addr: string) => `firstseen:${addr}`;
+
+/** Timestamp (ms) the user first contacted us; sets it on first call. */
+export async function ensureTrialStart(addr: string): Promise<number> {
+  const existing = await redis().get<number>(firstSeenKey(addr));
+  if (existing) return existing;
+  const now = Date.now();
+  await redis().set(firstSeenKey(addr), now);
+  return now;
+}
+
+/** True once the 7-day trial window has elapsed since first contact. */
+export async function isTrialExpired(addr: string): Promise<boolean> {
+  const start = await ensureTrialStart(addr);
+  return Date.now() > start + TRIAL_DAYS * 24 * 60 * 60 * 1000;
+}
+
+// ── User login records (web sign-in) ───────────────────────────
+export type UserRecord = {
+  email: string;
+  name?: string;
+  createdAt: string;
+  lastLoginAt: string;
+  logins: number;
+};
+const userInfoKey = (email: string) => `userinfo:${email.toLowerCase()}`;
+
+/** Persist a web login: first-seen, last-seen, and a running login count. */
+export async function recordUserLogin(
+  email: string,
+  name?: string,
+): Promise<void> {
+  const key = userInfoKey(email);
+  const existing = await redis().get<UserRecord>(key);
+  const now = new Date().toISOString();
+  const rec: UserRecord = {
+    email: email.toLowerCase(),
+    name: name ?? existing?.name,
+    createdAt: existing?.createdAt ?? now,
+    lastLoginAt: now,
+    logins: (existing?.logins ?? 0) + 1,
+  };
+  await redis().set(key, rec);
+  await redis().sadd("useremails", email.toLowerCase());
+}
+
+export async function allUserEmails(): Promise<string[]> {
+  return (await redis().smembers("useremails")) ?? [];
+}
 
 const planKey = (phone: string) => `plan:${phone}`;
 const emailKey = (phone: string) => `email:${phone}`;

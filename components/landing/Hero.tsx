@@ -101,7 +101,7 @@ export function Hero() {
           transition={{ duration: 0.6, delay: 0.48 }}
           className="mt-6 text-center text-[13px] font-medium text-white/75 [text-shadow:0_1px_12px_rgba(12,74,110,0.3)]"
         >
-          No credit card required · Cancel anytime · Setup in 2 minutes
+          7-day free trial · No credit card required · Cancel anytime
         </motion.p>
 
         {/* Floating glass showcase */}
