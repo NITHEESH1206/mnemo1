@@ -60,6 +60,7 @@ export default function RootLayout({
       <body className="bg-bg-base text-ink antialiased">
         <div className="grain-overlay" aria-hidden="true" />
         <div className="relative z-[1]">{children}</div>
+        <Analytics />
       </body>
     </html>
   );
