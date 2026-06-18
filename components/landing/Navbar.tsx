@@ -7,6 +7,7 @@ import Link from "next/link";
 import { NAV_LINKS } from "@/lib/constants";
 import { Logo } from "@/components/ui/Logo";
 import { GradientButton } from "@/components/ui/GradientButton";
+import { whatsappCTAUrl } from "@/lib/whatsapp";
 import { cn } from "@/lib/utils";
 
 type User = { name: string; email: string };
@@ -104,7 +105,8 @@ export function Navbar() {
                 Log in
               </a>
               <GradientButton
-                href="/api/auth/google/login"
+                href={whatsappCTAUrl()}
+                target="_blank"
                 variant="primary"
                 size="sm"
                 className="text-[13.5px]"
@@ -186,7 +188,8 @@ export function Navbar() {
                       Log in
                     </GradientButton>
                     <GradientButton
-                      href="/api/auth/google/login"
+                      href={whatsappCTAUrl()}
+                      target="_blank"
                       variant="primary"
                       size="md"
                       className="w-full justify-center"

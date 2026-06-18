@@ -40,7 +40,7 @@ export async function GET(req: NextRequest) {
       const base =
         process.env.NEXT_PUBLIC_BASE_URL?.replace(/\/$/, "") ||
         req.nextUrl.origin;
-      const res = NextResponse.redirect(`${base}/pricing?welcome=1`);
+      const res = NextResponse.redirect(`${base}/dashboard`);
       res.cookies.set(SESSION_COOKIE_NAME, signSession(email), {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",

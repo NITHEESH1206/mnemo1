@@ -4,6 +4,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import { Star, Play, Check, MessageCircle, Mic } from "lucide-react";
 import { GradientButton } from "@/components/ui/GradientButton";
 import { Mascot } from "@/components/ui/Mascot";
+import { whatsappCTAUrl } from "@/lib/whatsapp";
 
 export function Hero() {
   const reduced = useReducedMotion();
@@ -82,7 +83,12 @@ export function Hero() {
           transition={{ duration: 0.6, delay: 0.34 }}
           className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row"
         >
-          <GradientButton href="/api/auth/google/login" variant="primary" size="lg">
+          <GradientButton
+            href={whatsappCTAUrl()}
+            target="_blank"
+            variant="primary"
+            size="lg"
+          >
             Try for Free →
           </GradientButton>
           <GradientButton href="#how-it-works" variant="glass" size="lg">
