@@ -1,6 +1,7 @@
 import { Navbar } from "@/components/landing/Navbar";
 import { Hero } from "@/components/landing/Hero";
 import { IntegrationStrip } from "@/components/landing/IntegrationStrip";
+import { Overload } from "@/components/landing/Overload";
 import { Features } from "@/components/landing/Features";
 import { HowItWorks } from "@/components/landing/HowItWorks";
 import { WhyFeru } from "@/components/landing/WhyFeru";
@@ -17,6 +18,7 @@ export default function HomePage() {
       <main className="overflow-hidden">
         <Hero />
         <IntegrationStrip />
+        <Overload />
         <Features />
         <HowItWorks />
         <WhyFeru />
