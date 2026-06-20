@@ -5,12 +5,6 @@ import { Star } from "lucide-react";
 import { TESTIMONIALS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
-function fallbackAvatar(name: string) {
-  return `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(
-    name,
-  )}&backgroundColor=fb923c,f97316,ea580c&textColor=ffffff`;
-}
-
 export function Testimonials() {
   return (
     <section className="section relative">
@@ -57,7 +51,6 @@ function TestimonialCard({
   quote,
   rating,
   featured,
-  photo,
 }: {
   name: string;
   role: string;
@@ -84,18 +77,12 @@ function TestimonialCard({
             />
           ))}
         </div>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={photo}
-          width={48}
-          height={48}
-          alt={name}
-          loading="lazy"
-          onError={(e) => {
-            (e.currentTarget as HTMLImageElement).src = fallbackAvatar(name);
-          }}
-          className="h-12 w-12 rounded-full border-2 border-white object-cover shadow-[0_4px_14px_rgba(120,53,15,0.22)]"
-        />
+        <div
+          aria-hidden
+          className="grid h-12 w-12 shrink-0 place-items-center rounded-full border-2 border-white bg-gradient-primary text-[18px] font-extrabold text-white shadow-[0_4px_14px_rgba(120,53,15,0.22)]"
+        >
+          {name.charAt(0).toUpperCase()}
+        </div>
       </div>
 
       <p

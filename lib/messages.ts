@@ -238,7 +238,7 @@ export function limitReachedMessage(): string {
   const base = process.env.NEXT_PUBLIC_BASE_URL?.replace(/\/$/, "") || "";
   const link = base ? `${base}/pricing` : "the pricing page";
   return [
-    "you've used all *10* free reminders this month. 😅",
+    "you've used all *20* free reminders this month. 😅",
     "",
     `upgrade for unlimited reminders + every channel: ${link}`,
     "",

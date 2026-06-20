@@ -182,7 +182,7 @@ export const PRICING: PricingPlan[] = [
     annual: 0,
     blurb: "Everything you need to get started.",
     features: [
-      "10 reminders per month",
+      "20 reminders per month",
       "WhatsApp or Telegram",
       "Basic recurrence",
       "Community support",
@@ -235,7 +235,7 @@ export const FAQS = [
   },
   {
     q: "Is there a free trial?",
-    a: "Yes — Pro includes a 7-day free trial with full access, no card required. After the trial, subscribe to keep going. The Free plan gives you 10 reminders a month, always free.",
+    a: "Yes — Pro includes a 7-day free trial with full access, no card required. After the trial, subscribe to keep going. The Free plan gives you 20 reminders a month, always free.",
   },
   {
     q: "What channels are supported?",

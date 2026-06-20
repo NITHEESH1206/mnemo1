@@ -27,8 +27,8 @@ export function Overload() {
           transition={{ duration: 0.6 }}
           className="mx-auto max-w-2xl text-[20px] font-bold leading-snug text-ink sm:text-[24px]"
         >
-          Your mind never stops. And yet, things still slip.
-          <br className="hidden sm:block" /> It’s not a lack of discipline.
+          You’re juggling a hundred things at once.
+          <br className="hidden sm:block" /> No brain was built to hold them all.
         </motion.p>
 
         {/* Stage */}
@@ -55,7 +55,7 @@ export function Overload() {
             transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
             className="display-tight pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2 text-center text-[clamp(72px,17vw,210px)] leading-[0.9] text-ink"
           >
-            It’s overload<span className="text-flame-500">.</span>
+            Too much to hold<span className="text-flame-500">.</span>
           </motion.h2>
 
           {/* Sad mascot orb */}
