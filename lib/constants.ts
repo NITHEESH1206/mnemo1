@@ -197,7 +197,6 @@ export const PRICING: PricingPlan[] = [
     annual: 209,
     blurb: "For solopreneurs who run on reminders.",
     features: [
-      "7-day free trial included",
       "Unlimited reminders",
       "All channels (WhatsApp, Telegram, Email, Web)",
       "Voice input in any language",
@@ -234,8 +233,8 @@ export const FAQS = [
     a: "Yes — upgrade, downgrade, or cancel at any time from your dashboard. Changes prorate automatically, and your data follows you between plans.",
   },
   {
-    q: "Is there a free trial?",
-    a: "Yes — Pro includes a 7-day free trial with full access, no card required. After the trial, subscribe to keep going. The Free plan gives you 20 reminders a month, always free.",
+    q: "Is the Free plan really free?",
+    a: "Yes — the Free plan is free forever: 20 reminders a month, no card, no time limit. Upgrade to Pro anytime for unlimited reminders and every channel.",
   },
   {
     q: "What channels are supported?",
