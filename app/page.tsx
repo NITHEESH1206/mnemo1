@@ -3,7 +3,7 @@ import { Hero } from "@/components/landing/Hero";
 import { IntegrationStrip } from "@/components/landing/IntegrationStrip";
 import { Overload } from "@/components/landing/Overload";
 import { Features } from "@/components/landing/Features";
-import { HowItWorks } from "@/components/landing/HowItWorks";
+import { StopForgetting } from "@/components/landing/StopForgetting";
 import { WhyFeru } from "@/components/landing/WhyFeru";
 import { Stats } from "@/components/landing/Stats";
 import { Testimonials } from "@/components/landing/Testimonials";
@@ -20,7 +20,7 @@ export default function HomePage() {
         <IntegrationStrip />
         <Overload />
         <Features />
-        <HowItWorks />
+        <StopForgetting />
         <WhyFeru />
         <Stats />
         <Testimonials />
