@@ -413,6 +413,17 @@ export async function allUsers(): Promise<string[]> {
   return (await redis().smembers("users")) ?? [];
 }
 
+// ── Stats counters (for the admin stats page) ──────────────────
+export async function countBotUsers(): Promise<number> {
+  return (await redis().scard("users")) ?? 0;
+}
+export async function countWebUsers(): Promise<number> {
+  return (await redis().scard("useremails")) ?? 0;
+}
+export async function countSubscriptions(): Promise<number> {
+  return (await redis().zcard("subscriptions")) ?? 0;
+}
+
 const digestKey = (addr: string, ymd: string) => `digest:${addr}:${ymd}`;
 export async function wasDigestSent(
   addr: string,
