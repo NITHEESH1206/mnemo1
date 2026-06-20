@@ -15,9 +15,12 @@ export const dynamic = "force-dynamic";
  */
 export async function GET(req: NextRequest) {
   const key = req.nextUrl.searchParams.get("key");
-  if (!process.env.CRON_SECRET || key !== process.env.CRON_SECRET) {
+  const allowed = [process.env.ADMIN_KEY, process.env.CRON_SECRET].filter(
+    Boolean,
+  );
+  if (!key || !allowed.includes(key)) {
     return new NextResponse(
-      "Unauthorized. Append ?key=<your CRON_SECRET> to the URL.",
+      "Unauthorized. Append ?key=<your ADMIN_KEY> to the URL.",
       { status: 401 },
     );
   }
