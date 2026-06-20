@@ -253,8 +253,28 @@ export function trialOverMessage(pricingUrl: string): string {
     "i'd love to keep remembering things for you — subscribe to continue:",
     pricingUrl,
     "",
-    "once you're in, send *link <code>* here to unlock your number.",
+    "got a coupon? send *redeem <code>* to unlock it free.",
   ].join("\n");
+}
+
+export function couponAppliedMessage(plan: string): string {
+  return [
+    `🎉 coupon applied — you're on *${capitalize(plan)}*, 100% free.`,
+    "",
+    "unlimited reminders + every channel are all yours. enjoy! 🧡",
+  ].join("\n");
+}
+
+export function couponInvalidMessage(): string {
+  return "hmm, that coupon isn't valid. double-check it and try again — *redeem YOURCODE*";
+}
+
+export function couponExhaustedMessage(): string {
+  return "ahh, that coupon's been fully claimed. 😅 keep an eye out for the next drop!";
+}
+
+export function couponAlreadyMessage(): string {
+  return "you've already redeemed this one — you're all set. ✅";
 }
 
 function capitalize(s: string): string {

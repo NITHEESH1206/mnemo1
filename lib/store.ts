@@ -393,6 +393,59 @@ export async function consumeLinkToken(
   return data;
 }
 
+// ── Coupons (100%-off codes) ───────────────────────────────────
+export type Coupon = {
+  code: string;
+  plan: string;
+  maxUses: number; // 0 = unlimited
+  uses: number;
+  createdAt: string;
+};
+const couponKey = (code: string) => `coupon:${code.trim().toUpperCase()}`;
+const couponUsedKey = (code: string, addr: string) =>
+  `couponused:${code.trim().toUpperCase()}:${addr}`;
+
+export async function createCoupon(
+  code: string,
+  plan: string,
+  maxUses = 0,
+): Promise<Coupon> {
+  const c: Coupon = {
+    code: code.trim().toUpperCase(),
+    plan,
+    maxUses,
+    uses: 0,
+    createdAt: new Date().toISOString(),
+  };
+  await redis().set(couponKey(code), c);
+  return c;
+}
+
+export async function getCoupon(code: string): Promise<Coupon | null> {
+  return (await redis().get<Coupon>(couponKey(code))) ?? null;
+}
+
+/** Redeem a coupon for an address (one redemption per address). */
+export async function redeemCoupon(
+  code: string,
+  addr: string,
+): Promise<{
+  ok: boolean;
+  reason?: "invalid" | "exhausted" | "already";
+  plan?: string;
+}> {
+  const c = await getCoupon(code);
+  if (!c) return { ok: false, reason: "invalid" };
+  if (c.maxUses > 0 && c.uses >= c.maxUses)
+    return { ok: false, reason: "exhausted", plan: c.plan };
+  const used = await redis().get(couponUsedKey(c.code, addr));
+  if (used) return { ok: false, reason: "already", plan: c.plan };
+  await redis().set(couponUsedKey(c.code, addr), 1);
+  c.uses += 1;
+  await redis().set(couponKey(c.code), c);
+  return { ok: true, plan: c.plan };
+}
+
 export async function getMonthlyCount(phone: string): Promise<number> {
   const c = await redis().get<number>(monthKey(phone, yyyymm()));
   return c ?? 0;

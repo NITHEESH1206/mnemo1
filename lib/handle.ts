@@ -20,6 +20,7 @@ import {
   createReminder,
   findContact,
   getContacts,
+  getCoupon,
   getLastFired,
   getList,
   getMonthlyCount,
@@ -29,6 +30,7 @@ import {
   isPaidPlan,
   isTrialExpired,
   listForUser,
+  redeemCoupon,
   registerUser,
   removeContact,
   removeFromList,
@@ -46,6 +48,10 @@ import {
   badLinkMessage,
   cancelledMessage,
   confirmationMessage,
+  couponAlreadyMessage,
+  couponAppliedMessage,
+  couponExhaustedMessage,
+  couponInvalidMessage,
   connectGoogleMessage,
   connectNotionMessage,
   connectOutlookMessage,
@@ -143,7 +149,8 @@ export async function handleIncomingMessage(params: {
 
   // 7-day free trial gate. After the trial, unpaid users must subscribe.
   // We still let them through to link a paid plan, pay, or ask for help.
-  const isUnlockCmd = /^(link|pay|subscribe|upgrade|help)\b/i.test(lower);
+  const isUnlockCmd =
+    /^(link|pay|subscribe|upgrade|help|redeem|coupon|code)\b/i.test(lower);
   const currentPlan = await getPlan(from);
   if (
     !isPaidPlan(currentPlan) &&
@@ -307,6 +314,27 @@ export async function handleIncomingMessage(params: {
     const name = forgetMatch[1].trim();
     const ok = await removeContact(from, name);
     return ok ? contactForgottenMessage(name) : contactNotFoundMessage(name);
+  }
+
+  // --- Redeem a coupon (100% off) ------------------------------------
+  const couponMatch = body.match(
+    /^(?:redeem|coupon|code)\s+([a-z0-9]{3,24})\s*$/i,
+  );
+  const bareCode = /^[a-z0-9]{4,24}$/i.test(body) ? body.trim() : null;
+  const tryCode = couponMatch ? couponMatch[1] : bareCode;
+  if (tryCode) {
+    const coupon = await getCoupon(tryCode);
+    if (coupon) {
+      const res = await redeemCoupon(tryCode, from);
+      if (res.ok && res.plan) {
+        await setPlan(from, res.plan);
+        return couponAppliedMessage(res.plan);
+      }
+      if (res.reason === "already") return couponAlreadyMessage();
+      if (res.reason === "exhausted") return couponExhaustedMessage();
+    } else if (couponMatch) {
+      return couponInvalidMessage();
+    }
   }
 
   // --- Activate a paid plan -------------------------------------------
