@@ -386,8 +386,9 @@ export async function handleIncomingMessage(params: {
     }
   }
 
-  // Friend-to-friend
-  if (r.recipientName) {
+  // Friend-to-friend (but NOT for meetings — those just create a calendar
+  // event titled "Meet with <name>", no phone number needed).
+  if (r.recipientName && !r.meeting) {
     const contactPhone = await findContact(from, r.recipientName);
     if (!contactPhone) return needContactMessage(r.recipientName);
     const friendReminder = await createReminder({
