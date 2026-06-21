@@ -9,8 +9,11 @@ export const dynamic = "force-dynamic";
  * the secret token. Run once after deploying (or whenever the URL changes).
  */
 export async function GET(req: NextRequest) {
-  const cronSecret = process.env.CRON_SECRET;
-  if (cronSecret && req.nextUrl.searchParams.get("secret") !== cronSecret) {
+  const key = req.nextUrl.searchParams.get("secret");
+  const allowed = [process.env.ADMIN_KEY, process.env.CRON_SECRET].filter(
+    Boolean,
+  );
+  if (allowed.length && !allowed.includes(key || "")) {
     return new NextResponse("Unauthorized", { status: 401 });
   }
 
