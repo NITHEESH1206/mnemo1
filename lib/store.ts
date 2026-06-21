@@ -286,7 +286,8 @@ export async function recordSubscription(sub: Subscription): Promise<void> {
 
 // ── Plans, account linking & monthly usage ─────────────────────
 
-export const FREE_MONTHLY_LIMIT = 20;
+// Temporarily "unlimited" for early access — set back to 20 to re-enable the free cap.
+export const FREE_MONTHLY_LIMIT = 1_000_000;
 
 // ── 7-day free trial (tracked per WhatsApp/Telegram/email address) ──
 export const TRIAL_DAYS = 7;
