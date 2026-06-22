@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { GradientButton } from "@/components/ui/GradientButton";
-import { whatsappCTAUrl } from "@/lib/whatsapp";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 declare global {
@@ -77,17 +76,17 @@ export function CheckoutButton({
           });
           const vd = await v.json();
           if (vd.verified) {
-            // Paid — send them to the activation page (shows the link code
-            // + WhatsApp button to unlock the plan on their number).
-            if (vd.linkToken) {
-              window.location.href = `/activate?token=${encodeURIComponent(
-                vd.linkToken,
-              )}&plan=${encodeURIComponent(vd.plan || data.plan)}`;
-            } else {
-              window.location.href = whatsappCTAUrl(
-                `Hi Feru AI! I just subscribed to the ${data.plan} plan.`,
-              );
-            }
+            // Paid — go straight to WhatsApp with the activation command
+            // prefilled, so the user just taps send to unlock their plan.
+            const num = (
+              process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || ""
+            ).replace(/\D/g, "");
+            const msg = vd.linkToken
+              ? `link ${vd.linkToken}`
+              : `Hi Feru AI! I just subscribed to the ${data.plan} plan.`;
+            window.location.href = `https://wa.me/${num}?text=${encodeURIComponent(
+              msg,
+            )}`;
           } else {
             alert(
               "We couldn't verify the payment. If money was deducted, it'll auto-refund or contact support.",
