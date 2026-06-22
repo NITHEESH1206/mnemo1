@@ -6,6 +6,7 @@ import { Check } from "lucide-react";
 import { PricingToggle } from "@/components/ui/PricingToggle";
 import { FAQAccordion } from "@/components/ui/FAQAccordion";
 import { GradientButton } from "@/components/ui/GradientButton";
+import { CheckoutButton } from "@/components/ui/CheckoutButton";
 import { Mascot } from "@/components/ui/Mascot";
 import { FAQS, PRICING, type PricingPlan } from "@/lib/constants";
 import { cn } from "@/lib/utils";
@@ -172,14 +173,24 @@ function PricingCard({
       </ul>
 
       <div className="mt-7">
-        <GradientButton
-          href="/api/auth/google/login?next=wa"
-          variant={plan.highlight ? "primary" : "ink"}
-          size="md"
-          className="w-full justify-center"
-        >
-          Start for free →
-        </GradientButton>
+        {plan.monthly === 0 ? (
+          <GradientButton
+            href="/api/auth/google/login?next=wa"
+            variant="ink"
+            size="md"
+            className="w-full justify-center"
+          >
+            Start for free →
+          </GradientButton>
+        ) : (
+          <CheckoutButton
+            plan={plan.name}
+            billing={billing}
+            variant={plan.highlight ? "primary" : "ink"}
+          >
+            Get {plan.name} →
+          </CheckoutButton>
+        )}
       </div>
     </div>
   );
