@@ -303,6 +303,23 @@ export function capturedToInboxMessage(text: string): string {
   return `not sure when you meant 🤔 — i tucked “${snippet}” into your *inbox* so it's not lost.\n\nadd a time like "remind me … at 6pm" to schedule it.`;
 }
 
+export function contextReminderSetMessage(task: string, place: string): string {
+  return [
+    `got it 📍 — i'll remind you to *${task}* when you're at *${place}*.`,
+    "",
+    `just message me "i'm at ${place}"${place === "home" ? ' (or "home")' : ""} when you arrive.`,
+  ].join("\n");
+}
+
+export function contextRemindersDeliverMessage(
+  place: string,
+  tasks: string[],
+): string {
+  const lines = tasks.map((t) => `• ${t}`).join("\n");
+  const head = place === "home" ? "🏠 welcome home!" : `📍 you're at *${place}*!`;
+  return `${head} you wanted to:\n\n${lines}`;
+}
+
 function capitalize(s: string): string {
   if (!s) return s;
   return s.charAt(0).toUpperCase() + s.slice(1);

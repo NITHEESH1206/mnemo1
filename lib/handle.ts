@@ -12,6 +12,8 @@ import { parseMessage } from "./llm-parser";
 import {
   addContact,
   addToList,
+  addContextReminder,
+  popContextReminders,
   allListNames,
   cancelReminderForUser,
   clearList,
@@ -59,6 +61,8 @@ import {
   referralThanksMessage,
   savedToReadingMessage,
   capturedToInboxMessage,
+  contextReminderSetMessage,
+  contextRemindersDeliverMessage,
   connectGoogleMessage,
   connectNotionMessage,
   connectOutlookMessage,
@@ -437,6 +441,46 @@ export async function handleIncomingMessage(params: {
     if (result.reason === "not_connected") return notionNotConnectedMessage();
     if (result.reason === "no_target") return notionNoTargetMessage();
     return "couldn't save that to notion right now — try again in a moment.";
+  }
+
+  // --- Place reminders: "remind me to X when I get home/work/…" ------
+  let ctxTask = "";
+  let ctxPlace = "";
+  let cm = body.match(
+    /^remind me to (.+?)\s+when i\s*(?:'m|am)?\s*(?:get|reach|arrive|getting)?\s*home\b/i,
+  );
+  if (cm) {
+    ctxTask = cm[1].trim();
+    ctxPlace = "home";
+  } else {
+    cm = body.match(
+      /^remind me to (.+?)\s+when i\s*(?:'m|am)?\s*(?:get to|reach|arrive at|am at|get|reach)\s+(?:the\s+)?([a-z][a-z ]{1,18}?)\s*$/i,
+    );
+    if (cm) {
+      ctxTask = cm[1].trim();
+      ctxPlace = cm[2].trim().toLowerCase();
+    }
+  }
+  if (ctxTask && ctxPlace) {
+    await addContextReminder(from, ctxPlace, ctxTask);
+    return contextReminderSetMessage(ctxTask, ctxPlace);
+  }
+
+  // Arrival trigger → deliver everything queued for that place.
+  let arrived = "";
+  if (/^(?:i'?m\s+(?:now\s+)?home|home|reached home|at home|back home|i am home)\s*$/i.test(body.trim())) {
+    arrived = "home";
+  } else {
+    const am = body.match(
+      /^(?:i'?m\s+(?:now\s+)?(?:at|in)|reached|arrived at|got to|i am at)\s+(?:the\s+)?([a-z][a-z ]{1,18}?)\s*$/i,
+    );
+    if (am) arrived = am[1].trim().toLowerCase();
+  }
+  if (arrived) {
+    const tasks = await popContextReminders(from, arrived);
+    if (tasks.length) return contextRemindersDeliverMessage(arrived, tasks);
+    if (arrived === "home") return "🏠 welcome home! nothing queued for here.";
+    // generic place with nothing queued → fall through to normal handling
   }
 
   // --- Read later / summarize a link ---------------------------------

@@ -500,6 +500,29 @@ export async function creditReferral(
   return { ok: true, referrer, count };
 }
 
+// ── Context / place reminders ("when I get home") ──────────────
+const ctxKey = (addr: string, place: string) =>
+  `ctxrem:${addr}:${place.toLowerCase()}`;
+
+export async function addContextReminder(
+  addr: string,
+  place: string,
+  task: string,
+): Promise<void> {
+  await redis().rpush(ctxKey(addr, place), task);
+}
+
+/** Return AND clear all reminders queued for a place (e.g. "home"). */
+export async function popContextReminders(
+  addr: string,
+  place: string,
+): Promise<string[]> {
+  const key = ctxKey(addr, place);
+  const items = (await redis().lrange<string>(key, 0, -1)) ?? [];
+  if (items.length) await redis().del(key);
+  return items;
+}
+
 // ── Stats counters (for the admin stats page) ──────────────────
 export async function countBotUsers(): Promise<number> {
   return (await redis().scard("users")) ?? 0;
