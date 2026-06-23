@@ -78,10 +78,11 @@ export function confirmationMessage(r: Reminder, tz?: string): string {
 }
 
 export function reminderFireMessage(r: Reminder): string {
-  const base = r.fireText || `⏰ it's time to ${r.task}!`;
+  // Task is the headline; a tiny encouragement tag is optional.
+  const tag = r.fireText ? ` — ${r.fireText}` : "";
   const repeatNote =
     r.recurrence !== "none" ? `\n\n_(repeats ${r.recurrence})_` : "";
-  return `${base}${repeatNote}`;
+  return `⏰ Time to *${r.task}*${tag}${repeatNote}`;
 }
 
 export function listMessage(reminders: Reminder[], tz?: string): string {

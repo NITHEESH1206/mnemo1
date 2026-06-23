@@ -30,7 +30,7 @@ function fmt(iso: string, zone: string): string {
  * Generated once at creation and stored, so firing costs nothing extra.
  */
 export async function nudgeForTask(task: string): Promise<string> {
-  if (!process.env.OPENAI_API_KEY) return `⏰ it's time to ${task}!`;
+  if (!process.env.OPENAI_API_KEY) return "";
   try {
     const out = await openai().chat.completions.create({
       model: "gpt-4o-mini",
@@ -39,18 +39,19 @@ export async function nudgeForTask(task: string): Promise<string> {
         {
           role: "system",
           content:
-            'Write ONE short WhatsApp reminder line for when it\'s time to do a task. Start with "It\'s time to". Add a tiny, relevant, warm encouragement after it. Max 14 words. At most one emoji. No surrounding quotes.',
+            "Reply with ONLY a 2-4 word warm encouragement tag for the task. No punctuation, no quotes, do NOT repeat the task, do NOT say \"it's time\". Examples: task 'drink water' -> stay hydrated; task 'workout' -> you've got this; task 'call mom' -> she'll love it.",
         },
         { role: "user", content: `Task: ${task}` },
       ],
     });
-    const s = (out.choices[0]?.message?.content || "")
+    return (out.choices[0]?.message?.content || "")
       .trim()
-      .replace(/^["']|["']$/g, "");
-    return s || `⏰ it's time to ${task}!`;
+      .replace(/^["']|["']$/g, "")
+      .replace(/[.!]+$/, "")
+      .slice(0, 40);
   } catch (e) {
     console.error("[memory] nudge failed", e);
-    return `⏰ it's time to ${task}!`;
+    return "";
   }
 }
 
