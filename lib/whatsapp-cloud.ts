@@ -86,6 +86,28 @@ export async function sendCloudTemplate(
   });
 }
 
+/** Send a message with up to 3 tappable reply buttons (24h window only). */
+export async function sendCloudButtons(
+  to: string,
+  bodyText: string,
+  buttons: { id: string; title: string }[],
+): Promise<void> {
+  await graphSend({
+    to: toDigits(to),
+    type: "interactive",
+    interactive: {
+      type: "button",
+      body: { text: bodyText },
+      action: {
+        buttons: buttons.slice(0, 3).map((b) => ({
+          type: "reply",
+          reply: { id: b.id, title: b.title },
+        })),
+      },
+    },
+  });
+}
+
 /** Verify the X-Hub-Signature-256 header against the raw request body. */
 export function verifyMetaSignature(
   rawBody: string,

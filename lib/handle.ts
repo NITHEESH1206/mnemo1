@@ -133,6 +133,38 @@ function icsLink(baseUrl: string, title: string, fireAt: Date): string {
   return `${baseUrl}/api/ics?${q.toString()}`;
 }
 
+/**
+ * Handle a tapped reminder button (id like "done:<id>" / "snooze1h:<id>" /
+ * "tomorrow:<id>"). Returns the reply to send back.
+ */
+export async function handleReminderAction(
+  buttonId: string,
+  from: string,
+): Promise<string> {
+  const sep = buttonId.indexOf(":");
+  const action = buttonId.slice(0, sep);
+  const id = buttonId.slice(sep + 1);
+  if (!id) return "couldn't read that — type *done* or *snooze* instead.";
+  const zone = await getUserZone(from);
+
+  if (action === "done") {
+    const r = await completeReminder(id);
+    return r ? doneMessage(r) : "already handled. ✅";
+  }
+  if (action === "snooze1h") {
+    const r = await snoozeReminder(id, new Date(Date.now() + 60 * 60 * 1000));
+    return r ? snoozedMessage(r, zone) : "hmm, couldn't find that reminder.";
+  }
+  if (action === "tomorrow") {
+    const r = await snoozeReminder(
+      id,
+      new Date(Date.now() + 24 * 60 * 60 * 1000),
+    );
+    return r ? snoozedMessage(r, zone) : "hmm, couldn't find that reminder.";
+  }
+  return "not sure what to do with that one.";
+}
+
 export async function handleIncomingMessage(params: {
   from: string;
   text: string;

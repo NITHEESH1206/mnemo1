@@ -6,7 +6,7 @@ import {
 } from "@/lib/whatsapp-cloud";
 import { transcribeBuffer } from "@/lib/transcribe";
 import { extractReminderFromImage } from "@/lib/vision";
-import { handleIncomingMessage } from "@/lib/handle";
+import { handleIncomingMessage, handleReminderAction } from "@/lib/handle";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -94,11 +94,17 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ ok: true });
       }
     } else if (msg.type === "interactive") {
-      // Button/list replies — use the selected title/id as the command.
+      // Tapped reminder button (Done / Snooze 1h / Tomorrow)?
+      const btnId = msg.interactive?.button_reply?.id || "";
+      if (/^(done|snooze1h|tomorrow):/.test(btnId)) {
+        const reply = await handleReminderAction(btnId, from);
+        await sendCloudText(fromDigits, reply);
+        return NextResponse.json({ ok: true });
+      }
+      // Other button/list replies — treat the title as a typed command.
       body = (
         msg.interactive?.button_reply?.title ||
         msg.interactive?.list_reply?.title ||
-        msg.interactive?.button_reply?.id ||
         ""
       ).trim();
     } else {

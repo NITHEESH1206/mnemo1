@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { findDue, markSentOrReschedule, setLastFired } from "@/lib/store";
 import { sendReminderMessage } from "@/lib/notify";
+import { sendCloudButtons } from "@/lib/whatsapp-cloud";
 import { reminderFireMessage, friendReminderFireMessage } from "@/lib/messages";
 import { nextOccurrence } from "@/lib/scheduler";
 
@@ -37,7 +38,22 @@ export async function GET(req: NextRequest) {
       const body = r.recipientPhone
         ? friendReminderFireMessage(r, r.recipientName)
         : reminderFireMessage(r);
-      await sendReminderMessage(to, body, r.task);
+
+      // One-off WhatsApp reminders get tappable Done/Snooze buttons
+      // (only inside the 24h window — i.e. when not using a template).
+      if (
+        to.startsWith("whatsapp:") &&
+        r.recurrence === "none" &&
+        !process.env.WHATSAPP_REMINDER_TEMPLATE
+      ) {
+        await sendCloudButtons(to, body, [
+          { id: `done:${r.id}`, title: "✅ Done" },
+          { id: `snooze1h:${r.id}`, title: "😴 Snooze 1h" },
+          { id: `tomorrow:${r.id}`, title: "📅 Tomorrow" },
+        ]);
+      } else {
+        await sendReminderMessage(to, body, r.task);
+      }
       // Let the recipient reply "done" / "snooze" without a number.
       await setLastFired(to, r.id);
       const next = nextOccurrence(r);
