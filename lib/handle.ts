@@ -18,6 +18,9 @@ import {
   completeReminder,
   consumeLinkToken,
   createReminder,
+  creditReferral,
+  getOrCreateRefCode,
+  getReferralCount,
   findContact,
   getContacts,
   getCoupon,
@@ -42,7 +45,7 @@ import {
   FREE_MONTHLY_LIMIT,
 } from "./store";
 import { offsetForZone, resolveZone } from "./timezone";
-import { answerMemoryQuery } from "./memory";
+import { answerMemoryQuery, summarizeUrl } from "./memory";
 import {
   badAddMessage,
   badLinkMessage,
@@ -52,6 +55,10 @@ import {
   couponAppliedMessage,
   couponExhaustedMessage,
   couponInvalidMessage,
+  referMessage,
+  referralThanksMessage,
+  savedToReadingMessage,
+  capturedToInboxMessage,
   connectGoogleMessage,
   connectNotionMessage,
   connectOutlookMessage,
@@ -355,6 +362,33 @@ export async function handleIncomingMessage(params: {
     }
   }
 
+  // --- Referral ------------------------------------------------------
+  if (/^(refer|invite)\b/i.test(lower)) {
+    const code = await getOrCreateRefCode(from);
+    const count = await getReferralCount(from);
+    const num = (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "").replace(
+      /\D/g,
+      "",
+    );
+    const link = `https://wa.me/${num}?text=${encodeURIComponent(
+      `referred ${code}`,
+    )}`;
+    return referMessage(code, link, count);
+  }
+  const refMatch = body.match(
+    /^(?:i was referred by|referred|ref)\s+([a-z0-9]{4,12})\s*$/i,
+  );
+  if (refMatch) {
+    const res = await creditReferral(refMatch[1], from);
+    if (res.ok) {
+      if (res.count && res.count >= 3 && res.referrer) {
+        await setPlan(res.referrer, "pro");
+      }
+      return referralThanksMessage();
+    }
+    return "that referral code didn't work (or you've already used one) — but welcome! 🧡";
+  }
+
   // --- Activate a paid plan -------------------------------------------
   const linkMatch = body.match(/^link\s+([a-z0-9]{6,12})\s*$/i);
   if (linkMatch) {
@@ -405,6 +439,17 @@ export async function handleIncomingMessage(params: {
     return "couldn't save that to notion right now — try again in a moment.";
   }
 
+  // --- Read later / summarize a link ---------------------------------
+  const summarizeMatch = body.match(/^summari[sz]e\s+(https?:\/\/\S+)/i);
+  if (summarizeMatch) {
+    return summarizeUrl(summarizeMatch[1]);
+  }
+  const urlOnly = body.match(/^(https?:\/\/\S+)\s*$/i);
+  if (urlOnly) {
+    await addToList(from, "reading", urlOnly[1]);
+    return savedToReadingMessage(urlOnly[1]);
+  }
+
   // --- Ask your memory (natural-language questions) -------------------
   const askMatch = body.match(/^ask\s+(.+)/i);
   const looksLikeQuestion =
@@ -418,7 +463,11 @@ export async function handleIncomingMessage(params: {
 
   // --- Natural-language reminder / meeting ----------------------------
   const parsed = await parseMessage(body, new Date(), offsetMin);
-  if (!parsed.ok) return parsed.reason;
+  if (!parsed.ok) {
+    // Capture anything: don't lose it — tuck it into the user's inbox.
+    await addToList(from, "inbox", body);
+    return capturedToInboxMessage(body);
+  }
   const r = parsed.reminder;
 
   // Free-tier gate

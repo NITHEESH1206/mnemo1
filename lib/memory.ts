@@ -24,6 +24,46 @@ function fmt(iso: string, zone: string): string {
   });
 }
 
+/** Fetch a URL and return a short bullet summary (read-later). */
+export async function summarizeUrl(url: string): Promise<string> {
+  if (!process.env.OPENAI_API_KEY) {
+    return "it's saved to your reading list 📚 (add an AI key to get summaries).";
+  }
+  try {
+    const res = await fetch(url, {
+      redirect: "follow",
+      headers: { "User-Agent": "Mozilla/5.0 (FeruAI)" },
+    });
+    if (!res.ok) return "couldn't open that link — but it's saved to read later.";
+    const html = await res.text();
+    const text = html
+      .replace(/<script[\s\S]*?<\/script>/gi, " ")
+      .replace(/<style[\s\S]*?<\/style>/gi, " ")
+      .replace(/<[^>]+>/g, " ")
+      .replace(/\s+/g, " ")
+      .trim()
+      .slice(0, 6000);
+    if (!text) return "that page had nothing readable — saved it to read later.";
+    const out = await openai().chat.completions.create({
+      model: "gpt-4o-mini",
+      temperature: 0.3,
+      messages: [
+        {
+          role: "system",
+          content:
+            "Summarize this web page in 3–4 short bullet points. Lowercase, friendly, no preamble.",
+        },
+        { role: "user", content: text },
+      ],
+    });
+    const s = (out.choices[0]?.message?.content || "").trim();
+    return s || "couldn't summarize that one — but it's saved to read later.";
+  } catch (e) {
+    console.error("[memory] summarize failed", e);
+    return "couldn't fetch that link right now — it's saved to read later.";
+  }
+}
+
 export async function answerMemoryQuery(
   addr: string,
   question: string,

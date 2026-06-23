@@ -277,6 +277,32 @@ export function couponAlreadyMessage(): string {
   return "you've already redeemed this one — you're all set. ✅";
 }
 
+export function referMessage(code: string, link: string, count: number): string {
+  return [
+    "share Feru AI with a friend 🧡",
+    "",
+    `your code: *${code}*`,
+    `invite link: ${link}`,
+    "",
+    count > 0
+      ? `you've referred *${count}* ${count === 1 ? "friend" : "friends"} so far.`
+      : "refer 3 friends and i'll unlock *Pro* for you, free.",
+  ].join("\n");
+}
+
+export function referralThanksMessage(): string {
+  return 'welcome to Feru AI! 🎉 your friend just got referral credit. try "remind me to…" to start.';
+}
+
+export function savedToReadingMessage(url: string): string {
+  return `saved to your reading list 📚\n\nsay *summarize ${url}* and i'll give you the gist.`;
+}
+
+export function capturedToInboxMessage(text: string): string {
+  const snippet = text.length > 80 ? text.slice(0, 80) + "…" : text;
+  return `not sure when you meant 🤔 — i tucked “${snippet}” into your *inbox* so it's not lost.\n\nadd a time like "remind me … at 6pm" to schedule it.`;
+}
+
 function capitalize(s: string): string {
   if (!s) return s;
   return s.charAt(0).toUpperCase() + s.slice(1);

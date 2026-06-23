@@ -467,6 +467,39 @@ export async function allUsers(): Promise<string[]> {
   return (await redis().smembers("users")) ?? [];
 }
 
+// ── Referrals ──────────────────────────────────────────────────
+const refCodeKey = (addr: string) => `refcode:${addr}`;
+const refOwnerKey = (code: string) => `refowner:${code.toUpperCase()}`;
+const refCountKey = (addr: string) => `refcount:${addr}`;
+const refByKey = (addr: string) => `refby:${addr}`;
+
+/** Get (or create) this user's shareable referral code. */
+export async function getOrCreateRefCode(addr: string): Promise<string> {
+  const existing = await redis().get<string>(refCodeKey(addr));
+  if (existing) return existing;
+  const code = crypto.randomBytes(3).toString("hex").toUpperCase(); // 6 chars
+  await redis().set(refCodeKey(addr), code);
+  await redis().set(refOwnerKey(code), addr);
+  return code;
+}
+
+export async function getReferralCount(addr: string): Promise<number> {
+  return (await redis().get<number>(refCountKey(addr))) ?? 0;
+}
+
+/** Credit a referral when a new user redeems someone's code (once per user). */
+export async function creditReferral(
+  code: string,
+  newAddr: string,
+): Promise<{ ok: boolean; referrer?: string; count?: number }> {
+  const referrer = await redis().get<string>(refOwnerKey(code));
+  if (!referrer || referrer === newAddr) return { ok: false };
+  if (await redis().get(refByKey(newAddr))) return { ok: false }; // already referred
+  await redis().set(refByKey(newAddr), referrer);
+  const count = await redis().incr(refCountKey(referrer));
+  return { ok: true, referrer, count };
+}
+
 // ── Stats counters (for the admin stats page) ──────────────────
 export async function countBotUsers(): Promise<number> {
   return (await redis().scard("users")) ?? 0;
