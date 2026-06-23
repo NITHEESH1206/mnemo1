@@ -42,6 +42,7 @@ import {
   FREE_MONTHLY_LIMIT,
 } from "./store";
 import { offsetForZone, resolveZone } from "./timezone";
+import { answerMemoryQuery } from "./memory";
 import {
   badAddMessage,
   badLinkMessage,
@@ -402,6 +403,17 @@ export async function handleIncomingMessage(params: {
     if (result.reason === "not_connected") return notionNotConnectedMessage();
     if (result.reason === "no_target") return notionNoTargetMessage();
     return "couldn't save that to notion right now — try again in a moment.";
+  }
+
+  // --- Ask your memory (natural-language questions) -------------------
+  const askMatch = body.match(/^ask\s+(.+)/i);
+  const looksLikeQuestion =
+    /\?\s*$/.test(body) ||
+    /^(what|whats|what's|when|which|where|how many|how much|do i|did i|is there|are there)\b/i.test(
+      lower,
+    );
+  if (askMatch || looksLikeQuestion) {
+    return answerMemoryQuery(from, askMatch ? askMatch[1] : body, zone);
   }
 
   // --- Natural-language reminder / meeting ----------------------------
