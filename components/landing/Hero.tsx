@@ -10,13 +10,14 @@ export function Hero() {
 
   return (
     <section className="relative isolate overflow-hidden pt-36 pb-28 sm:pt-44">
-      {/* ── Blue sky stage ───────────────────────────────── */}
-      <div className="sky-stage" aria-hidden="true">
-        <div className="sky-sun" />
-        <div className="cloud cloud-1" />
-        <div className="cloud cloud-2" />
-        <div className="cloud cloud-3" />
-        <div className="cloud cloud-4" />
+      {/* ── Grass photo background ───────────────────────── */}
+      <div className="absolute inset-0 z-0 overflow-hidden" aria-hidden="true">
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: "url('/grass.jpg')" }}
+        />
+        {/* darken top for white headline readability, fade to cream at bottom */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-black/10 to-[#fff8f0]" />
       </div>
 
       {/* Floating mascot accents (warm orbs pop against the blue) */}
