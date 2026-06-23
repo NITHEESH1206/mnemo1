@@ -24,6 +24,36 @@ function fmt(iso: string, zone: string): string {
   });
 }
 
+/**
+ * Generate a short, warm, task-aware "it's time to…" line, used when the
+ * reminder fires (e.g. "it's time to drink water — stay hydrated 💧").
+ * Generated once at creation and stored, so firing costs nothing extra.
+ */
+export async function nudgeForTask(task: string): Promise<string> {
+  if (!process.env.OPENAI_API_KEY) return `⏰ it's time to ${task}!`;
+  try {
+    const out = await openai().chat.completions.create({
+      model: "gpt-4o-mini",
+      temperature: 0.7,
+      messages: [
+        {
+          role: "system",
+          content:
+            'Write ONE short WhatsApp reminder line for when it\'s time to do a task. Start with "It\'s time to". Add a tiny, relevant, warm encouragement after it. Max 14 words. At most one emoji. No surrounding quotes.',
+        },
+        { role: "user", content: `Task: ${task}` },
+      ],
+    });
+    const s = (out.choices[0]?.message?.content || "")
+      .trim()
+      .replace(/^["']|["']$/g, "");
+    return s || `⏰ it's time to ${task}!`;
+  } catch (e) {
+    console.error("[memory] nudge failed", e);
+    return `⏰ it's time to ${task}!`;
+  }
+}
+
 /** Fetch a URL and return a short bullet summary (read-later). */
 export async function summarizeUrl(url: string): Promise<string> {
   if (!process.env.OPENAI_API_KEY) {

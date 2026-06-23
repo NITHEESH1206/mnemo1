@@ -47,7 +47,7 @@ import {
   FREE_MONTHLY_LIMIT,
 } from "./store";
 import { offsetForZone, resolveZone } from "./timezone";
-import { answerMemoryQuery, summarizeUrl } from "./memory";
+import { answerMemoryQuery, summarizeUrl, nudgeForTask } from "./memory";
 import {
   badAddMessage,
   badLinkMessage,
@@ -541,12 +541,14 @@ export async function handleIncomingMessage(params: {
     return friendConfirmationMessage(friendReminder, r.recipientName, zone);
   }
 
+  const fireText = await nudgeForTask(r.task);
   const created = await createReminder({
     userPhone: from,
     task: r.task,
     fireAt: r.fireAt,
     recurrence: r.recurrence,
     weekday: r.weekday,
+    fireText,
   });
   await incrMonthlyCount(from);
 

@@ -47,25 +47,41 @@ export function helpMessage(): string {
   ].join("\n");
 }
 
+function whenPhrase(iso: string, tz?: string): string {
+  const timeZone = tz || process.env.TIMEZONE_NAME || "Asia/Kolkata";
+  const d = new Date(iso);
+  const now = new Date();
+  const dayOf = (x: Date) => x.toLocaleDateString("en-US", { timeZone });
+  const time = d.toLocaleTimeString("en-US", {
+    timeZone,
+    hour: "numeric",
+    minute: "2-digit",
+  });
+  if (dayOf(d) === dayOf(now)) return `at ${time}`;
+  const tmr = new Date(now.getTime() + 86_400_000);
+  if (dayOf(d) === dayOf(tmr)) return `tomorrow at ${time}`;
+  const date = d.toLocaleDateString("en-US", {
+    timeZone,
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+  });
+  return `on ${date} at ${time}`;
+}
+
 export function confirmationMessage(r: Reminder, tz?: string): string {
-  const repeat =
-    r.recurrence !== "none" ? ` · repeats ${r.recurrence}` : "";
-  return [
-    "consider it remembered.",
-    "",
-    `*${r.task}*`,
-    `${formatHuman(r.fireAt, tz)}${repeat}`,
-    "",
-    "you can forget now.",
-  ].join("\n");
+  const when = whenPhrase(r.fireAt, tz);
+  if (r.recurrence !== "none") {
+    return `Great — I'll remind you to *${r.task}* every ${r.recurrence} (next ${when}). 🔁`;
+  }
+  return `Great — I'll remind you ${when} to *${r.task}*. ✅`;
 }
 
 export function reminderFireMessage(r: Reminder): string {
+  const base = r.fireText || `⏰ it's time to ${r.task}!`;
   const repeatNote =
-    r.recurrence !== "none"
-      ? `\n_(repeats ${r.recurrence} — i'll be back next time.)_`
-      : "";
-  return `⏰ heads up — *${r.task}*${repeatNote}\n\n_reply *done* or *snooze 30m*_`;
+    r.recurrence !== "none" ? `\n\n_(repeats ${r.recurrence})_` : "";
+  return `${base}${repeatNote}`;
 }
 
 export function listMessage(reminders: Reminder[], tz?: string): string {

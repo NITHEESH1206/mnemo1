@@ -30,6 +30,7 @@ export type Reminder = {
   createdAt: string;
   recipientPhone?: string; // friend-to-friend: who gets pinged (defaults to creator)
   recipientName?: string; // display name of the friend
+  fireText?: string; // contextual "it's time to…" line, generated at creation
 };
 
 let cached: Redis | null = null;
@@ -59,6 +60,7 @@ export async function createReminder(input: {
   weekday?: number;
   recipientPhone?: string;
   recipientName?: string;
+  fireText?: string;
 }): Promise<Reminder> {
   const id = crypto.randomBytes(8).toString("hex");
   const r: Reminder = {
@@ -72,6 +74,7 @@ export async function createReminder(input: {
     createdAt: new Date().toISOString(),
     recipientPhone: input.recipientPhone,
     recipientName: input.recipientName,
+    fireText: input.fireText,
   };
   const ts = input.fireAt.getTime();
   const client = redis();
