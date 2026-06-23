@@ -14,7 +14,7 @@ export function Hero() {
       <div className="absolute inset-0 z-0 overflow-hidden" aria-hidden="true">
         <div
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: "url('/grass.jpg')" }}
+          style={{ backgroundImage: "url('/grass.png')" }}
         />
         {/* darken top for white headline readability, fade to cream at bottom */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-black/10 to-[#fff8f0]" />
