@@ -5,9 +5,10 @@ import {
   setLastFired,
   getQuietHours,
   getUserZone,
+  getLastSeen,
 } from "@/lib/store";
 import { sendReminderMessage } from "@/lib/notify";
-import { sendCloudButtons } from "@/lib/whatsapp-cloud";
+import { sendCloudButtons, sendCloudText } from "@/lib/whatsapp-cloud";
 import { reminderFireMessage, friendReminderFireMessage } from "@/lib/messages";
 import { nextOccurrence } from "@/lib/scheduler";
 import { quietResume } from "@/lib/timezone";
@@ -62,19 +63,25 @@ export async function GET(req: NextRequest) {
         ? friendReminderFireMessage(r, r.recipientName)
         : reminderFireMessage(r);
 
-      // One-off WhatsApp reminders get tappable Done/Snooze buttons
-      // (only inside the 24h window — i.e. when not using a template).
-      if (
-        to.startsWith("whatsapp:") &&
-        r.recurrence === "none" &&
-        !process.env.WHATSAPP_REMINDER_TEMPLATE
-      ) {
+      // Are we inside WhatsApp's 24h window (free-form allowed)? Use a 23h
+      // cutoff for safety so we switch to a template before Meta would reject.
+      const isWhatsApp = to.startsWith("whatsapp:");
+      const lastSeen = isWhatsApp ? await getLastSeen(to) : null;
+      const inWindow =
+        !!lastSeen && Date.now() - lastSeen < 23 * 60 * 60 * 1000;
+
+      if (isWhatsApp && inWindow && r.recurrence === "none") {
+        // Inside the window — nice free-form message with tappable buttons.
         await sendCloudButtons(to, body, [
           { id: `done:${r.id}`, title: "✅ Done" },
           { id: `snooze1h:${r.id}`, title: "😴 Snooze 1h" },
           { id: `tomorrow:${r.id}`, title: "📅 Tomorrow" },
         ]);
+      } else if (isWhatsApp && inWindow) {
+        // Inside the window, recurring — free-form text (no buttons).
+        await sendCloudText(to, body);
       } else {
+        // Outside the window (or another channel) — reliable template / send.
         await sendReminderMessage(to, body, r.task);
       }
       // Let the recipient reply "done" / "snooze" without a number.

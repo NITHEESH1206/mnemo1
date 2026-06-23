@@ -48,6 +48,7 @@ import {
   getQuietHours,
   setQuietHours,
   clearQuietHours,
+  setLastSeen,
   FREE_MONTHLY_LIMIT,
 } from "./store";
 import { offsetForZone, resolveZone } from "./timezone";
@@ -193,8 +194,9 @@ export async function handleIncomingMessage(params: {
   const body = (params.text || "").trim();
   const lower = body.toLowerCase();
 
-  // Track the user (for the digest) + resolve their timezone.
+  // Track the user (for the digest) + the 24h window + resolve their timezone.
   await registerUser(from).catch(() => {});
+  await setLastSeen(from).catch(() => {});
 
   const zone = await getUserZone(from);
   const offsetMin = offsetForZone(zone) ?? 330;

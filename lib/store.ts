@@ -222,6 +222,16 @@ export async function getLastFired(addr: string): Promise<string | null> {
   return (await redis().get<string>(lastFiredKey(addr))) ?? null;
 }
 
+// Track when the user last messaged us, to know if we're inside WhatsApp's
+// 24-hour customer-service window (free-form OK) or must use a template.
+const lastSeenKey = (addr: string) => `lastseen:${addr}`;
+export async function setLastSeen(addr: string): Promise<void> {
+  await redis().set(lastSeenKey(addr), Date.now(), { ex: 60 * 60 * 24 * 2 });
+}
+export async function getLastSeen(addr: string): Promise<number | null> {
+  return (await redis().get<number>(lastSeenKey(addr))) ?? null;
+}
+
 // ── Contacts (for friend-to-friend reminders) ──────────────────
 // Stored as a Redis hash per user: contacts:<userPhone> { name -> phone }
 
