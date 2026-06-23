@@ -35,7 +35,11 @@ export function toDigits(addr: string): string {
   return (addr || "").replace(/\D/g, "");
 }
 
-async function graphSend(payload: Record<string, unknown>): Promise<void> {
+export type GraphResult = { ok: boolean; status: number; error?: string };
+
+async function graphSend(
+  payload: Record<string, unknown>,
+): Promise<GraphResult> {
   const res = await fetch(
     `https://graph.facebook.com/${version()}/${phoneNumberId()}/messages`,
     {
@@ -48,8 +52,11 @@ async function graphSend(payload: Record<string, unknown>): Promise<void> {
     },
   );
   if (!res.ok) {
-    console.error("[whatsapp-cloud] send failed", res.status, await res.text());
+    const error = await res.text();
+    console.error("[whatsapp-cloud] send failed", res.status, error);
+    return { ok: false, status: res.status, error };
   }
+  return { ok: true, status: res.status };
 }
 
 /** Free-form text (only delivers within the 24h customer-service window). */
@@ -67,8 +74,8 @@ export async function sendCloudTemplate(
   name: string,
   lang: string,
   bodyParams: string[] = [],
-): Promise<void> {
-  await graphSend({
+): Promise<GraphResult> {
+  return graphSend({
     to: toDigits(to),
     type: "template",
     template: {
