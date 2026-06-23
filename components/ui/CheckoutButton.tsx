@@ -36,27 +36,49 @@ export function CheckoutButton({
   variant?: "primary" | "ink";
 }) {
   const [loading, setLoading] = useState(false);
+  const [coupon, setCoupon] = useState("");
+
+  function goToWhatsApp(linkToken?: string) {
+    const num = (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "").replace(
+      /\D/g,
+      "",
+    );
+    const msg = linkToken
+      ? `link ${linkToken}`
+      : `Hi Feru AI! I just subscribed to the ${plan} plan.`;
+    window.location.href = `https://wa.me/${num}?text=${encodeURIComponent(msg)}`;
+  }
 
   async function pay() {
     try {
       setLoading(true);
+
+      const res = await fetch("/api/razorpay/order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          plan,
+          billing,
+          coupon: coupon.trim() || undefined,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.error || "Couldn't start checkout. Please try again.");
+        return;
+      }
+
+      // 100%-off coupon → no payment needed, jump straight to WhatsApp.
+      if (data.freeUnlock && data.linkToken) {
+        goToWhatsApp(data.linkToken);
+        return;
+      }
 
       const ok = await loadScript(
         "https://checkout.razorpay.com/v1/checkout.js",
       );
       if (!ok || !window.Razorpay) {
         alert("Couldn't load the payment window. Check your connection and try again.");
-        return;
-      }
-
-      const res = await fetch("/api/razorpay/order", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan, billing }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        alert(data.error || "Couldn't start checkout. Please try again.");
         return;
       }
 
@@ -78,15 +100,7 @@ export function CheckoutButton({
           if (vd.verified) {
             // Paid — go straight to WhatsApp with the activation command
             // prefilled, so the user just taps send to unlock their plan.
-            const num = (
-              process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || ""
-            ).replace(/\D/g, "");
-            const msg = vd.linkToken
-              ? `link ${vd.linkToken}`
-              : `Hi Feru AI! I just subscribed to the ${data.plan} plan.`;
-            window.location.href = `https://wa.me/${num}?text=${encodeURIComponent(
-              msg,
-            )}`;
+            goToWhatsApp(vd.linkToken);
           } else {
             alert(
               "We couldn't verify the payment. If money was deducted, it'll auto-refund or contact support.",
@@ -107,14 +121,24 @@ export function CheckoutButton({
   }
 
   return (
-    <GradientButton
-      onClick={pay}
-      disabled={loading}
-      variant={variant}
-      size="md"
-      className="w-full justify-center"
-    >
-      {loading ? "Loading…" : children}
-    </GradientButton>
+    <div className="w-full">
+      <GradientButton
+        onClick={pay}
+        disabled={loading}
+        variant={variant}
+        size="md"
+        className="w-full justify-center"
+      >
+        {loading ? "Loading…" : children}
+      </GradientButton>
+      <input
+        value={coupon}
+        onChange={(e) => setCoupon(e.target.value)}
+        placeholder="Have a coupon? Enter code"
+        autoComplete="off"
+        spellCheck={false}
+        className="mt-2 w-full rounded-full border border-black/10 bg-white/70 px-4 py-2 text-center text-[13px] text-ink/80 outline-none placeholder:text-ink/40 focus:border-orange-400/70"
+      />
+    </div>
   );
 }

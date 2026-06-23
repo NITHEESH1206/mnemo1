@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createOrder, razorpayKeyId } from "@/lib/razorpay";
 import { PRICING } from "@/lib/constants";
+import { applyCouponWeb, createLinkToken } from "@/lib/store";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -14,9 +15,10 @@ export const dynamic = "force-dynamic";
  */
 export async function POST(req: NextRequest) {
   try {
-    const { plan, billing } = (await req.json()) as {
+    const { plan, billing, coupon } = (await req.json()) as {
       plan?: string;
       billing?: "monthly" | "annual";
+      coupon?: string;
     };
 
     const p = PRICING.find(
@@ -24,6 +26,30 @@ export async function POST(req: NextRequest) {
     );
     if (!p) {
       return NextResponse.json({ error: "Unknown plan" }, { status: 400 });
+    }
+
+    // Coupon → 100% off: skip payment, hand back an activation token for the
+    // selected plan so the browser can jump straight to WhatsApp.
+    if (coupon && coupon.trim()) {
+      const result = await applyCouponWeb(coupon.trim());
+      if (!result.ok) {
+        return NextResponse.json(
+          {
+            error:
+              result.reason === "exhausted"
+                ? "That coupon has already been fully used."
+                : "That coupon code isn't valid.",
+          },
+          { status: 400 },
+        );
+      }
+      const linkToken = await createLinkToken(p.name);
+      return NextResponse.json({
+        freeUnlock: true,
+        linkToken,
+        plan: p.name,
+        billing: billing ?? "monthly",
+      });
     }
 
     const perMonth = billing === "annual" ? p.annual : p.monthly;

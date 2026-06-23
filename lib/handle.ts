@@ -44,6 +44,10 @@ import {
   setUserZone,
   snoozeReminder,
   updateReminder,
+  storeFeedback,
+  getQuietHours,
+  setQuietHours,
+  clearQuietHours,
   FREE_MONTHLY_LIMIT,
 } from "./store";
 import { offsetForZone, resolveZone } from "./timezone";
@@ -101,6 +105,9 @@ import {
   listItemNotFoundMessage,
   listClearedMessage,
   listsOverviewMessage,
+  feedbackThanksMessage,
+  quietHoursSetMessage,
+  quietHoursOffMessage,
 } from "./messages";
 import {
   authedClientFor,
@@ -216,6 +223,37 @@ export async function handleIncomingMessage(params: {
       minute: "2-digit",
     });
     return timezoneSetMessage(resolved, t);
+  }
+
+  // --- Quiet hours / Do-Not-Disturb -----------------------------------
+  // "quiet off" / "dnd off" — turn it off
+  if (/^(quiet( hours)?|dnd|do not disturb)\s+off\b/i.test(body)) {
+    await clearQuietHours(from);
+    return quietHoursOffMessage();
+  }
+  // "quiet hours 10pm to 7am" / "dnd 22-7" / "do not disturb 10 pm - 6 am"
+  const quietMatch = body.match(
+    /^(?:quiet(?: hours?)?|dnd|do not disturb)\s+(\d{1,2})\s*(am|pm)?\s*(?:to|-|–|until)\s*(\d{1,2})\s*(am|pm)?\b/i,
+  );
+  if (quietMatch) {
+    const to24 = (h: string, mer?: string) => {
+      let n = parseInt(h, 10) % 24;
+      const m = (mer || "").toLowerCase();
+      if (m === "pm" && n < 12) n += 12;
+      if (m === "am" && n === 12) n = 0;
+      return n;
+    };
+    const start = to24(quietMatch[1], quietMatch[2]);
+    const end = to24(quietMatch[3], quietMatch[4]);
+    await setQuietHours(from, start, end);
+    return quietHoursSetMessage(start, end);
+  }
+
+  // --- Feedback / support ---------------------------------------------
+  const fb = body.match(/^(feedback|support)\b[:\s]+(.+)$/is);
+  if (fb && fb[2].trim()) {
+    await storeFeedback(from, `[${fb[1].toLowerCase()}] ${fb[2].trim()}`);
+    return feedbackThanksMessage();
   }
 
   // --- Lists ----------------------------------------------------------

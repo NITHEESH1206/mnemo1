@@ -42,7 +42,19 @@
       "Bash(node scripts/wa-test.mjs +919361092458 1182916118236627)",
       "Bash(node scripts/wa-subscribe.mjs 2454292438329075)",
       "mcp__visualize__read_me",
-      "WebFetch(domain:plugin-value-scrum.figma.site)"
+      "WebFetch(domain:plugin-value-scrum.figma.site)",
+      "Bash(mkdir -p out/frames)",
+      "Bash(rm -f out/frames/*.png)",
+      "WebFetch(domain:memorae.ai)",
+      "mcp__Claude_in_Chrome__list_connected_browsers",
+      "Bash(git commit -q -m 'Use the new high-res grass photo for the hero background *)",
+      "Bash(git commit -q -m 'Tappable Done/Snooze buttons on one-off reminders *)",
+      "Bash(git commit -q -m 'Add '\\\\''Ask your memory'\\\\'' — natural-language Q&A over saved reminders + lists *)",
+      "Bash(git commit -q -m 'Add read-later+summarize, capture-anything inbox, and referrals *)",
+      "Bash(git commit -q -m 'Add place reminders \\('\\\\''remind me when I get home'\\\\''\\) *)",
+      "Bash(git commit -q -m 'Warmer, task-aware reminder messages *)",
+      "Bash(node scripts/make-coupon.mjs NNKSIUU pro 0)",
+      "Bash(git commit -q -m 'MVP batch: free cap, onboarding, quiet hours, feedback + checkout coupon *)"
     ]
   }
 }

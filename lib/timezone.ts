@@ -76,6 +76,32 @@ export function offsetForZone(tz: string, at: Date = new Date()): number | null 
   }
 }
 
+/**
+ * If `now` falls inside the quiet window for a zone, return the UTC Date when
+ * quiet ends (so a reminder can be deferred to then). Otherwise null.
+ * `start`/`end` are local hours 0-23; the window may wrap past midnight.
+ */
+export function quietResume(
+  quiet: { start: number; end: number },
+  zone: string,
+  now: Date = new Date(),
+): Date | null {
+  const offset = offsetForZone(zone, now) ?? 330; // minutes east of UTC
+  const localMs = now.getTime() + offset * 60000;
+  const local = new Date(localMs);
+  const hour = local.getUTCHours();
+  const { start, end } = quiet;
+  const inQuiet =
+    start <= end ? hour >= start && hour < end : hour >= start || hour < end;
+  if (!inQuiet) return null;
+  const resumeLocal = new Date(localMs);
+  resumeLocal.setUTCHours(end, 0, 0, 0);
+  if (resumeLocal.getTime() <= localMs) {
+    resumeLocal.setUTCDate(resumeLocal.getUTCDate() + 1);
+  }
+  return new Date(resumeLocal.getTime() - offset * 60000);
+}
+
 /** Resolve a user's free-text timezone input to an IANA zone name, or null. */
 export function resolveZone(input: string): string | null {
   const raw = input.trim();

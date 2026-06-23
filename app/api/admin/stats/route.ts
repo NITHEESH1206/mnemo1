@@ -4,6 +4,7 @@ import {
   countBotUsers,
   countWebUsers,
   countSubscriptions,
+  listFeedback,
 } from "@/lib/store";
 
 export const runtime = "nodejs";
@@ -25,11 +26,12 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  const [bot, web, subs, users] = await Promise.all([
+  const [bot, web, subs, users, feedback] = await Promise.all([
     countBotUsers(),
     countWebUsers(),
     countSubscriptions(),
     allUsers(),
+    listFeedback(50),
   ]);
 
   const whatsapp = users.filter((u) => u.startsWith("whatsapp:")).length;
@@ -42,9 +44,24 @@ export async function GET(req: NextRequest) {
       byChannel: { whatsapp, telegram, email },
       webSignIns: web,
       paidSubscriptions: subs,
+      feedback,
       checkedAt: new Date().toISOString(),
     });
   }
+
+  const esc = (s: string) =>
+    s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  const feedbackHtml = feedback.length
+    ? feedback
+        .map(
+          (f) => `
+      <div style="background:#fff;border:1px solid rgba(15,12,9,0.08);border-radius:16px;padding:14px 18px;margin-top:10px">
+        <div style="color:#0c0a09;font-size:15px">${esc(f.text)}</div>
+        <div style="color:#a8a29e;font-size:12px;margin-top:6px">${esc(f.addr)} · ${new Date(f.at).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })}</div>
+      </div>`,
+        )
+        .join("")
+    : `<p style="color:#a8a29e;font-size:14px">No feedback yet.</p>`;
 
   const card = (label: string, value: number, accent = "#ea580c") => `
     <div style="background:#fff;border:1px solid rgba(15,12,9,0.08);border-radius:22px;padding:26px 28px;box-shadow:0 18px 40px -26px rgba(120,53,15,0.25)">
@@ -71,6 +88,9 @@ export async function GET(req: NextRequest) {
       ${card("Email", email, "#7c2d12")}
     </div>
     <p class="hint">"Bot users" = everyone who has ever messaged Feru AI on any channel. Refresh to update. Add &format=json for raw data.</p>
+    <h1 style="margin-top:38px;font-size:20px">Feedback &amp; support (${feedback.length})</h1>
+    <p class="sub">From users who typed <b>feedback …</b> or <b>support …</b></p>
+    ${feedbackHtml}
   </div></body></html>`;
 
   return new NextResponse(html, {

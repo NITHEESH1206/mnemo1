@@ -1,9 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
-import { findDue, markSentOrReschedule, setLastFired } from "@/lib/store";
+import {
+  findDue,
+  markSentOrReschedule,
+  setLastFired,
+  getQuietHours,
+  getUserZone,
+} from "@/lib/store";
 import { sendReminderMessage } from "@/lib/notify";
 import { sendCloudButtons } from "@/lib/whatsapp-cloud";
 import { reminderFireMessage, friendReminderFireMessage } from "@/lib/messages";
 import { nextOccurrence } from "@/lib/scheduler";
+import { quietResume } from "@/lib/timezone";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -29,12 +36,28 @@ export async function GET(req: NextRequest) {
   }
 
   const due = await findDue();
-  const results: Array<{ id: string; status: "sent" | "error"; error?: string }> = [];
+  const results: Array<{
+    id: string;
+    status: "sent" | "error" | "deferred";
+    error?: string;
+  }> = [];
 
   for (const r of due) {
     try {
       // Friend-to-friend reminders fire to the recipient; otherwise the creator.
       const to = r.recipientPhone || r.userPhone;
+
+      // Respect quiet hours — defer this firing until the window ends.
+      const quiet = await getQuietHours(to);
+      if (quiet) {
+        const resume = quietResume(quiet, await getUserZone(to));
+        if (resume) {
+          await markSentOrReschedule(r.id, resume);
+          results.push({ id: r.id, status: "deferred" });
+          continue;
+        }
+      }
+
       const body = r.recipientPhone
         ? friendReminderFireMessage(r, r.recipientName)
         : reminderFireMessage(r);
@@ -73,6 +96,7 @@ export async function GET(req: NextRequest) {
     checkedAt: new Date().toISOString(),
     due: due.length,
     sent: results.filter((r) => r.status === "sent").length,
+    deferred: results.filter((r) => r.status === "deferred").length,
     errors: results.filter((r) => r.status === "error"),
   });
 }

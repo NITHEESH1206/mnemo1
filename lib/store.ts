@@ -289,8 +289,7 @@ export async function recordSubscription(sub: Subscription): Promise<void> {
 
 // ── Plans, account linking & monthly usage ─────────────────────
 
-// Temporarily "unlimited" for early access — set back to 20 to re-enable the free cap.
-export const FREE_MONTHLY_LIMIT = 1_000_000;
+export const FREE_MONTHLY_LIMIT = 20;
 
 // ── 7-day free trial (tracked per WhatsApp/Telegram/email address) ──
 export const TRIAL_DAYS = 7;
@@ -450,6 +449,19 @@ export async function redeemCoupon(
   return { ok: true, plan: c.plan };
 }
 
+/** Validate a coupon for web checkout (no per-address lock) and count the use. */
+export async function applyCouponWeb(
+  code: string,
+): Promise<{ ok: boolean; reason?: "invalid" | "exhausted" }> {
+  const c = await getCoupon(code);
+  if (!c) return { ok: false, reason: "invalid" };
+  if (c.maxUses > 0 && c.uses >= c.maxUses)
+    return { ok: false, reason: "exhausted" };
+  c.uses += 1;
+  await redis().set(couponKey(c.code), c);
+  return { ok: true };
+}
+
 export async function getMonthlyCount(phone: string): Promise<number> {
   const c = await redis().get<number>(monthKey(phone, yyyymm()));
   return c ?? 0;
@@ -555,6 +567,47 @@ export async function getUserZone(addr: string): Promise<string> {
 }
 export async function setUserZone(addr: string, zone: string): Promise<void> {
   await redis().set(tzKey(addr), zone);
+}
+
+// ── Quiet hours / Do-Not-Disturb ───────────────────────────────
+export type QuietHours = { start: number; end: number }; // 0-23 local hours
+const quietKey = (addr: string) => `quiet:${addr}`;
+export async function getQuietHours(addr: string): Promise<QuietHours | null> {
+  return (await redis().get<QuietHours>(quietKey(addr))) ?? null;
+}
+export async function setQuietHours(
+  addr: string,
+  start: number,
+  end: number,
+): Promise<void> {
+  await redis().set(quietKey(addr), { start, end });
+}
+export async function clearQuietHours(addr: string): Promise<void> {
+  await redis().del(quietKey(addr));
+}
+
+// ── Feedback / support inbox ───────────────────────────────────
+const FEEDBACK_KEY = "feedback:inbox";
+export async function storeFeedback(addr: string, text: string): Promise<void> {
+  await redis().rpush(
+    FEEDBACK_KEY,
+    JSON.stringify({ addr, text, at: new Date().toISOString() }),
+  );
+}
+export async function listFeedback(limit = 100): Promise<
+  { addr: string; text: string; at: string }[]
+> {
+  const raw = (await redis().lrange<string>(FEEDBACK_KEY, -limit, -1)) ?? [];
+  return raw
+    .map((s) => {
+      try {
+        return typeof s === "string" ? JSON.parse(s) : s;
+      } catch {
+        return null;
+      }
+    })
+    .filter(Boolean)
+    .reverse();
 }
 
 // ── Email ↔ phone link (for the web dashboard) ─────────────────

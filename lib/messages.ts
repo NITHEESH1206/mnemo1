@@ -2,15 +2,41 @@ import type { Reminder } from "./store";
 
 export function welcomeMessage(): string {
   return [
-    "alright, your brain just got an upgrade. i'm Feru AI.",
+    "hey, i'm Feru AI — your second brain on WhatsApp. 🧠",
     "",
-    "just tell me what to remember:",
-    "• 'remind me to call james tomorrow at 3pm'",
-    "• 'standup prep every friday at 9am'",
-    "• 'pick up groceries in 2 hours'",
+    "i remember things so you don't have to. just talk to me naturally:",
     "",
-    "type *list* to see what's coming up, *cancel <number>* to drop one, or *help* anytime.",
+    "⏰ *remind me* to drink water at 2pm",
+    "🔁 *standup prep* every weekday at 9am",
+    "🛒 *add* milk to my grocery list",
+    "🎙️ send a *voice note* — i'll catch it",
+    "📸 send a *screenshot* — i'll pull out the details",
+    "🏠 remind me to water the plants *when i get home*",
+    '❓ ask me *"what\'s on for today?"* anytime',
+    "",
+    "type *help* to see everything — or just tell me what to remember. let's go 🚀",
   ].join("\n");
+}
+
+export function feedbackThanksMessage(): string {
+  return "🙏 thank you — your note just reached the team. we read every single one.";
+}
+
+function hourLabel(n: number): string {
+  const am = n < 12 ? "am" : "pm";
+  const hr = n % 12 === 0 ? 12 : n % 12;
+  return `${hr}${am}`;
+}
+export function quietHoursSetMessage(start: number, end: number): string {
+  return [
+    `🤫 quiet hours on — i won't ping you between ${hourLabel(start)} and ${hourLabel(end)}.`,
+    `anything due in that window waits until ${hourLabel(end)}.`,
+    "",
+    "_type *quiet off* to turn this off._",
+  ].join("\n");
+}
+export function quietHoursOffMessage(): string {
+  return "🔔 quiet hours off — i'll remind you any time again.";
 }
 
 export function helpMessage(): string {
@@ -43,6 +69,8 @@ export function helpMessage(): string {
     "• edit 2 call James at 5pm — change one",
     "• cancel <number> — drop one",
     "• timezone <city> — set your timezone",
+    "• quiet hours 10pm to 7am — pause pings at night (*quiet off* to undo)",
+    "• feedback <your thoughts> — tell us anything",
     "• help — this menu",
   ].join("\n");
 }

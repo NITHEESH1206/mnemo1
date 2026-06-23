@@ -1,6 +1,7 @@
 import { Composition } from "remotion";
 import { ExplainerVideo } from "./ExplainerVideo";
 import { FeruReel } from "./FeruReel";
+import { FeruReelDark } from "./FeruReelDark";
 import { FPS, TOTAL_FRAMES } from "./theme";
 
 export const Root: React.FC = () => {
@@ -18,6 +19,15 @@ export const Root: React.FC = () => {
       <Composition
         id="FeruReel"
         component={FeruReel}
+        durationInFrames={900}
+        fps={30}
+        width={1080}
+        height={1920}
+      />
+      {/* Dark cinematic 30s Reel (reference style, Feru orange glow) */}
+      <Composition
+        id="FeruReelDark"
+        component={FeruReelDark}
         durationInFrames={900}
         fps={30}
         width={1080}
