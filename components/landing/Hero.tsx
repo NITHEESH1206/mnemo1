@@ -105,17 +105,16 @@ export function Hero() {
           transition={{ duration: 0.75, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
           className="display-tight mx-auto mt-8 max-w-5xl text-center text-hero sky-text"
         >
-          You weren’t built to{" "}
+          your second brain,
+          <br className="hidden sm:block" />{" "}
           <span className="relative inline-block">
-            <span className="gradient-text-bright">remember everything</span>
+            <span className="gradient-text-bright">always on</span>
             <span
               aria-hidden
               className="absolute -inset-x-2 -bottom-1 h-1.5 rounded-full bg-gradient-warm opacity-80 blur-[3px]"
             />
             <span aria-hidden>.</span>
           </span>
-          <br className="hidden sm:block" />
-          Feru AI is.
         </motion.h1>
 
         <motion.p

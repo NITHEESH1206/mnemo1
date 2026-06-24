@@ -66,13 +66,14 @@ const CARDS: FeatureCard[] = [
   },
 ];
 
-// Soft, readable background wash per card tone (keeps dark text legible).
+// Background wash per card tone — closer to the card color, still legible
+// with dark text.
 const toneTint: Record<FeatureCard["tone"], string> = {
-  amber: "#fdf3da",
-  flame: "#fde7d2",
-  rust: "#f7e5d8",
-  ink: "#eceae5",
-  cream: "#fff6ea",
+  amber: "#fbe09a",
+  flame: "#fbc59c",
+  rust: "#ecbb9e",
+  ink: "#d4cfc5",
+  cream: "#ffe9c4",
 };
 
 const toneStyles: Record<FeatureCard["tone"], string> = {
