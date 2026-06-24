@@ -12,6 +12,7 @@ import {
 import { Star, Play, Check } from "lucide-react";
 import { GradientButton } from "@/components/ui/GradientButton";
 import { Mascot } from "@/components/ui/Mascot";
+import { HeroScene } from "@/components/landing/HeroScene";
 import {
   WaHeader,
   WaOut,
@@ -29,7 +30,6 @@ export function Hero() {
     target: heroRef,
     offset: ["start start", "end start"],
   });
-  const bgY = useTransform(scrollYProgress, [0, 1], [0, 130]);
   const orbY = useTransform(scrollYProgress, [0, 1], [0, -150]);
   const showcaseY = useTransform(scrollYProgress, [0, 1], [0, 70]);
 
@@ -59,17 +59,11 @@ export function Hero() {
       onMouseMove={onMove}
       className="relative isolate overflow-hidden pt-36 pb-28 sm:pt-44"
     >
-      {/* ── Grass photo background (parallax) ───────────────── */}
-      <div className="absolute inset-0 z-0 overflow-hidden" aria-hidden="true">
-        <motion.div
-          style={{
-            backgroundImage: "url('/grass.png')",
-            ...(reduced ? {} : { y: bgY }),
-          }}
-          className="absolute inset-0 scale-110 bg-cover bg-center"
-        />
-        {/* darken top for white headline readability, fade to cream at bottom */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-black/10 to-[#fff8f0]" />
+      {/* ── Natural dawn-valley scene (layered parallax) ────── */}
+      <div className="absolute inset-0 z-0" aria-hidden="true">
+        <HeroScene progress={scrollYProgress} reduced={!!reduced} />
+        {/* soften the top so the white headline stays readable */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-transparent" />
       </div>
 
       {/* Floating mascot accents (parallax — warm orbs pop against the blue) */}

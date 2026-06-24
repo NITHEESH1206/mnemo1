@@ -13,10 +13,7 @@ export function WaHeader({ name = "Feru AI" }: { name?: string }) {
       style={{ backgroundColor: "#075e54" }}
     >
       <ChevronLeft size={17} className="text-white/90" aria-hidden />
-      <div
-        className="grid h-8 w-8 place-items-center rounded-full bg-white text-[12px] font-bold"
-        style={{ color: "#075e54" }}
-      >
+      <div className="grid h-8 w-8 place-items-center overflow-hidden rounded-full bg-gradient-primary text-[13px] font-extrabold text-white shadow-[inset_0_0_0_1.5px_rgba(255,255,255,0.5)]">
         F
       </div>
       <div className="leading-tight">

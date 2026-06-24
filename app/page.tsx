@@ -5,6 +5,7 @@ import { IntegrationStrip } from "@/components/landing/IntegrationStrip";
 import { Overload } from "@/components/landing/Overload";
 import { LiveDemo } from "@/components/landing/LiveDemo";
 import { Features } from "@/components/landing/Features";
+import { BigStatement } from "@/components/landing/BigStatement";
 import { StopForgetting } from "@/components/landing/StopForgetting";
 import { WhyFeru } from "@/components/landing/WhyFeru";
 import { Stats } from "@/components/landing/Stats";
@@ -24,6 +25,7 @@ export default function HomePage() {
         <Overload />
         <LiveDemo />
         <Features />
+        <BigStatement />
         <StopForgetting />
         <WhyFeru />
         <Stats />
