@@ -55,6 +55,7 @@ type LlmOut = {
   fireAtLocal: string;
   recurrence: Recurrence;
   weekday: number | null;
+  intervalMinutes: number | null;
   recipientName: string | null;
   isMeeting: boolean;
 };
@@ -72,12 +73,13 @@ async function llmParse(
     "Reply with STRICT JSON only, with these keys:",
     '- isReminder (boolean): true if the message asks to remember/schedule/be reminded of something.',
     '- task (string): the action only, without "remind me to". E.g. "call James".',
-    '- fireAtLocal (string): when it should fire, as "YYYY-MM-DDTHH:mm" in the user\'s LOCAL time. If no time was given, default to 1 hour from now. If only a date was given, use 09:00.',
-    '- recurrence (string): one of "none","daily","weekly","monthly".',
-    "- weekday (integer 0-6 Sunday-based, or null): only for weekly recurrence tied to a weekday.",
+    '- fireAtLocal (string): when it should FIRST fire, as "YYYY-MM-DDTHH:mm" in the user\'s LOCAL time. If no time was given for a one-off, default to 1 hour from now. For any recurring reminder with no time, use 09:00. If only a date was given, use 09:00.',
+    '- recurrence (string): one of "none","daily","weekly","monthly","weekday","interval". Use "weekday" for Monday–Friday only ("every weekday", "on weekdays", "standup every weekday"). Use "interval" for things that repeat every fixed gap ("twice a day", "three times a day", "every 3 hours", "every 30 minutes").',
+    "- weekday (integer 0-6 Sunday-based, or null): only for weekly recurrence tied to a specific weekday.",
+    '- intervalMinutes (integer or null): ONLY when recurrence is "interval" — the gap in minutes. "twice a day"=720, "three times a day"=480, "every 2 hours"=120, "every 30 minutes"=30. Otherwise null.',
     '- recipientName (string or null): a person\'s name if the reminder is FOR SOMEONE ELSE ("remind James..."), else null. "me"/"myself" => null.',
     "- isMeeting (boolean): true if it's a meeting/call/sync with a person that belongs on a calendar.",
-    "Resolve relative dates (tomorrow, next Tuesday, in 2 hours) against the current local time.",
+    "Resolve relative dates (tomorrow, next Tuesday, in 2 hours) against the current local time. For \"weekday\" recurrence, make sure fireAtLocal is a Monday–Friday.",
   ].join("\n");
 
   const completion = await openai().chat.completions.create({
@@ -115,9 +117,20 @@ async function llmParse(
   }
 
   const recurrence: Recurrence =
-    out.recurrence && ["none", "daily", "weekly", "monthly"].includes(out.recurrence)
+    out.recurrence &&
+    ["none", "daily", "weekly", "monthly", "weekday", "interval"].includes(
+      out.recurrence,
+    )
       ? out.recurrence
       : "none";
+
+  // Interval reminders need a sane gap; default to twice a day (12h).
+  const intervalMinutes =
+    recurrence === "interval"
+      ? typeof out.intervalMinutes === "number" && out.intervalMinutes >= 15
+        ? out.intervalMinutes
+        : 720
+      : undefined;
 
   const reminder: ParsedReminder = {
     task,
@@ -127,6 +140,7 @@ async function llmParse(
       typeof out.weekday === "number" && out.weekday >= 0 && out.weekday <= 6
         ? out.weekday
         : undefined,
+    intervalMinutes,
     recipientName: out.recipientName ? String(out.recipientName).trim() : undefined,
     meeting: out.isMeeting
       ? { attendee: out.recipientName ?? null, summary: task }

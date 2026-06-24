@@ -19,13 +19,20 @@
  * (e.g., OpenAI / Anthropic) that returns the same ParsedReminder shape.
  */
 
-export type Recurrence = "none" | "daily" | "weekly" | "monthly";
+export type Recurrence =
+  | "none"
+  | "daily"
+  | "weekly"
+  | "monthly"
+  | "weekday" // every Mon–Fri
+  | "interval"; // every N minutes (twice a day, every 3 hours, …)
 
 export type ParsedReminder = {
   task: string;
   fireAt: Date;
   recurrence: Recurrence;
   weekday?: number; // 0 = Sunday … 6 = Saturday
+  intervalMinutes?: number; // for recurrence === "interval"
   meeting?: {
     /** Other person's name as parsed (e.g. "ashok"). null if not specified. */
     attendee: string | null;
@@ -133,12 +140,41 @@ export function parseReminder(
 
   let recurrence: Recurrence = "none";
   let weekday: number | undefined;
+  let intervalMinutes: number | undefined;
+
+  // every weekday (Mon–Fri) — check before the generic "every <weekday>".
+  const weekdaysMatch = body.match(
+    /\b(?:every\s+weekday|each\s+weekday|on\s+weekdays|every\s+week\s*day|weekdays)\b/i,
+  );
+  // "twice a day" / "N times a day" / "every N hours|minutes"
+  const perDayMatch = body.match(
+    /\b(twice|thrice|once|two|three|four|five|six|\d+)\s+times?\s+(?:a|per|each)\s+day\b/i,
+  ) || body.match(/\b(twice|thrice)\s+(?:a|per|each)\s+day\b/i);
+  const everyNMatch = body.match(
+    /\bevery\s+(\d+)\s+(hour|hr|minute|min)s?\b/i,
+  );
 
   // every <weekday>
   const wdMatch = body.match(
     new RegExp(`\\bevery\\s+(${WEEKDAYS.join("|")})\\b`, "i"),
   );
-  if (wdMatch) {
+  if (weekdaysMatch) {
+    recurrence = "weekday";
+    body = body.replace(weekdaysMatch[0], "").trim();
+  } else if (perDayMatch) {
+    const n = wordToNum(perDayMatch[1]);
+    if (n >= 1) {
+      recurrence = "interval";
+      intervalMinutes = Math.max(15, Math.round(1440 / n));
+    }
+    body = body.replace(perDayMatch[0], "").trim();
+  } else if (everyNMatch) {
+    const n = parseInt(everyNMatch[1], 10);
+    const unit = everyNMatch[2].toLowerCase();
+    recurrence = "interval";
+    intervalMinutes = Math.max(15, unit.startsWith("h") ? n * 60 : n);
+    body = body.replace(everyNMatch[0], "").trim();
+  } else if (wdMatch) {
     recurrence = "weekly";
     weekday = WEEKDAYS.indexOf(wdMatch[1].toLowerCase());
     body = body.replace(wdMatch[0], "").trim();
@@ -151,6 +187,17 @@ export function parseReminder(
   } else if (/\bevery\s+month\b|\bmonthly\b/i.test(body)) {
     recurrence = "monthly";
     body = body.replace(/\bevery\s+month\b|\bmonthly\b/i, "").trim();
+  }
+
+  // Clean up monthly day-of-month phrasing ("first of", "on the 1st of").
+  if (recurrence === "monthly") {
+    body = body
+      .replace(
+        /\b(on\s+)?(the\s+)?(\d{1,2}(?:st|nd|rd|th)?|first|last)\s+of\b/gi,
+        " ",
+      )
+      .replace(/\s+/g, " ")
+      .trim();
   }
 
   let fireAt: Date | null = null;
@@ -229,19 +276,28 @@ export function parseReminder(
     fireAt = candidate;
   }
 
-  // Daily/monthly without an explicit time → 9am next slot.
-  if ((recurrence === "daily" || recurrence === "monthly") && !fireAt) {
+  // Recurring without an explicit time → 9am next slot.
+  if (
+    !fireAt &&
+    (recurrence === "daily" ||
+      recurrence === "weekday" ||
+      recurrence === "interval")
+  ) {
     let candidate = dateInTimezone(now, 9, 0, 0, offsetMin);
-    if (candidate <= now) {
-      if (recurrence === "daily") {
-        candidate = dateInTimezone(now, 9, 0, 1, offsetMin);
-      } else {
-        // Approximate monthly by adding 30 days; the scheduler advances
-        // properly on each fire via nextOccurrence().
-        candidate = dateInTimezone(now, 9, 0, 30, offsetMin);
-      }
-    }
+    if (candidate <= now) candidate = dateInTimezone(now, 9, 0, 1, offsetMin);
     fireAt = candidate;
+  }
+  if (recurrence === "monthly" && !fireAt) {
+    // Approximate monthly by adding 30 days; the scheduler advances
+    // properly on each fire via nextOccurrence().
+    let candidate = dateInTimezone(now, 9, 0, 0, offsetMin);
+    if (candidate <= now) candidate = dateInTimezone(now, 9, 0, 30, offsetMin);
+    fireAt = candidate;
+  }
+
+  // For "every weekday", make sure the FIRST fire lands on Mon–Fri.
+  if (recurrence === "weekday" && fireAt) {
+    fireAt = advanceToWeekday(fireAt, offsetMin);
   }
 
   // Default: 1 hour from now (timezone-agnostic).
@@ -269,8 +325,45 @@ export function parseReminder(
 
   return {
     ok: true,
-    reminder: { task: body, fireAt, recurrence, weekday, meeting, recipientName },
+    reminder: {
+      task: body,
+      fireAt,
+      recurrence,
+      weekday,
+      intervalMinutes,
+      meeting,
+      recipientName,
+    },
   };
+}
+
+/** "twice"→2, "thrice"→3, "once"→1, number words, or a raw integer. */
+function wordToNum(w: string): number {
+  const map: Record<string, number> = {
+    once: 1,
+    twice: 2,
+    thrice: 3,
+    two: 2,
+    three: 3,
+    four: 4,
+    five: 5,
+    six: 6,
+  };
+  const lw = w.trim().toLowerCase();
+  if (map[lw] !== undefined) return map[lw];
+  const n = parseInt(lw, 10);
+  return Number.isNaN(n) ? 0 : n;
+}
+
+/** Push a Date forward (keeping its local time) until it lands on Mon–Fri. */
+function advanceToWeekday(d: Date, offMin: number): Date {
+  let r = d;
+  for (let i = 0; i < 7; i++) {
+    const localDay = new Date(r.getTime() + offMin * 60_000).getUTCDay();
+    if (localDay !== 0 && localDay !== 6) break;
+    r = new Date(r.getTime() + 86_400_000);
+  }
+  return r;
 }
 
 // Words that look like a name slot but are really the task verb, so

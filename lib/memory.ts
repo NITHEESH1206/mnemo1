@@ -5,6 +5,7 @@
  */
 import OpenAI from "openai";
 import { listForUser, allListNames, getList } from "./store";
+import { recurrenceLabel } from "./messages";
 
 let cached: OpenAI | null = null;
 function openai(): OpenAI {
@@ -112,7 +113,7 @@ export async function answerMemoryQuery(
         .map(
           (r) =>
             `- ${r.task} — ${fmt(r.fireAt, zone)}${
-              r.recurrence !== "none" ? ` (repeats ${r.recurrence})` : ""
+              r.recurrence !== "none" ? ` (repeats ${recurrenceLabel(r)})` : ""
             }`,
         )
         .join("\n")

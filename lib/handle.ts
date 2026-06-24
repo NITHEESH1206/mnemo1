@@ -588,6 +588,7 @@ export async function handleIncomingMessage(params: {
     fireAt: r.fireAt,
     recurrence: r.recurrence,
     weekday: r.weekday,
+    intervalMinutes: r.intervalMinutes,
     fireText,
   });
   await incrMonthlyCount(from);

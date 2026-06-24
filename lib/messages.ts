@@ -48,7 +48,9 @@ export function helpMessage(): string {
     "• remind me to <thing> tomorrow at 9am",
     "• remind me to <thing> in 30 minutes",
     "• <thing> every day at 7am",
-    "• <thing> every friday at 9am",
+    "• <thing> every weekday at 9am",
+    "• <thing> twice a day  ·  every 3 hours",
+    "• <thing> first of every month",
     "",
     "*nudge a friend*",
     "• add james +919876543210 — save a contact",
@@ -97,10 +99,51 @@ function whenPhrase(iso: string, tz?: string): string {
   return `on ${date} at ${time}`;
 }
 
+const WEEKDAY_NAMES = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+];
+
+/** Human phrase for a reminder's recurrence, e.g. "twice a day". */
+export function recurrenceLabel(r: Reminder): string {
+  switch (r.recurrence) {
+    case "daily":
+      return "every day";
+    case "weekday":
+      return "every weekday (Mon–Fri)";
+    case "weekly":
+      return typeof r.weekday === "number"
+        ? `every ${WEEKDAY_NAMES[r.weekday]}`
+        : "every week";
+    case "monthly":
+      return "every month";
+    case "interval": {
+      const m = r.intervalMinutes || 720;
+      if (m % 1440 === 0)
+        return m === 1440 ? "every day" : `every ${m / 1440} days`;
+      if (m % 60 === 0) {
+        const h = m / 60;
+        if (h === 12) return "twice a day";
+        if (h === 8) return "3 times a day";
+        if (h === 6) return "4 times a day";
+        return `every ${h} hours`;
+      }
+      return `every ${m} minutes`;
+    }
+    default:
+      return "";
+  }
+}
+
 export function confirmationMessage(r: Reminder, tz?: string): string {
   const when = whenPhrase(r.fireAt, tz);
   if (r.recurrence !== "none") {
-    return `Great — I'll remind you to *${r.task}* every ${r.recurrence} (next ${when}). 🔁`;
+    return `Great — I'll remind you to *${r.task}* ${recurrenceLabel(r)} (next ${when}). 🔁`;
   }
   return `Great — I'll remind you ${when} to *${r.task}*. ✅`;
 }
@@ -109,7 +152,7 @@ export function reminderFireMessage(r: Reminder): string {
   // Task is the headline; a tiny encouragement tag is optional.
   const tag = r.fireText ? ` — ${r.fireText}` : "";
   const repeatNote =
-    r.recurrence !== "none" ? `\n\n_(repeats ${r.recurrence})_` : "";
+    r.recurrence !== "none" ? `\n\n_(repeats ${recurrenceLabel(r)})_` : "";
   return `⏰ Time to *${r.task}*${tag}${repeatNote}`;
 }
 
@@ -118,7 +161,7 @@ export function listMessage(reminders: Reminder[], tz?: string): string {
     return "your queue is empty. living dangerously, i see. try: 'remind me to call james tomorrow at 3pm'.";
   }
   const lines = reminders.slice(0, 15).map((r, i) => {
-    const rec = r.recurrence !== "none" ? ` · repeats ${r.recurrence}` : "";
+    const rec = r.recurrence !== "none" ? ` · repeats ${recurrenceLabel(r)}` : "";
     return `${i + 1}. *${r.task}* — ${formatHuman(r.fireAt, tz)}${rec}`;
   });
   const more =
@@ -145,7 +188,7 @@ export function snoozedMessage(r: Reminder, tz?: string): string {
 }
 
 export function editedMessage(r: Reminder, tz?: string): string {
-  const repeat = r.recurrence !== "none" ? ` · repeats ${r.recurrence}` : "";
+  const repeat = r.recurrence !== "none" ? ` · repeats ${recurrenceLabel(r)}` : "";
   return `✏️ updated:\n\n*${r.task}*\n${formatHuman(r.fireAt, tz)}${repeat}`;
 }
 
@@ -169,7 +212,7 @@ export function friendConfirmationMessage(
   tz?: string,
 ): string {
   const repeat =
-    r.recurrence !== "none" ? ` · repeats ${r.recurrence}` : "";
+    r.recurrence !== "none" ? ` · repeats ${recurrenceLabel(r)}` : "";
   const who = capitalize(recipientName);
   return [
     `done — i'll nudge *${who}* for you.`,
@@ -185,7 +228,7 @@ export function friendReminderFireMessage(
 ): string {
   const repeatNote =
     r.recurrence !== "none"
-      ? `\n_(repeats ${r.recurrence})_`
+      ? `\n_(repeats ${recurrenceLabel(r)})_`
       : "";
   return `⏰ a friendly nudge${recipientName ? `, ${capitalize(recipientName)}` : ""} — *${r.task}*\n\n_(set for you by a friend via Feru AI)_${repeatNote}\n\n_reply *done* or *snooze 30m*_`;
 }
@@ -408,7 +451,7 @@ export function meetingConfirmationMessage(
   tz?: string,
 ): string {
   const repeat =
-    r.recurrence !== "none" ? ` · repeats ${r.recurrence}` : "";
+    r.recurrence !== "none" ? ` · repeats ${recurrenceLabel(r)}` : "";
   const lines = [
     "calendar event created. 🗓️",
     "",
