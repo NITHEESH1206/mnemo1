@@ -9,9 +9,16 @@ import {
   useMotionValue,
   useSpring,
 } from "framer-motion";
-import { Star, Play, Check, MessageCircle, Mic } from "lucide-react";
+import { Star, Play, Check } from "lucide-react";
 import { GradientButton } from "@/components/ui/GradientButton";
 import { Mascot } from "@/components/ui/Mascot";
+import {
+  WaHeader,
+  WaOut,
+  WaIn,
+  WaInputBar,
+  WA_CHAT_BG,
+} from "@/components/ui/WhatsAppChat";
 
 export function Hero() {
   const reduced = useReducedMotion();
@@ -284,41 +291,20 @@ function PhoneMockup() {
     <div className="relative mx-auto w-[260px] animate-float-slower">
       <div className="absolute -inset-6 rounded-[40px] bg-[radial-gradient(circle_at_70%_30%,rgba(125,211,252,0.5),transparent_65%)] blur-2xl" />
       <div className="relative rounded-[36px] border border-white/60 bg-ink p-2 shadow-[0_40px_80px_-24px_rgba(20,60,110,0.55)]">
-        <div className="relative h-[500px] overflow-hidden rounded-[28px] bg-bg-tint">
-          <div className="flex items-center justify-between px-5 pt-3 text-[11px] text-ink/55">
-            <span>9:41</span>
-            <span>···</span>
-          </div>
-          <div className="mt-2 flex items-center gap-2 border-b border-ink/8 px-4 pb-3">
-            <div className="grid h-8 w-8 place-items-center rounded-full bg-gradient-primary text-[12px] font-bold text-white shadow-[0_4px_14px_rgba(249,115,22,0.4)]">
-              F
-            </div>
-            <div>
-              <div className="text-[12px] font-semibold text-ink">Feru AI</div>
-              <div className="text-[10px] text-emerald-600">online</div>
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-2.5 px-3 pt-4">
-            <div className="self-end max-w-[80%] rounded-2xl rounded-br-md bg-gradient-primary px-3.5 py-2 text-[12px] text-white shadow-[0_4px_14px_rgba(249,115,22,0.35)]">
-              Remind me to call James tomorrow at 3pm
-            </div>
-            <div className="self-start max-w-[85%] rounded-2xl rounded-bl-md border border-ink/8 bg-white px-3.5 py-2 text-[12px] text-ink">
+        <div
+          className="relative h-[500px] overflow-hidden rounded-[28px]"
+          style={{ backgroundColor: WA_CHAT_BG }}
+        >
+          <WaHeader />
+          <div className="flex flex-col gap-1.5 px-3 pt-3">
+            <WaOut time="9:40">Remind me to call James tomorrow at 3pm</WaOut>
+            <WaIn time="9:40">
               Got it. I’ll ping you at <b>3:00 PM tomorrow</b> on WhatsApp. ✅
-            </div>
-            <div className="self-end max-w-[80%] rounded-2xl rounded-br-md bg-gradient-primary px-3.5 py-2 text-[12px] text-white shadow-[0_4px_14px_rgba(249,115,22,0.35)]">
-              And every Friday — standup prep at 9am
-            </div>
-            <div className="self-start max-w-[85%] rounded-2xl rounded-bl-md border border-ink/8 bg-white px-3.5 py-2 text-[12px] text-ink">
-              Done. Recurring weekly · Fridays · 9:00 AM 🔁
-            </div>
+            </WaIn>
+            <WaOut time="9:41">And every Friday — standup prep at 9am</WaOut>
+            <WaIn time="9:41">Done. Recurring weekly · Fridays · 9:00 AM 🔁</WaIn>
           </div>
-
-          <div className="absolute inset-x-3 bottom-3 flex items-center gap-2 rounded-full border border-ink/10 bg-white px-3 py-2 text-[11px] text-ink/55">
-            <MessageCircle size={12} />
-            Message Feru AI…
-            <Mic size={12} className="ml-auto text-flame-500" />
-          </div>
+          <WaInputBar />
         </div>
       </div>
     </div>
