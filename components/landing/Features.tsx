@@ -66,6 +66,15 @@ const CARDS: FeatureCard[] = [
   },
 ];
 
+// Soft, readable background wash per card tone (keeps dark text legible).
+const toneTint: Record<FeatureCard["tone"], string> = {
+  amber: "#fdf3da",
+  flame: "#fde7d2",
+  rust: "#f7e5d8",
+  ink: "#eceae5",
+  cream: "#fff6ea",
+};
+
 const toneStyles: Record<FeatureCard["tone"], string> = {
   amber:
     "bg-[radial-gradient(circle_at_70%_-10%,#fde68a,#fbbf24_55%,#f59e0b)] text-ink",
@@ -166,7 +175,10 @@ export function Features() {
       className="relative"
       style={{ height: `${CARDS.length * 60}vh` }}
     >
-      <div className="sticky top-0 flex h-screen flex-col justify-center overflow-hidden">
+      <div
+        className="sticky top-0 flex h-screen flex-col justify-center overflow-hidden transition-colors duration-700 ease-out"
+        style={{ backgroundColor: toneTint[CARDS[active].tone] }}
+      >
         <div className="container-x">
           <Header />
         </div>
