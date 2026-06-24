@@ -7,6 +7,7 @@ import {
 import { transcribeBuffer } from "@/lib/transcribe";
 import { extractReminderFromImage } from "@/lib/vision";
 import { handleIncomingMessage, handleReminderAction } from "@/lib/handle";
+import { setLastWaStatus } from "@/lib/store";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -47,9 +48,25 @@ export async function POST(req: NextRequest) {
   }
 
   const value = data?.entry?.[0]?.changes?.[0]?.value;
+
+  // Delivery status callbacks (sent/delivered/read/failed) — capture the latest
+  // so we can diagnose failed sends (errors carry the reason + code).
+  const status = value?.statuses?.[0];
+  if (status) {
+    await setLastWaStatus({
+      status: status.status,
+      recipient: status.recipient_id,
+      errors: status.errors ?? null,
+      conversation: status.conversation ?? null,
+      pricing: status.pricing ?? null,
+      at: new Date().toISOString(),
+    }).catch(() => {});
+    return NextResponse.json({ ok: true });
+  }
+
   const msg = value?.messages?.[0];
 
-  // Status callbacks (delivered/read) and other events have no `messages`.
+  // Other events without a message — nothing to do.
   if (!msg) return NextResponse.json({ ok: true });
 
   const fromDigits: string = msg.from; // e.g. "919361092458"

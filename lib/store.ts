@@ -235,6 +235,16 @@ export async function getLastSeen(addr: string): Promise<number | null> {
   return (await redis().get<number>(lastSeenKey(addr))) ?? null;
 }
 
+// Last WhatsApp delivery status callback (sent/delivered/read/failed + errors)
+// — captured so we can diagnose why a message didn't arrive.
+const WA_STATUS_KEY = "wa:laststatus";
+export async function setLastWaStatus(v: unknown): Promise<void> {
+  await redis().set(WA_STATUS_KEY, v, { ex: 60 * 60 * 24 });
+}
+export async function getLastWaStatus(): Promise<unknown> {
+  return (await redis().get(WA_STATUS_KEY)) ?? null;
+}
+
 // ── Contacts (for friend-to-friend reminders) ──────────────────
 // Stored as a Redis hash per user: contacts:<userPhone> { name -> phone }
 
