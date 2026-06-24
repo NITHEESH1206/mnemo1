@@ -1,8 +1,14 @@
 "use client";
 
-import { useRef } from "react";
-import { motion } from "framer-motion";
-import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import {
+  motion,
+  useReducedMotion,
+  useScroll,
+  useMotionValue,
+  useMotionValueEvent,
+} from "framer-motion";
+import { Plus } from "lucide-react";
 import { Mascot, type MascotVariant } from "@/components/ui/Mascot";
 import { cn } from "@/lib/utils";
 
@@ -72,75 +78,129 @@ const toneStyles: Record<FeatureCard["tone"], string> = {
     "bg-[radial-gradient(circle_at_70%_-10%,#ffffff,#fef3e6_55%,#fed7aa)] text-ink",
 };
 
-export function Features() {
-  const trackRef = useRef<HTMLDivElement | null>(null);
+function Header() {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-80px" }}
+      transition={{ duration: 0.6 }}
+      className="max-w-2xl"
+    >
+      <span className="pill">Superpowers</span>
+      <h2 className="mt-5 text-h2 text-ink">
+        Superpowers for minds <br className="hidden sm:block" />
+        that can’t do it all.
+      </h2>
+      <p className="mt-4 max-w-xl text-[17px] text-ink/65">
+        Scroll through everything Feru AI quietly does in the background.
+      </p>
+    </motion.div>
+  );
+}
 
-  const scroll = (dir: 1 | -1) => {
-    const el = trackRef.current;
-    if (!el) return;
-    el.scrollBy({ left: dir * el.clientWidth * 0.85, behavior: "smooth" });
+export function Features() {
+  const reduced = useReducedMotion();
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const trackRef = useRef<HTMLDivElement | null>(null);
+  const centersRef = useRef<number[]>([]);
+  const x = useMotionValue(0);
+  const [active, setActive] = useState(0);
+
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start start", "end end"],
+  });
+
+  // Translate the filmstrip so the scroll-position card sits dead centre.
+  const apply = (p: number) => {
+    const cs = centersRef.current;
+    if (!cs.length || typeof window === "undefined") return;
+    const n = cs.length;
+    const pos = Math.min(n - 1, Math.max(0, p * (n - 1)));
+    const i = Math.floor(pos);
+    const j = Math.min(n - 1, i + 1);
+    const center = cs[i] + (cs[j] - cs[i]) * (pos - i);
+    x.set(window.innerWidth / 2 - center);
+    setActive(Math.round(pos));
   };
 
-  return (
-    <section id="features" className="section relative overflow-hidden">
-      <div className="container-x relative z-10">
-        <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.6 }}
-            className="max-w-2xl"
-          >
-            <span className="pill">Superpowers</span>
-            <h2 className="mt-5 text-h2 text-ink">
-              Superpowers for minds <br className="hidden sm:block" />
-              that can’t do it all.
-            </h2>
-            <p className="mt-5 max-w-xl text-[17px] text-ink/65">
-              Feru AI sits quietly across all your tools, capturing what matters
-              and surfacing it exactly when you need it.
-            </p>
-          </motion.div>
+  useMotionValueEvent(scrollYProgress, "change", apply);
 
-          <div className="flex items-center gap-2.5">
-            <button
-              aria-label="Previous"
-              onClick={() => scroll(-1)}
-              className="btn-glass h-11 w-11 !p-0"
-            >
-              <ChevronLeft size={18} />
-            </button>
-            <button
-              aria-label="Next"
-              onClick={() => scroll(1)}
-              className="btn-glass h-11 w-11 !p-0"
-            >
-              <ChevronRight size={18} />
-            </button>
-          </div>
-        </div>
+  useEffect(() => {
+    if (reduced) return;
+    const measure = () => {
+      const track = trackRef.current;
+      if (!track) return;
+      const kids = Array.from(track.children) as HTMLElement[];
+      centersRef.current = kids.map((k) => k.offsetLeft + k.offsetWidth / 2);
+      apply(scrollYProgress.get());
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reduced]);
 
-        <div className="relative mt-12 -mx-6 px-6 md:-mx-0 md:px-0">
-          <div
-            ref={trackRef}
-            className="carousel-track flex snap-x snap-mandatory gap-5 overflow-x-auto pb-6"
-          >
-            {CARDS.map((c, i) => (
-              <motion.div
-                key={c.title}
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-60px" }}
-                transition={{ duration: 0.55, delay: i * 0.06 }}
-                className="w-[80%] shrink-0 sm:w-[48%] lg:w-[30%]"
-              >
+  if (reduced) {
+    return (
+      <section id="features" className="section relative overflow-hidden">
+        <div className="container-x">
+          <Header />
+          <div className="carousel-track mt-12 flex gap-5 overflow-x-auto pb-6">
+            {CARDS.map((c) => (
+              <div key={c.title} className="w-[78%] shrink-0 sm:w-[300px]">
                 <FeatureCardView {...c} />
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
+      </section>
+    );
+  }
 
+  return (
+    <section
+      id="features"
+      ref={sectionRef}
+      className="relative"
+      style={{ height: `${CARDS.length * 60}vh` }}
+    >
+      <div className="sticky top-0 flex h-screen flex-col justify-center overflow-hidden">
+        <div className="container-x">
+          <Header />
+        </div>
+        <motion.div
+          ref={trackRef}
+          style={{ x }}
+          className="relative mt-10 flex w-max gap-6 pl-[10vw] pr-[10vw]"
+        >
+          {CARDS.map((c, i) => (
+            <div
+              key={c.title}
+              className={cn(
+                "w-[280px] shrink-0 transition-all duration-500 ease-out sm:w-[320px]",
+                i === active
+                  ? "scale-100 opacity-100"
+                  : "scale-[0.84] opacity-50",
+              )}
+            >
+              <FeatureCardView {...c} />
+            </div>
+          ))}
+        </motion.div>
+
+        <div className="container-x mt-8 flex items-center gap-2">
+          {CARDS.map((_, i) => (
+            <span
+              key={i}
+              className={cn(
+                "h-1.5 rounded-full transition-all duration-300",
+                i === active ? "w-7 bg-flame-500" : "w-1.5 bg-ink/15",
+              )}
+            />
+          ))}
+        </div>
       </div>
     </section>
   );
@@ -153,16 +213,10 @@ function FeatureCardView({ title, blurb, mascot, tone, hueShift }: FeatureCard) 
         "group relative flex aspect-[4/5] flex-col justify-between overflow-hidden rounded-[32px] p-7",
         "border border-white/20 shadow-[0_20px_50px_-20px_rgba(120,53,15,0.35)]",
         toneStyles[tone],
-        "transition-transform duration-500 hover:-translate-y-1",
       )}
     >
       <div>
-        <h3
-          className={cn(
-            "text-[26px] font-extrabold leading-[1.08] tracking-tight",
-            "max-w-[80%]",
-          )}
-        >
+        <h3 className="max-w-[80%] text-[26px] font-extrabold leading-[1.08] tracking-tight">
           {title}
         </h3>
         <p
@@ -195,7 +249,6 @@ function FeatureCardView({ title, blurb, mascot, tone, hueShift }: FeatureCard) 
         </div>
       </div>
 
-      {/* Top-right glossy */}
       <span
         aria-hidden
         className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full opacity-50 blur-2xl"
