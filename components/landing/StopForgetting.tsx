@@ -49,7 +49,7 @@ export function StopForgetting() {
   };
 
   return (
-    <section id="how-it-works" className="section relative overflow-hidden">
+    <section id="use-cases" className="section relative overflow-hidden">
       <div className="ambient-warm opacity-60" aria-hidden />
       <div className="container-x relative z-10">
         <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">

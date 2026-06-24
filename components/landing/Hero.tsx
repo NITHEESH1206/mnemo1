@@ -1,27 +1,78 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { useRef, type MouseEvent } from "react";
+import {
+  motion,
+  useReducedMotion,
+  useScroll,
+  useTransform,
+  useMotionValue,
+  useSpring,
+} from "framer-motion";
 import { Star, Play, Check, MessageCircle, Mic } from "lucide-react";
 import { GradientButton } from "@/components/ui/GradientButton";
 import { Mascot } from "@/components/ui/Mascot";
 
 export function Hero() {
   const reduced = useReducedMotion();
+  const heroRef = useRef<HTMLElement | null>(null);
+
+  // Scroll-linked parallax: layers drift at different speeds as you scroll.
+  const { scrollYProgress } = useScroll({
+    target: heroRef,
+    offset: ["start start", "end start"],
+  });
+  const bgY = useTransform(scrollYProgress, [0, 1], [0, 130]);
+  const orbY = useTransform(scrollYProgress, [0, 1], [0, -150]);
+  const showcaseY = useTransform(scrollYProgress, [0, 1], [0, 70]);
+
+  // Mouse parallax tilt for the showcase mockups.
+  const px = useMotionValue(0);
+  const py = useMotionValue(0);
+  const rotX = useSpring(useTransform(py, [-0.5, 0.5], [6, -6]), {
+    stiffness: 110,
+    damping: 18,
+  });
+  const rotY = useSpring(useTransform(px, [-0.5, 0.5], [-8, 8]), {
+    stiffness: 110,
+    damping: 18,
+  });
+
+  function onMove(e: MouseEvent) {
+    if (reduced) return;
+    const r = heroRef.current?.getBoundingClientRect();
+    if (!r) return;
+    px.set((e.clientX - r.left) / r.width - 0.5);
+    py.set((e.clientY - r.top) / r.height - 0.5);
+  }
 
   return (
-    <section className="relative isolate overflow-hidden pt-36 pb-28 sm:pt-44">
-      {/* ── Grass photo background ───────────────────────── */}
+    <section
+      ref={heroRef}
+      onMouseMove={onMove}
+      className="relative isolate overflow-hidden pt-36 pb-28 sm:pt-44"
+    >
+      {/* ── Grass photo background (parallax) ───────────────── */}
       <div className="absolute inset-0 z-0 overflow-hidden" aria-hidden="true">
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: "url('/grass.png')" }}
+        <motion.div
+          style={{
+            backgroundImage: "url('/grass.png')",
+            ...(reduced ? {} : { y: bgY }),
+          }}
+          className="absolute inset-0 scale-110 bg-cover bg-center"
         />
         {/* darken top for white headline readability, fade to cream at bottom */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-black/10 to-[#fff8f0]" />
       </div>
 
-      {/* Floating mascot accents (warm orbs pop against the blue) */}
-      <FloatingOrbs />
+      {/* Floating mascot accents (parallax — warm orbs pop against the blue) */}
+      <motion.div
+        aria-hidden
+        style={reduced ? undefined : { y: orbY }}
+        className="pointer-events-none absolute inset-0 z-20"
+      >
+        <FloatingOrbs />
+      </motion.div>
 
       <div className="container-x relative z-10">
         {/* Rating row — frosted glass pill on the sky */}
@@ -105,18 +156,29 @@ export function Hero() {
           Free forever · No credit card required · Cancel anytime
         </motion.p>
 
-        {/* Floating glass showcase */}
+        {/* Floating glass showcase — scroll parallax + mouse tilt */}
         <motion.div
           initial={reduced ? false : { opacity: 0, y: 44 }}
           animate={reduced ? undefined : { opacity: 1, y: 0 }}
           transition={{ duration: 0.95, delay: 0.42, ease: [0.22, 1, 0.36, 1] }}
-          className="relative mx-auto mt-20 w-full max-w-5xl"
+          className="relative mx-auto mt-20 w-full max-w-5xl [perspective:1400px]"
         >
-          {/* No frosted tray — the sky, clouds and animation stay fully visible */}
-          <div className="relative grid grid-cols-1 items-end gap-6 md:grid-cols-[1fr_300px] md:gap-10">
+          <motion.div
+            style={
+              reduced
+                ? undefined
+                : {
+                    y: showcaseY,
+                    rotateX: rotX,
+                    rotateY: rotY,
+                    transformPerspective: 1400,
+                  }
+            }
+            className="relative grid grid-cols-1 items-end gap-6 [transform-style:preserve-3d] md:grid-cols-[1fr_300px] md:gap-10"
+          >
             <BrowserMockup />
             <PhoneMockup />
-          </div>
+          </motion.div>
         </motion.div>
       </div>
     </section>
