@@ -18,7 +18,7 @@ import {
   WaOut,
   WaIn,
   WaInputBar,
-  WA_CHAT_BG,
+  WA_CHAT_STYLE,
 } from "@/components/ui/WhatsAppChat";
 
 export function Hero() {
@@ -124,7 +124,7 @@ export function Hero() {
           className="mx-auto mt-7 max-w-2xl text-center text-[17px] font-medium leading-relaxed text-white/90 sm:text-[19px] [text-shadow:0_1px_18px_rgba(12,74,110,0.35)]"
         >
           Set reminders, capture ideas, and stay in flow — across WhatsApp,
-          Telegram, Email, and your web dashboard. One AI that never forgets.
+          Email, and your web dashboard. One AI that never forgets.
         </motion.p>
 
         {/* CTAs */}
@@ -286,7 +286,7 @@ function PhoneMockup() {
       <div className="relative rounded-[36px] border border-white/60 bg-ink p-2 shadow-[0_40px_80px_-24px_rgba(20,60,110,0.55)]">
         <div
           className="relative h-[500px] overflow-hidden rounded-[28px]"
-          style={{ backgroundColor: WA_CHAT_BG }}
+          style={WA_CHAT_STYLE}
         >
           <WaHeader />
           <div className="flex flex-col gap-1.5 px-3 pt-3">

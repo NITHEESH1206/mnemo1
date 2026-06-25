@@ -107,7 +107,7 @@ function OnboardingMock() {
       <div className="mt-5 grid grid-cols-2 gap-3">
         {[
           { n: "WhatsApp", c: true },
-          { n: "Telegram", c: true },
+          { n: "Calendar", c: true },
           { n: "Email", c: false },
           { n: "Web App", c: true },
         ].map((ch) => (

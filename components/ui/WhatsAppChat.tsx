@@ -114,4 +114,16 @@ export function WaInputBar() {
 }
 
 /** Beige WhatsApp chat backdrop. */
-export const WA_CHAT_BG = "#ece5dd";
+export const WA_CHAT_BG = "#efe7dd";
+
+/**
+ * The WhatsApp-style chat backdrop: warm beige + a faint scattered doodle
+ * texture (an original approximation of the default wallpaper, not the
+ * trademarked artwork). Spread onto the chat screen container.
+ */
+export const WA_CHAT_STYLE = {
+  backgroundColor: WA_CHAT_BG,
+  backgroundImage:
+    "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90' viewBox='0 0 90 90'%3E%3Cg fill='none' stroke='%23d8cdbd' stroke-width='1.3' stroke-linecap='round' opacity='0.55'%3E%3Ccircle cx='18' cy='20' r='6'/%3E%3Cpath d='M58 14l5 5-5 5-5-5z'/%3E%3Cpath d='M12 58h11M17.5 52.5v11'/%3E%3Ccircle cx='68' cy='64' r='4.5'/%3E%3Cpath d='M40 44c2-3 6-3 6 0s-6 6-6 6-6-3-6-6 4-3 6 0z'/%3E%3Cpath d='M74 30h8M78 26v8'/%3E%3C/g%3E%3C/svg%3E\")",
+  backgroundSize: "90px 90px",
+} as const;

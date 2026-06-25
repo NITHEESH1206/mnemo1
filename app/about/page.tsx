@@ -11,7 +11,7 @@ export default function AboutPage() {
       <p>
         Feru AI is a calm, intelligent memory layer for people who have better
         things to do than remember everything. It lives where you already are —
-        WhatsApp, Telegram, and email — and quietly captures your reminders,
+        WhatsApp and email — and quietly captures your reminders,
         ideas, and follow-ups, then surfaces them at exactly the right moment.
       </p>
 
@@ -35,8 +35,8 @@ export default function AboutPage() {
       <LegalSection heading="Get in touch">
         <p>
           Questions, feedback, or partnership ideas? Reach us anytime at{" "}
-          <a className="text-flame-700 underline" href="mailto:hello@feru.ai">
-            hello@feru.ai
+          <a className="text-flame-700 underline" href="mailto:contact@feruai.com">
+            contact@feruai.com
           </a>{" "}
           or on{" "}
           <a

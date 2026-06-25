@@ -18,7 +18,7 @@ export default function PrivacyPage() {
         <p>
           We collect the information you give us to provide the service: your
           name and contact details, the messages and reminders you send, the
-          channels you connect (such as WhatsApp, Telegram, email, and
+          channels you connect (such as WhatsApp, email, and
           calendars), and basic usage data that helps us keep the product
           reliable.
         </p>
@@ -54,8 +54,8 @@ export default function PrivacyPage() {
         <p>
           You can access, export, or delete your data at any time. To make a
           request, contact us at{" "}
-          <a className="text-flame-700 underline" href="mailto:privacy@feru.ai">
-            privacy@feru.ai
+          <a className="text-flame-700 underline" href="mailto:contact@feruai.com">
+            contact@feruai.com
           </a>
           .
         </p>

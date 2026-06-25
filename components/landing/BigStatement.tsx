@@ -17,14 +17,12 @@ export function BigStatement() {
     offset: ["start start", "end end"],
   });
 
-  // Phase 1 (0–0.6): the headline sweeps in from the right.
-  // Phase 2 (0.5–0.95): it shrinks and lifts into place, then the sub fades in.
-  const x = useTransform(scrollYProgress, [0, 0.6], ["46vw", "-4vw"]);
-  const scale = useTransform(scrollYProgress, [0.5, 0.95], [1, 0.42]);
-  const lift = useTransform(scrollYProgress, [0.5, 0.95], ["0vh", "-24vh"]);
-  const glow = useTransform(scrollYProgress, [0, 0.5, 1], [0.35, 0.7, 0.4]);
-  const subO = useTransform(scrollYProgress, [0.78, 1], [0, 1]);
-  const subY = useTransform(scrollYProgress, [0.78, 1], [34, 0]);
+  // Sweep in from the right → settle dead-centre by 40% → hold centred while
+  // you keep scrolling, then the pin releases into the next section.
+  const x = useTransform(scrollYProgress, [0, 0.4], ["55vw", "0vw"]);
+  const glow = useTransform(scrollYProgress, [0, 0.4, 1], [0.25, 0.7, 0.55]);
+  const subO = useTransform(scrollYProgress, [0.46, 0.66], [0, 1]);
+  const subY = useTransform(scrollYProgress, [0.46, 0.66], [36, 0]);
 
   if (reduced) {
     return (
@@ -51,9 +49,9 @@ export function BigStatement() {
     <section
       ref={ref}
       className="relative bg-gradient-dark"
-      style={{ height: "260vh" }}
+      style={{ height: "230vh" }}
     >
-      <div className="sticky top-0 flex h-screen items-center justify-center overflow-hidden text-white">
+      <div className="sticky top-0 flex h-screen flex-col items-center justify-center overflow-hidden px-6 text-white">
         <motion.div
           aria-hidden
           style={{
@@ -61,19 +59,19 @@ export function BigStatement() {
             background:
               "radial-gradient(circle, rgba(249,115,22,0.55), rgba(249,115,22,0.12) 38%, transparent 68%)",
           }}
-          className="pointer-events-none absolute inset-0 m-auto h-[72vh] w-[72vh] rounded-full blur-[30px]"
+          className="pointer-events-none absolute inset-0 m-auto h-[70vh] w-[70vh] rounded-full blur-[30px]"
         />
 
         <motion.h2
-          style={{ x, scale, y: lift }}
-          className="display-tight whitespace-nowrap text-[clamp(4rem,16vw,15rem)] leading-[0.9]"
+          style={{ x }}
+          className="display-tight whitespace-nowrap text-center text-[clamp(2.75rem,12vw,11rem)] leading-[0.95]"
         >
           you’ll never <span className="gradient-text">forget</span> again.
         </motion.h2>
 
         <motion.div
           style={{ opacity: subO, y: subY }}
-          className="absolute inset-x-0 bottom-[20%] flex flex-col items-center px-6 text-center"
+          className="mt-8 flex flex-col items-center text-center"
         >
           <p className="max-w-xl text-[17px] leading-relaxed text-white/75 sm:text-[19px]">
             Feru holds every reminder, idea and list — and brings it back at the

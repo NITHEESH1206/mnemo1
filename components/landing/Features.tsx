@@ -38,7 +38,7 @@ const CARDS: FeatureCard[] = [
   {
     title: "Memory everywhere",
     blurb:
-      "WhatsApp, Telegram, Email, Web — Feru AI answers wherever you happen to be.",
+      "WhatsApp, Email, Web — Feru AI answers wherever you happen to be.",
     mascot: "goggles",
     tone: "ink",
   },

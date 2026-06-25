@@ -37,13 +37,15 @@ export function LegalPage({
 
 export function LegalSection({
   heading,
+  id,
   children,
 }: {
   heading: string;
+  id?: string;
   children: React.ReactNode;
 }) {
   return (
-    <div>
+    <div id={id} className={id ? "scroll-mt-28" : undefined}>
       <h2 className="mb-2 text-[20px] font-extrabold tracking-tight text-ink">
         {heading}
       </h2>

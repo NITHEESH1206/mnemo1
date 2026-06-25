@@ -64,7 +64,7 @@ export async function GET(req: NextRequest) {
       }
 
       const res = NextResponse.redirect(destination);
-      res.cookies.set(SESSION_COOKIE_NAME, signSession(email), {
+      res.cookies.set(SESSION_COOKIE_NAME, signSession(email, tokens.name), {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",

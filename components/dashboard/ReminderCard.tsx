@@ -5,7 +5,6 @@ import {
   Check,
   MessageCircle,
   Mail,
-  Send,
   Globe,
   Plus,
   type LucideIcon,
@@ -16,7 +15,6 @@ import { GradientButton } from "@/components/ui/GradientButton";
 
 const channelIcon: Record<string, LucideIcon> = {
   whatsapp: MessageCircle,
-  telegram: Send,
   email: Mail,
   web: Globe,
 };

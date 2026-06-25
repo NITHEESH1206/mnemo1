@@ -50,11 +50,12 @@ export async function POST(req: NextRequest) {
       const session = readSession(
         req.cookies.get(SESSION_COOKIE_NAME)?.value,
       );
-      plan = order?.notes?.plan ?? "Supernova";
+      plan = order?.notes?.plan ?? "Pro";
       await recordSubscription({
         plan,
         billing: order?.notes?.billing ?? "unknown",
         email: session?.email,
+        name: session?.name,
         orderId: razorpay_order_id,
         paymentId: razorpay_payment_id,
         amount: order?.amount ?? 0,

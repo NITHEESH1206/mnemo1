@@ -318,6 +318,7 @@ export type Subscription = {
   plan: string;
   billing: string;
   email?: string;
+  name?: string;
   orderId: string;
   paymentId: string;
   amount: number;
@@ -332,6 +333,26 @@ export async function recordSubscription(sub: Subscription): Promise<void> {
     score: Date.now(),
     member: sub.orderId,
   });
+}
+
+/** Most-recent subscriptions, with the WhatsApp phone resolved per email. */
+export async function listSubscriptions(
+  limit = 100,
+): Promise<Array<Subscription & { phone?: string }>> {
+  const client = redis();
+  const ids = (await client.zrange<string[]>("subscriptions", -limit, -1)) ?? [];
+  const out: Array<Subscription & { phone?: string }> = [];
+  for (const id of [...ids].reverse()) {
+    const s = await client.get<Subscription>(`subscription:${id}`);
+    if (!s) continue;
+    let phone: string | undefined;
+    if (s.email) {
+      const p = await getPhoneForEmail(s.email);
+      phone = p ? p.replace(/^whatsapp:/, "") : undefined;
+    }
+    out.push({ ...s, phone });
+  }
+  return out;
 }
 
 // ── Plans, account linking & monthly usage ─────────────────────

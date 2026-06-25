@@ -11,17 +11,17 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://feru.ai"),
+  metadataBase: new URL("https://www.feruai.com"),
   title: {
     default: "Feru AI — Your AI memory layer. Everywhere you work.",
     template: "%s · Feru AI",
   },
   description:
-    "Set reminders, capture ideas, and stay in flow — across WhatsApp, Telegram, Email, and your web dashboard. One AI that never forgets.",
+    "Set reminders, capture ideas, and stay in flow — across WhatsApp, Email, and your web dashboard. One AI that never forgets.",
   openGraph: {
     title: "Feru AI — Your AI memory layer.",
     description:
-      "One AI that never forgets. Across WhatsApp, Telegram, Email, and your web dashboard.",
+      "One AI that never forgets. Across WhatsApp, Email, and your web dashboard.",
     type: "website",
   },
   twitter: {

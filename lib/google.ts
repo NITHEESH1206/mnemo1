@@ -15,7 +15,7 @@ import type { Credentials, OAuth2Client } from "google-auth-library";
 import { Redis } from "@upstash/redis";
 import crypto from "crypto";
 
-export type GoogleTokens = Credentials & { email?: string };
+export type GoogleTokens = Credentials & { email?: string; name?: string };
 
 const SCOPES = [
   "openid",
@@ -136,9 +136,9 @@ function sessionSecret(): string {
   );
 }
 
-export function signSession(email: string): string {
+export function signSession(email: string, name?: string): string {
   const payload = Buffer.from(
-    JSON.stringify({ email, t: Date.now() }),
+    JSON.stringify({ email, name, t: Date.now() }),
   ).toString("base64url");
   const sig = crypto
     .createHmac("sha256", sessionSecret())
@@ -150,7 +150,7 @@ export function signSession(email: string): string {
 
 export function readSession(
   cookieValue: string | undefined,
-): { email: string } | null {
+): { email: string; name?: string } | null {
   if (!cookieValue) return null;
   const [payload, sig] = cookieValue.split(".");
   if (!payload || !sig) return null;
@@ -162,7 +162,7 @@ export function readSession(
   if (sig !== expected) return null;
   try {
     const data = JSON.parse(Buffer.from(payload, "base64url").toString());
-    return { email: data.email };
+    return { email: data.email, name: data.name };
   } catch {
     return null;
   }
@@ -177,18 +177,20 @@ export async function exchangeCodeForTokens(
   const client = oauthClient();
   const { tokens } = await client.getToken(code);
 
-  // Look up the user's primary email so we can show it back.
+  // Look up the user's primary email + name so we can show it back.
   let email: string | undefined;
+  let name: string | undefined;
   try {
     client.setCredentials(tokens);
     const oauth2 = google.oauth2({ version: "v2", auth: client });
     const info = await oauth2.userinfo.get();
     email = info.data.email ?? undefined;
+    name = info.data.name ?? undefined;
   } catch {
     // Non-fatal — we can still proceed without the email.
   }
 
-  return { ...tokens, email };
+  return { ...tokens, email, name };
 }
 
 export async function saveTokens(

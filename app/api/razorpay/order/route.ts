@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createOrder, razorpayKeyId } from "@/lib/razorpay";
 import { PRICING } from "@/lib/constants";
-import { applyCouponWeb, createLinkToken } from "@/lib/store";
+import {
+  applyCouponWeb,
+  createLinkToken,
+  recordSubscription,
+} from "@/lib/store";
+import { readSession, SESSION_COOKIE_NAME } from "@/lib/google";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -43,7 +48,21 @@ export async function POST(req: NextRequest) {
           { status: 400 },
         );
       }
-      const linkToken = await createLinkToken(p.name);
+      const session = readSession(
+        req.cookies.get(SESSION_COOKIE_NAME)?.value,
+      );
+      const orderId = `coupon_${Date.now()}`;
+      await recordSubscription({
+        plan: p.name,
+        billing: "coupon",
+        email: session?.email,
+        name: session?.name,
+        orderId,
+        paymentId: "coupon",
+        amount: 0,
+        createdAt: new Date().toISOString(),
+      }).catch(() => {});
+      const linkToken = await createLinkToken(p.name, session?.email);
       return NextResponse.json({
         freeUnlock: true,
         linkToken,

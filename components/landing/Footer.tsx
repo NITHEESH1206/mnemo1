@@ -14,6 +14,12 @@ export function Footer() {
             <p className="mt-4 max-w-xs text-[13.5px] leading-relaxed text-ink/65">
               The calm AI memory layer that quietly keeps your life in motion.
             </p>
+            <a
+              href="mailto:contact@feruai.com"
+              className="mt-4 inline-block text-[13.5px] font-semibold text-flame-700 hover:text-flame-600"
+            >
+              contact@feruai.com
+            </a>
           </div>
 
           {Object.entries(FOOTER_LINKS).map(([group, links]) => (

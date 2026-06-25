@@ -5,6 +5,7 @@ import {
   countWebUsers,
   countSubscriptions,
   listFeedback,
+  listSubscriptions,
 } from "@/lib/store";
 
 export const runtime = "nodejs";
@@ -26,24 +27,25 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  const [bot, web, subs, users, feedback] = await Promise.all([
+  const [bot, web, subs, users, feedback, subscribers] = await Promise.all([
     countBotUsers(),
     countWebUsers(),
     countSubscriptions(),
     allUsers(),
     listFeedback(50),
+    listSubscriptions(100),
   ]);
 
   const whatsapp = users.filter((u) => u.startsWith("whatsapp:")).length;
-  const telegram = users.filter((u) => u.startsWith("telegram:")).length;
   const email = users.filter((u) => u.startsWith("email:")).length;
 
   if (req.nextUrl.searchParams.get("format") === "json") {
     return NextResponse.json({
       botUsers: bot,
-      byChannel: { whatsapp, telegram, email },
+      byChannel: { whatsapp, email },
       webSignIns: web,
       paidSubscriptions: subs,
+      subscribers,
       feedback,
       checkedAt: new Date().toISOString(),
     });
@@ -62,6 +64,25 @@ export async function GET(req: NextRequest) {
         )
         .join("")
     : `<p style="color:#a8a29e;font-size:14px">No feedback yet.</p>`;
+
+  const subsHtml = subscribers.length
+    ? `<table style="width:100%;border-collapse:collapse;font-size:14px;margin-top:12px">
+        <thead><tr style="text-align:left;color:#a8a29e;font-size:11px;text-transform:uppercase;letter-spacing:.06em">
+          <th style="padding:8px 6px">Name</th><th style="padding:8px 6px">Email</th><th style="padding:8px 6px">Phone</th><th style="padding:8px 6px">Plan</th><th style="padding:8px 6px">When</th>
+        </tr></thead><tbody>
+        ${subscribers
+          .map(
+            (s) => `<tr style="border-top:1px solid rgba(15,12,9,0.08)">
+            <td style="padding:10px 6px;font-weight:600">${esc(s.name || "—")}</td>
+            <td style="padding:10px 6px">${esc(s.email || "—")}</td>
+            <td style="padding:10px 6px">${esc(s.phone || "—")}</td>
+            <td style="padding:10px 6px">${esc(s.plan)}${s.billing === "coupon" ? " · coupon" : ""}</td>
+            <td style="padding:10px 6px;color:#78716c">${new Date(s.createdAt).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })}</td>
+          </tr>`,
+          )
+          .join("")}
+        </tbody></table>`
+    : `<p style="color:#a8a29e;font-size:14px">No subscribers yet.</p>`;
 
   const card = (label: string, value: number, accent = "#ea580c") => `
     <div style="background:#fff;border:1px solid rgba(15,12,9,0.08);border-radius:22px;padding:26px 28px;box-shadow:0 18px 40px -26px rgba(120,53,15,0.25)">
@@ -84,10 +105,12 @@ export async function GET(req: NextRequest) {
       ${card("Web sign-ins", web, "#0c4a6e")}
       ${card("Paid subscriptions", subs, "#16a34a")}
       ${card("WhatsApp", whatsapp)}
-      ${card("Telegram", telegram, "#0284c7")}
       ${card("Email", email, "#7c2d12")}
     </div>
     <p class="hint">"Bot users" = everyone who has ever messaged Feru AI on any channel. Refresh to update. Add &format=json for raw data.</p>
+    <h1 style="margin-top:38px;font-size:20px">Subscribers (${subscribers.length})</h1>
+    <p class="sub">Everyone who unlocked a paid plan — name, email &amp; the WhatsApp number they linked.</p>
+    ${subsHtml}
     <h1 style="margin-top:38px;font-size:20px">Feedback &amp; support (${feedback.length})</h1>
     <p class="sub">From users who typed <b>feedback …</b> or <b>support …</b></p>
     ${feedbackHtml}

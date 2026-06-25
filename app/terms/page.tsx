@@ -31,10 +31,19 @@ export default function TermsPage() {
 
       <LegalSection heading="Plans & payments">
         <p>
-          Paid plans are billed in advance through our payment provider. You can
-          upgrade, downgrade, or cancel at any time, and a 14-day money-back
-          guarantee applies to new paid subscriptions. Taxes may apply depending
-          on your location.
+          Paid plans are billed in advance through our payment provider
+          (Razorpay). You can upgrade, downgrade, or cancel at any time. Taxes
+          may apply depending on your location.
+        </p>
+      </LegalSection>
+
+      <LegalSection heading="Refunds" id="refunds">
+        <p>
+          All payments are <strong>final and non-refundable</strong>. Because
+          Feru AI is a digital service delivered to you immediately, we do not
+          offer refunds for any plan, partial billing period, or unused time.
+          You can cancel anytime to stop future charges — you&apos;ll keep
+          access until the end of your current billing period.
         </p>
       </LegalSection>
 
@@ -58,8 +67,8 @@ export default function TermsPage() {
       <LegalSection heading="Contact">
         <p>
           Questions about these Terms? Email{" "}
-          <a className="text-flame-700 underline" href="mailto:hello@feru.ai">
-            hello@feru.ai
+          <a className="text-flame-700 underline" href="mailto:contact@feruai.com">
+            contact@feruai.com
           </a>
           .
         </p>

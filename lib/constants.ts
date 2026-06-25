@@ -2,7 +2,8 @@ export const SITE = {
   name: "Feru AI",
   tagline: "Your AI memory layer. Everywhere you work.",
   subTagline:
-    "Set reminders, capture ideas, and stay in flow — across WhatsApp, Telegram, Email, and your web dashboard. One AI that never forgets.",
+    "Set reminders, capture ideas, and stay in flow — across WhatsApp, Email, and your web dashboard. One AI that never forgets.",
+  email: "contact@feruai.com",
 } as const;
 
 export const NAV_LINKS = [
@@ -13,7 +14,6 @@ export const NAV_LINKS = [
 
 export const INTEGRATIONS = [
   "WhatsApp",
-  "Telegram",
   "Gmail",
   "Google Calendar",
   "Notion",
@@ -32,7 +32,7 @@ export const FEATURES = [
     icon: "📱",
     title: "Multi-Channel",
     description:
-      "Works where you already are: WhatsApp, Telegram, Email, and a full web dashboard.",
+      "Works where you already are: WhatsApp, Email, and a full web dashboard.",
   },
   {
     icon: "🔁",
@@ -65,7 +65,7 @@ export const STEPS = [
     num: "01",
     title: "Connect your world",
     description:
-      "Link your WhatsApp, Telegram, email, or just open the web app. No new apps to install. No learning curve.",
+      "Link your WhatsApp, email, or just open the web app. No new apps to install. No learning curve.",
   },
   {
     num: "02",
@@ -134,7 +134,7 @@ export const TESTIMONIALS = [
   {
     name: "Sneha Reddy",
     role: "Executive Assistant",
-    quote: "The voice input on Telegram is witchcraft. It just works.",
+    quote: "The voice input is witchcraft. I just send a note and it's done.",
     rating: 5,
     featured: false,
     seed: "Sneha Reddy",
@@ -183,7 +183,7 @@ export const PRICING: PricingPlan[] = [
     blurb: "Everything you need to get started.",
     features: [
       "20 reminders per month",
-      "WhatsApp or Telegram",
+      "WhatsApp & Email",
       "Basic recurrence",
       "Community support",
     ],
@@ -198,7 +198,7 @@ export const PRICING: PricingPlan[] = [
     blurb: "For solopreneurs who run on reminders.",
     features: [
       "Unlimited reminders",
-      "All channels (WhatsApp, Telegram, Email, Web)",
+      "All channels (WhatsApp, Email, Web)",
       "Voice input in any language",
       "Calendar sync (Google, Outlook, Apple)",
       "Priority support",
@@ -238,7 +238,7 @@ export const FAQS = [
   },
   {
     q: "What channels are supported?",
-    a: "WhatsApp, Telegram, Email, and the web dashboard out of the box. Calendar sync covers Google Calendar, Outlook, and Apple Calendar.",
+    a: "WhatsApp, Email, and the web dashboard out of the box. Calendar sync covers Google Calendar, Outlook, and Apple Calendar.",
   },
   {
     q: "How does team billing work?",
@@ -255,10 +255,12 @@ export const FOOTER_LINKS = {
     { label: "Features", href: "#features" },
     { label: "Pricing", href: "#pricing" },
   ],
-  Company: [{ label: "About", href: "/about" }],
+  Company: [
+    { label: "About", href: "/about" },
+    { label: "Contact", href: "mailto:contact@feruai.com" },
+  ],
   Integrations: [
     { label: "WhatsApp", href: "#whatsapp" },
-    { label: "Telegram", href: "#telegram" },
     { label: "Gmail", href: "#gmail" },
     { label: "Calendar", href: "#calendar" },
     { label: "Notion", href: "#notion" },
@@ -266,6 +268,7 @@ export const FOOTER_LINKS = {
   Legal: [
     { label: "Privacy", href: "/privacy" },
     { label: "Terms", href: "/terms" },
+    { label: "Refunds", href: "/terms#refunds" },
     { label: "Cookie Policy", href: "/cookies" },
   ],
 } as const;
@@ -286,7 +289,7 @@ export const REMINDERS_DEMO = [
   {
     title: "Pick up dry cleaning",
     time: "6:00 PM",
-    channel: "telegram",
+    channel: "whatsapp",
     done: true,
   },
   {
@@ -306,14 +309,14 @@ export const REMINDERS_DEMO = [
 export const ACTIVITY_DEMO = [
   { icon: "📨", text: "Reminder sent on WhatsApp — ‘Call James’", ago: "2m" },
   { icon: "✅", text: "Completed: ‘Pick up dry cleaning’", ago: "14m" },
-  { icon: "🎙️", text: "Voice note transcribed from Telegram", ago: "1h" },
+  { icon: "🎙️", text: "Voice note transcribed from WhatsApp", ago: "1h" },
   { icon: "📅", text: "New Google Calendar event synced", ago: "3h" },
   { icon: "🔁", text: "Recurring reminder ‘Standup prep’ scheduled", ago: "yesterday" },
 ] as const;
 
 export const CHANNELS_DEMO = [
   { name: "WhatsApp", connected: true, status: "Connected" },
-  { name: "Telegram", connected: true, status: "Connected" },
   { name: "Email", connected: true, status: "Connected" },
+  { name: "Google Calendar", connected: true, status: "Connected" },
   { name: "Notion", connected: false, status: "Connect" },
 ] as const;

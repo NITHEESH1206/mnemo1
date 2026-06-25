@@ -40,8 +40,8 @@ export default function CookiesPage() {
       <LegalSection heading="Contact">
         <p>
           Questions about cookies? Email{" "}
-          <a className="text-flame-700 underline" href="mailto:privacy@feru.ai">
-            privacy@feru.ai
+          <a className="text-flame-700 underline" href="mailto:contact@feruai.com">
+            contact@feruai.com
           </a>
           .
         </p>

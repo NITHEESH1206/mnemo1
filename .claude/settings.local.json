@@ -54,7 +54,18 @@
       "Bash(git commit -q -m 'Add place reminders \\('\\\\''remind me when I get home'\\\\''\\) *)",
       "Bash(git commit -q -m 'Warmer, task-aware reminder messages *)",
       "Bash(node scripts/make-coupon.mjs NNKSIUU pro 0)",
-      "Bash(git commit -q -m 'MVP batch: free cap, onboarding, quiet hours, feedback + checkout coupon *)"
+      "Bash(git commit -q -m 'MVP batch: free cap, onboarding, quiet hours, feedback + checkout coupon *)",
+      "Bash(git commit -q -m 'Reminders: free-form+buttons inside 24h window, template outside it *)",
+      "Bash(git commit -q -m 'Add admin test-template endpoint + surface Meta send errors *)",
+      "mcp__visualize__show_widget",
+      "WebFetch(domain:oryzo.ai)",
+      "Bash(git commit -q -m 'Landing: hero parallax + mouse-tilt, pinned scroll demo, progress bar *)",
+      "Bash(git commit -q -m 'Phone mockups: real WhatsApp chat UI \\(green header, beige bg, light-green bubbles, blue ticks\\) *)",
+      "Bash(git commit -q -m 'Landing: dawn-valley hero scene, horizontal-scroll headline, Feru DP *)",
+      "Bash(git commit -q -m 'Superpowers: pinned horizontal filmstrip driven by scroll \\(oryzo-style\\) *)",
+      "Bash(git commit -q -m 'Superpowers: tint section bg to a soft, readable wash of the active card color *)",
+      "Bash(git commit -q -m 'Hero headline -> '\\\\''your second brain, always on'\\\\''; richer Superpowers tints *)",
+      "Bash(git commit -q -m 'Proactive follow-ups: re-ping un-done one-off reminders *)"
     ]
   }
 }

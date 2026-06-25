@@ -31,29 +31,32 @@ export function Overload() {
           <br className="hidden sm:block" /> No brain was built to hold them all.
         </motion.p>
 
-        {/* Stage */}
-        <div className="relative mx-auto mt-12 h-[420px] max-w-5xl sm:mt-16 sm:h-[480px]">
+        {/* Stage — the big word sits in normal flow so the line below can
+            never end up underneath it (the overlap bug on desktop). */}
+        <div className="relative mx-auto mt-12 max-w-5xl sm:mt-16">
           {/* Mobile: simple wrapped pills */}
-          <div className="flex flex-wrap justify-center gap-2.5 md:hidden">
+          <div className="mb-10 flex flex-wrap justify-center gap-2.5 md:hidden">
             {BUBBLES.slice(0, 4).map((b) => (
               <WorryPill key={b.text} text={b.text} rot={0} delay={b.delay} />
             ))}
           </div>
 
-          {/* Desktop: scattered pills */}
-          {BUBBLES.map((b) => (
-            <div key={b.text} className={`absolute hidden md:block ${b.pos}`}>
-              <WorryPill text={b.text} rot={b.rot} delay={b.delay} />
-            </div>
-          ))}
+          {/* Desktop: scattered pills — decorative layer behind the word */}
+          <div className="pointer-events-none absolute inset-0 z-0 hidden md:block" aria-hidden>
+            {BUBBLES.map((b) => (
+              <div key={b.text} className={`absolute ${b.pos}`}>
+                <WorryPill text={b.text} rot={b.rot} delay={b.delay} />
+              </div>
+            ))}
+          </div>
 
-          {/* The big word */}
+          {/* The big word — in flow, generous vertical padding for the pills */}
           <motion.h2
             initial={{ opacity: 0, y: 30, scale: 0.96 }}
             whileInView={{ opacity: 1, y: 0, scale: 1 }}
             viewport={{ once: true, margin: "-60px" }}
             transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-            className="display-tight pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2 text-center text-[clamp(72px,17vw,210px)] leading-[0.9] text-ink"
+            className="display-tight relative z-10 px-2 py-12 text-center text-[clamp(64px,14vw,168px)] leading-[0.9] text-ink sm:py-16"
           >
             Too much to hold<span className="text-flame-500">.</span>
           </motion.h2>
@@ -64,9 +67,9 @@ export function Overload() {
             whileInView={{ opacity: 1, scale: 1, y: 0 }}
             viewport={{ once: true, margin: "-60px" }}
             transition={{ duration: 0.7, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-            className="absolute right-[3%] top-[36%] hidden animate-float-slow lg:block"
+            className="pointer-events-none absolute right-[2%] top-[8%] z-0 hidden animate-float-slow lg:block"
           >
-            <Mascot variant="wink" size={150} hueShift={-8} />
+            <Mascot variant="wink" size={140} hueShift={-8} />
           </motion.div>
         </div>
 
@@ -75,7 +78,7 @@ export function Overload() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-60px" }}
           transition={{ duration: 0.6 }}
-          className="mx-auto mt-4 max-w-xl text-[17px] text-ink/60"
+          className="relative z-10 mx-auto mt-6 max-w-xl text-[17px] text-ink/60"
         >
           So we built a memory that never overflows — and lives right in your
           WhatsApp.

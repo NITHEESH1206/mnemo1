@@ -11,7 +11,7 @@ const ROWS: Row[] = [
   { feature: "Capture by text, voice note, or screenshot", feru: true, others: false },
   { feature: "Understands natural language with AI", feru: true, others: false },
   { feature: "Reminds you where you actually look", feru: true, others: false },
-  { feature: "WhatsApp · Telegram · Email · Web, in sync", feru: true, others: false },
+  { feature: "WhatsApp · Email · Web, in sync", feru: true, others: false },
   { feature: "Send reminders to friends & teammates", feru: true, others: false },
   { feature: "Auto-creates calendar events + Meet links", feru: true, others: false },
   { feature: "A friendly digest of your day, every morning", feru: true, others: false },

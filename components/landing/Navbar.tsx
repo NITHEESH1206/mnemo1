@@ -13,11 +13,20 @@ type User = { name: string; email: string };
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
+  const [hidden, setHidden] = useState(false);
   const [open, setOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 16);
+    let lastY = window.scrollY;
+    const onScroll = () => {
+      const y = window.scrollY;
+      setScrolled(y > 16);
+      // Hide when scrolling down (past the hero), reveal when scrolling up.
+      if (y > lastY && y > 120) setHidden(true);
+      else if (y < lastY) setHidden(false);
+      lastY = y;
+    };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -39,7 +48,12 @@ export function Navbar() {
   const initial = user?.name?.charAt(0).toUpperCase() || "U";
 
   return (
-    <div className="fixed inset-x-0 top-4 z-50 px-4">
+    <div
+      className={cn(
+        "fixed inset-x-0 top-4 z-50 px-4 transition-transform duration-300 ease-out",
+        hidden && !open && "-translate-y-[160%]",
+      )}
+    >
       <header
         className={cn(
           "mx-auto flex max-w-3xl items-center justify-between gap-3 rounded-full px-3 py-2 transition-all duration-300",

@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ loggedIn: false });
   }
   const local = session.email.split("@")[0];
-  const name = local
+  const derived = local
     .replace(/[._-]+/g, " ")
     .replace(/\s+/g, " ")
     .trim()
@@ -22,6 +22,6 @@ export async function GET(req: NextRequest) {
   return NextResponse.json({
     loggedIn: true,
     email: session.email,
-    name: name || session.email,
+    name: session.name || derived || session.email,
   });
 }

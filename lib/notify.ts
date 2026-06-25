@@ -2,20 +2,13 @@
  * Channel-agnostic outbound messaging.
  * Routes by the recipient's prefix:
  *   "whatsapp:+91..."  → WhatsApp Cloud API (Meta)
- *   "telegram:12345"   → Telegram Bot API
  *   "email:a@b.com"    → Resend
  */
 
 import { sendCloudText, sendCloudTemplate } from "./whatsapp-cloud";
-import { sendTelegram } from "./telegram";
 import { sendEmail } from "./email";
 
 export async function sendMessage(to: string, body: string): Promise<void> {
-  if (to.startsWith("telegram:")) {
-    const chatId = to.slice("telegram:".length);
-    await sendTelegram(chatId, body);
-    return;
-  }
   if (to.startsWith("email:")) {
     const addr = to.slice("email:".length);
     await sendEmail(addr, "Your Feru AI reminder", body);
