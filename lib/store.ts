@@ -32,6 +32,7 @@ export type Reminder = {
   recipientName?: string; // display name of the friend
   fireText?: string; // contextual "it's time to…" line, generated at creation
   intervalMinutes?: number; // for recurrence === "interval"
+  followupCount?: number; // how many "still need to…?" nudges have been sent
 };
 
 let cached: Redis | null = null;
@@ -138,6 +139,28 @@ export async function markSentOrReschedule(
   }
 }
 
+/**
+ * Reschedule a one-off reminder as a follow-up nudge — keeps it pending and
+ * bumps the follow-up counter, so the dispatcher will ping again later unless
+ * the user marks it done first.
+ */
+export async function scheduleFollowup(
+  id: string,
+  next: Date,
+  count: number,
+): Promise<void> {
+  const client = redis();
+  const r = await client.get<Reminder>(reminderKey(id));
+  if (!r) return;
+  r.fireAt = next.toISOString();
+  r.status = "pending";
+  r.followupCount = count;
+  const ts = next.getTime();
+  await client.set(reminderKey(id), r);
+  await client.zadd(DUE_KEY, { score: ts, member: id });
+  await client.zadd(userKey(r.userPhone), { score: ts, member: id });
+}
+
 export async function cancelReminderForUser(
   userPhone: string,
   indexOneBased: number,
@@ -179,6 +202,7 @@ export async function snoozeReminder(
   if (!r) return null;
   r.fireAt = newDate.toISOString();
   r.status = "pending";
+  r.followupCount = 0; // a manual snooze restarts the follow-up cycle
   const ts = newDate.getTime();
   await client.set(reminderKey(id), r);
   await client.zadd(DUE_KEY, { score: ts, member: id });

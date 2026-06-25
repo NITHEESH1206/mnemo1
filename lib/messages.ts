@@ -156,6 +156,14 @@ export function reminderFireMessage(r: Reminder): string {
   return `⏰ Time to *${r.task}*${tag}${repeatNote}`;
 }
 
+/** A gentle re-ping when a reminder hasn't been marked done yet. */
+export function followUpMessage(r: Reminder, count: number): string {
+  if (count >= 2) {
+    return `⏳ last nudge — did you *${r.task}*? tap *Done* if it's sorted.`;
+  }
+  return `👀 still need to *${r.task}*? tap *Done* when it's handled.`;
+}
+
 export function listMessage(reminders: Reminder[], tz?: string): string {
   if (reminders.length === 0) {
     return "your queue is empty. living dangerously, i see. try: 'remind me to call james tomorrow at 3pm'.";
