@@ -118,7 +118,7 @@ export function Navbar() {
                 Log in
               </a>
               <GradientButton
-                href="/api/auth/google/login?next=wa"
+                href="/#pricing"
                 variant="primary"
                 size="sm"
                 className="text-[13.5px]"
@@ -200,10 +200,11 @@ export function Navbar() {
                       Log in
                     </GradientButton>
                     <GradientButton
-                      href="/api/auth/google/login?next=wa"
+                      href="/#pricing"
                       variant="primary"
                       size="md"
                       className="w-full justify-center"
+                      onClick={() => setOpen(false)}
                     >
                       Try for Free
                     </GradientButton>

@@ -134,11 +134,7 @@ export function Hero() {
           transition={{ duration: 0.6, delay: 0.34 }}
           className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row"
         >
-          <GradientButton
-            href="/api/auth/google/login?next=wa"
-            variant="primary"
-            size="lg"
-          >
+          <GradientButton href="#pricing" variant="primary" size="lg">
             Try for Free →
           </GradientButton>
           <GradientButton href="#how-it-works" variant="glass" size="lg">

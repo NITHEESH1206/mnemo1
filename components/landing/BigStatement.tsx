@@ -19,10 +19,13 @@ export function BigStatement() {
 
   // Sweep in from the right → settle dead-centre by 40% → hold centred while
   // you keep scrolling, then the pin releases into the next section.
-  const x = useTransform(scrollYProgress, [0, 0.4], ["55vw", "0vw"]);
+  const x = useTransform(scrollYProgress, [0, 0.4], ["50vw", "0vw"]);
+  // Once centred, zoom out a touch so the whole sentence (first + last word)
+  // is comfortably in view during the hold.
+  const scale = useTransform(scrollYProgress, [0.4, 0.6], [1.12, 0.92]);
   const glow = useTransform(scrollYProgress, [0, 0.4, 1], [0.25, 0.7, 0.55]);
-  const subO = useTransform(scrollYProgress, [0.46, 0.66], [0, 1]);
-  const subY = useTransform(scrollYProgress, [0.46, 0.66], [36, 0]);
+  const subO = useTransform(scrollYProgress, [0.5, 0.68], [0, 1]);
+  const subY = useTransform(scrollYProgress, [0.5, 0.68], [36, 0]);
 
   if (reduced) {
     return (
@@ -36,7 +39,7 @@ export function BigStatement() {
             exact moment you need it.
           </p>
           <div className="mt-8 flex justify-center">
-            <GradientButton href="/api/auth/google/login?next=wa" variant="primary" size="lg">
+            <GradientButton href="#pricing" variant="primary" size="lg">
               Try Feru free →
             </GradientButton>
           </div>
@@ -63,8 +66,8 @@ export function BigStatement() {
         />
 
         <motion.h2
-          style={{ x }}
-          className="display-tight whitespace-nowrap text-center text-[clamp(2.75rem,12vw,11rem)] leading-[0.95]"
+          style={{ x, scale }}
+          className="display-tight mx-auto max-w-[18ch] text-center text-[clamp(2.5rem,9vw,7rem)] leading-[0.98]"
         >
           you’ll never <span className="gradient-text">forget</span> again.
         </motion.h2>
@@ -79,7 +82,7 @@ export function BigStatement() {
           </p>
           <div className="mt-7">
             <GradientButton
-              href="/api/auth/google/login?next=wa"
+              href="#pricing"
               variant="primary"
               size="lg"
             >

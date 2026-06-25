@@ -139,12 +139,43 @@ export function BrandLogo({
 
     case "outlook":
       return (
-        <svg {...common} viewBox="0 0 32 32" fill="none">
-          <rect x="14" y="7" width="17" height="18" rx="1.5" fill="#0F6CBD" />
-          <path d="M14 10.5 22.5 16 31 10.5V25H14z" fill="#fff" fillOpacity="0.9" />
-          <path d="M14 9.5 22.5 15.5 31 9.5v1.6L22.5 17 14 11.1z" fill="#0F6CBD" />
-          <ellipse cx="9.5" cy="16" rx="9.5" ry="10.5" fill="#0A4F8F" />
-          <ellipse cx="9.5" cy="16" rx="4.6" ry="5.6" fill="#fff" />
+        <svg {...common} viewBox="0 0 48 48" fill="none">
+          <defs>
+            <linearGradient
+              id="feruOutlookGrad"
+              x1="6"
+              y1="12"
+              x2="44"
+              y2="40"
+              gradientUnits="userSpaceOnUse"
+            >
+              <stop stopColor="#36C5F8" />
+              <stop offset="0.5" stopColor="#1E9BF0" />
+              <stop offset="1" stopColor="#1A52C9" />
+            </linearGradient>
+          </defs>
+          {/* right: card + envelope */}
+          <path
+            d="M25 10.5 44 18.5V35a3 3 0 0 1-3 3H25z"
+            fill="url(#feruOutlookGrad)"
+          />
+          <path d="M25 18.5h19l-9.5 6.5z" fill="#ffffff" fillOpacity="0.92" />
+          <path
+            d="M25 22.5 34.5 29 44 22.5V35a3 3 0 0 1-3 3H25z"
+            fill="#ffffff"
+            fillOpacity="0.16"
+          />
+          {/* left: blue square with the white "O" */}
+          <rect x="4" y="14" width="21" height="20" rx="3.5" fill="#0A53C8" />
+          <ellipse
+            cx="14.5"
+            cy="24"
+            rx="5.4"
+            ry="6.4"
+            fill="none"
+            stroke="#ffffff"
+            strokeWidth="3"
+          />
         </svg>
       );
 

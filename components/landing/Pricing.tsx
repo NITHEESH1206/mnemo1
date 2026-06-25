@@ -105,15 +105,24 @@ function PricingCard({
   const struckPrice =
     billing === "annual" && plan.monthly > 0 ? plan.monthly : null;
 
+  const tone = TONE[plan.name] ?? TONE.Pro;
+
   return (
     <div
       className={cn(
-        "relative h-full rounded-[28px] p-7",
+        "group relative h-full rounded-[28px] p-7 transition-shadow duration-300",
         plan.highlight
           ? "gradient-border card-glass shadow-[0_40px_90px_-24px_rgba(234,88,12,0.4)]"
           : "card-glass",
       )}
     >
+      {/* On hover, the card fills with a soft wash of the plan's colour. */}
+      <div
+        aria-hidden
+        style={{ background: tone.tint }}
+        className="pointer-events-none absolute inset-0 z-0 rounded-[28px] opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+      />
+
       {plan.highlight && (
         <div className="absolute -top-3.5 left-1/2 z-10 -translate-x-1/2">
           <span className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-gradient-primary px-3 py-1 text-[11px] font-extrabold uppercase tracking-[0.14em] text-white shadow-[0_8px_24px_-6px_rgba(234,88,12,0.55)]">
@@ -122,9 +131,13 @@ function PricingCard({
         </div>
       )}
 
-      <div className="relative flex items-start justify-between gap-3">
+      <div className="relative z-10">
+      <div className="flex items-start justify-between gap-3">
         <div>
-          <div className="text-[11.5px] font-bold uppercase tracking-[0.16em] text-flame-700">
+          <div
+            className="text-[11.5px] font-bold uppercase tracking-[0.16em]"
+            style={{ color: tone.accent }}
+          >
             ✦ {plan.category}
           </div>
           <div className="mt-1.5 text-[26px] font-extrabold tracking-tight text-ink">
@@ -192,6 +205,26 @@ function PricingCard({
           </CheckoutButton>
         )}
       </div>
+      </div>
     </div>
   );
 }
+
+// Per-plan accent colour + the soft wash shown on hover.
+const TONE: Record<string, { accent: string; tint: string }> = {
+  Free: {
+    accent: "#b45309",
+    tint:
+      "radial-gradient(130% 90% at 50% 0%, rgba(251,191,36,0.30), rgba(251,191,36,0.08) 55%, transparent 80%)",
+  },
+  Pro: {
+    accent: "#c2410c",
+    tint:
+      "radial-gradient(130% 90% at 50% 0%, rgba(249,115,22,0.32), rgba(249,115,22,0.10) 55%, transparent 80%)",
+  },
+  Team: {
+    accent: "#7c2d12",
+    tint:
+      "radial-gradient(130% 90% at 50% 0%, rgba(124,45,18,0.26), rgba(194,65,12,0.08) 55%, transparent 80%)",
+  },
+};

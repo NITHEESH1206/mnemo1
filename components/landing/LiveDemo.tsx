@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import {
   motion,
   AnimatePresence,
@@ -15,6 +15,7 @@ import {
   WaInputBar,
   WA_CHAT_STYLE,
 } from "@/components/ui/WhatsAppChat";
+import { cn } from "@/lib/utils";
 
 type Step = { label: string; user: string; reply: string };
 
@@ -44,19 +45,8 @@ const SCRIPT: Step[] = [
 export function LiveDemo() {
   const reduced = useReducedMotion();
   const ref = useRef<HTMLElement | null>(null);
-  const [desktop, setDesktop] = useState(false);
   const [active, setActive] = useState(0);
-
-  useEffect(() => {
-    const mq = window.matchMedia("(min-width: 768px)");
-    const update = () => setDesktop(mq.matches);
-    update();
-    mq.addEventListener("change", update);
-    return () => mq.removeEventListener("change", update);
-  }, []);
-
-  // Only scroll-scrub (pin) on desktop with motion enabled; otherwise stack.
-  const pinned = desktop && !reduced;
+  const pinned = !reduced;
 
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -66,6 +56,15 @@ export function LiveDemo() {
     if (!pinned) return;
     setActive(Math.min(SCRIPT.length - 1, Math.max(0, Math.floor(v * SCRIPT.length))));
   });
+
+  const Heading = (
+    <>
+      <span className="pill">See it work</span>
+      <h2 className="mt-4 text-h2 text-ink md:mt-5">
+        One message. <span className="gradient-text">It’s handled.</span>
+      </h2>
+    </>
+  );
 
   return (
     <section
@@ -82,38 +81,35 @@ export function LiveDemo() {
         }
       >
         <div className="ambient-warm opacity-50" aria-hidden />
-        <div className="container-x relative z-10 grid items-center gap-10 md:grid-cols-2 md:gap-12">
-          {/* Narrative + progress */}
-          <div>
-            <span className="pill">See it work</span>
-            <h2 className="mt-5 text-h2 text-ink">
-              One message.{" "}
-              <span className="gradient-text">It’s handled.</span>
-            </h2>
+        <div className="container-x relative z-10 grid items-center gap-8 md:grid-cols-2 md:gap-12">
+          {/* Desktop narrative (left) */}
+          <div className="hidden md:block">
+            {Heading}
             <p className="mt-5 max-w-md text-[17px] text-ink/65">
               No new app to learn. Talk to Feru like you’d text a friend — it
               sets reminders, captures lists, and nudges you at exactly the right
               moment.
             </p>
-
             <ol className="mt-9 space-y-3.5">
               {SCRIPT.map((s, i) => {
                 const lit = pinned ? i <= active : true;
                 return (
                   <li key={s.label} className="flex items-center gap-3.5">
                     <span
-                      className={`grid h-8 w-8 shrink-0 place-items-center rounded-full text-[13px] font-bold transition-all duration-300 ${
+                      className={cn(
+                        "grid h-8 w-8 shrink-0 place-items-center rounded-full text-[13px] font-bold transition-all duration-300",
                         lit
                           ? "bg-gradient-primary text-white shadow-[0_6px_16px_-6px_rgba(234,88,12,0.6)]"
-                          : "bg-ink/[0.06] text-ink/40"
-                      }`}
+                          : "bg-ink/[0.06] text-ink/40",
+                      )}
                     >
                       {i + 1}
                     </span>
                     <span
-                      className={`text-[15.5px] font-semibold transition-colors duration-300 ${
-                        lit ? "text-ink" : "text-ink/40"
-                      }`}
+                      className={cn(
+                        "text-[15.5px] font-semibold transition-colors duration-300",
+                        lit ? "text-ink" : "text-ink/40",
+                      )}
                     >
                       {s.label}
                     </span>
@@ -123,20 +119,24 @@ export function LiveDemo() {
             </ol>
           </div>
 
+          {/* Mobile compact header (centered) */}
+          <div className="text-center md:hidden">{Heading}</div>
+
           {/* Phone */}
           <div className="relative mx-auto w-[270px] sm:w-[300px]">
             <div className="absolute -inset-8 rounded-[48px] bg-[radial-gradient(circle_at_60%_30%,rgba(249,115,22,0.28),transparent_65%)] blur-2xl" />
             <div className="relative rounded-[40px] border border-white/60 bg-ink p-2.5 shadow-[0_50px_100px_-30px_rgba(20,60,110,0.6)]">
               <div
-                className={`relative overflow-hidden rounded-[32px] ${
-                  pinned ? "h-[560px]" : "min-h-[480px]"
-                }`}
+                className={cn(
+                  "relative overflow-hidden rounded-[32px]",
+                  pinned ? "h-[440px] sm:h-[560px]" : "min-h-[480px]",
+                )}
                 style={WA_CHAT_STYLE}
               >
                 <WaHeader />
 
                 {pinned ? (
-                  <div className="flex min-h-[360px] flex-col justify-start px-3 pt-3">
+                  <div className="flex min-h-[280px] flex-col justify-start px-3 pt-3 sm:min-h-[360px]">
                     <AnimatePresence mode="wait">
                       <motion.div
                         key={active}
@@ -162,6 +162,26 @@ export function LiveDemo() {
               </div>
             </div>
           </div>
+
+          {/* Mobile active-step label (centered, below phone) */}
+          {pinned && (
+            <div className="text-center md:hidden">
+              <p className="text-[15.5px] font-semibold text-ink">
+                {SCRIPT[active].label}
+              </p>
+              <div className="mt-3 flex justify-center gap-1.5">
+                {SCRIPT.map((_, i) => (
+                  <span
+                    key={i}
+                    className={cn(
+                      "h-1.5 rounded-full transition-all duration-300",
+                      i === active ? "w-6 bg-flame-500" : "w-1.5 bg-ink/15",
+                    )}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </section>

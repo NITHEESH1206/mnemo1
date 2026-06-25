@@ -19,9 +19,12 @@ export async function GET(req: NextRequest) {
     .replace(/\s+/g, " ")
     .trim()
     .replace(/\b\w/g, (c) => c.toUpperCase());
+  // Username = first name only.
+  const full = (session.name || derived || session.email).trim();
+  const firstName = full.split(/\s+/)[0] || full;
   return NextResponse.json({
     loggedIn: true,
     email: session.email,
-    name: session.name || derived || session.email,
+    name: firstName,
   });
 }

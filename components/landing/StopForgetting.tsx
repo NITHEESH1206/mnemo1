@@ -52,13 +52,13 @@ export function StopForgetting() {
     <section id="use-cases" className="section relative overflow-hidden">
       <div className="ambient-warm opacity-60" aria-hidden />
       <div className="container-x relative z-10">
-        <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
+        <div className="flex flex-col items-center justify-between gap-6 md:flex-row md:items-end">
           <motion.h2
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.6 }}
-            className="text-h2 max-w-2xl text-ink"
+            className="text-h2 w-full max-w-2xl text-center text-ink md:w-auto md:text-left"
           >
             How you’ll stop forgetting{" "}
             <span className="gradient-text">forever.</span>

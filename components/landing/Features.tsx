@@ -95,14 +95,14 @@ function Header() {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-80px" }}
       transition={{ duration: 0.6 }}
-      className="max-w-2xl"
+      className="max-w-2xl text-center md:text-left"
     >
       <span className="pill">Superpowers</span>
       <h2 className="mt-5 text-h2 text-ink">
         Superpowers for minds <br className="hidden sm:block" />
         that can’t do it all.
       </h2>
-      <p className="mt-4 max-w-xl text-[17px] text-ink/65">
+      <p className="mx-auto mt-4 max-w-xl text-[17px] text-ink/65 md:mx-0">
         Scroll through everything Feru AI quietly does in the background.
       </p>
     </motion.div>
