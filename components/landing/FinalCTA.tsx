@@ -64,7 +64,7 @@ export function FinalCTA() {
             className="relative mt-10 flex flex-col items-center gap-4"
           >
             <GradientButton
-              href="/api/auth/google/login"
+              href="#pricing"
               variant="primary"
               size="lg"
               className="px-10 py-5 text-[16px]"
