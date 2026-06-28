@@ -1,301 +1,200 @@
 "use client";
 
-import { useRef, type MouseEvent } from "react";
-import {
-  motion,
-  useReducedMotion,
-  useScroll,
-  useTransform,
-  useMotionValue,
-  useSpring,
-} from "framer-motion";
-import { Star, Play, Check } from "lucide-react";
+import { motion, useReducedMotion } from "framer-motion";
+import { Play } from "lucide-react";
 import { GradientButton } from "@/components/ui/GradientButton";
-import { Mascot } from "@/components/ui/Mascot";
-import { HeroScene } from "@/components/landing/HeroScene";
-import {
-  WaHeader,
-  WaOut,
-  WaIn,
-  WaInputBar,
-  WA_CHAT_STYLE,
-} from "@/components/ui/WhatsAppChat";
+import { BrandLogo } from "@/components/ui/BrandLogo";
+
+const WORKS_ON = ["WhatsApp", "Gmail", "Google Calendar", "Notion", "Outlook"];
 
 export function Hero() {
   const reduced = useReducedMotion();
-  const heroRef = useRef<HTMLElement | null>(null);
-
-  // Scroll-linked parallax: layers drift at different speeds as you scroll.
-  const { scrollYProgress } = useScroll({
-    target: heroRef,
-    offset: ["start start", "end start"],
-  });
-  const orbY = useTransform(scrollYProgress, [0, 1], [0, -150]);
-  const showcaseY = useTransform(scrollYProgress, [0, 1], [0, 70]);
-
-  // Mouse parallax tilt for the showcase mockups.
-  const px = useMotionValue(0);
-  const py = useMotionValue(0);
-  const rotX = useSpring(useTransform(py, [-0.5, 0.5], [6, -6]), {
-    stiffness: 110,
-    damping: 18,
-  });
-  const rotY = useSpring(useTransform(px, [-0.5, 0.5], [-8, 8]), {
-    stiffness: 110,
-    damping: 18,
-  });
-
-  function onMove(e: MouseEvent) {
-    if (reduced) return;
-    const r = heroRef.current?.getBoundingClientRect();
-    if (!r) return;
-    px.set((e.clientX - r.left) / r.width - 0.5);
-    py.set((e.clientY - r.top) / r.height - 0.5);
-  }
 
   return (
-    <section
-      ref={heroRef}
-      onMouseMove={onMove}
-      className="relative isolate overflow-hidden pt-36 pb-28 sm:pt-44"
-    >
-      {/* ── Natural dawn-valley scene (layered parallax) ────── */}
-      <div className="absolute inset-0 z-0" aria-hidden="true">
-        <HeroScene progress={scrollYProgress} reduced={!!reduced} />
-        {/* soften the top so the white headline stays readable */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-transparent" />
-      </div>
-
-      {/* Floating mascot accents (parallax — warm orbs pop against the blue) */}
-      <motion.div
+    <section className="relative isolate overflow-hidden bg-[#0b0a12] pt-36 pb-24 sm:pt-44 sm:pb-28">
+      {/* ── Background: warm dark + orange glows ───────────────── */}
+      <div
         aria-hidden
-        style={reduced ? undefined : { y: orbY }}
-        className="pointer-events-none absolute inset-0 z-20"
-      >
-        <FloatingOrbs />
-      </motion.div>
+        className="absolute inset-0 -z-10"
+        style={{
+          background:
+            "radial-gradient(110% 80% at 78% 4%, rgba(249,115,22,0.30), transparent 52%)," +
+            "radial-gradient(90% 70% at 6% 96%, rgba(251,191,36,0.12), transparent 55%)," +
+            "linear-gradient(180deg,#0c0b16 0%,#100d1c 55%,#0b0a12 100%)",
+        }}
+      />
+      {/* faint star/grain dots */}
+      <div
+        aria-hidden
+        className="absolute inset-0 -z-10 opacity-[0.5]"
+        style={{
+          backgroundImage:
+            "radial-gradient(rgba(255,255,255,0.25) 0.5px, transparent 0.5px)",
+          backgroundSize: "26px 26px",
+          maskImage:
+            "radial-gradient(120% 80% at 70% 10%, black, transparent 70%)",
+          WebkitMaskImage:
+            "radial-gradient(120% 80% at 70% 10%, black, transparent 70%)",
+        }}
+      />
 
-      <div className="container-x relative z-10">
-        {/* Rating row — frosted glass pill on the sky */}
-        <motion.div
-          initial={reduced ? false : { opacity: 0, y: 8 }}
-          animate={reduced ? undefined : { opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="flex flex-wrap items-center justify-center gap-2.5"
-        >
-          <span className="pill-glass">
-            <span className="flex items-center gap-0.5" aria-label="Rated 4.9 of 5">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <Star
-                  key={i}
-                  size={13}
-                  className="fill-amber-400 text-amber-400"
-                />
-              ))}
-            </span>
-            <span className="font-bold">4.9</span>
-            <span className="opacity-60">· 50k+ minds freed</span>
-          </span>
-        </motion.div>
-
-        {/* Headline — Satoshi, white on sky with a gradient pop */}
-        <motion.h1
-          initial={reduced ? false : { opacity: 0, y: 22 }}
-          animate={reduced ? undefined : { opacity: 1, y: 0 }}
-          transition={{ duration: 0.75, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
-          className="display-tight mx-auto mt-8 max-w-5xl text-center text-hero sky-text"
-        >
-          your second brain,
-          <br className="hidden sm:block" />{" "}
-          <span className="relative inline-block">
-            <span className="gradient-text-bright">always on</span>
-            <span
-              aria-hidden
-              className="absolute -inset-x-2 -bottom-1 h-1.5 rounded-full bg-gradient-warm opacity-80 blur-[3px]"
-            />
-            <span aria-hidden>.</span>
-          </span>
-        </motion.h1>
-
-        <motion.p
-          initial={reduced ? false : { opacity: 0, y: 14 }}
-          animate={reduced ? undefined : { opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.24 }}
-          className="mx-auto mt-7 max-w-2xl text-center text-[17px] font-medium leading-relaxed text-white/90 sm:text-[19px] [text-shadow:0_1px_18px_rgba(12,74,110,0.35)]"
-        >
-          Set reminders, capture ideas, and stay in flow — across WhatsApp,
-          Email, and your web dashboard. One AI that never forgets.
-        </motion.p>
-
-        {/* CTAs */}
-        <motion.div
-          initial={reduced ? false : { opacity: 0, y: 12 }}
-          animate={reduced ? undefined : { opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.34 }}
-          className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row"
-        >
-          <GradientButton href="#pricing" variant="primary" size="lg">
-            Try for Free →
-          </GradientButton>
-          <GradientButton href="#how-it-works" variant="glass" size="lg">
-            <Play size={15} className="fill-current" />
-            Watch Demo
-          </GradientButton>
-        </motion.div>
-
-        <motion.p
-          initial={reduced ? false : { opacity: 0 }}
-          animate={reduced ? undefined : { opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.48 }}
-          className="mt-6 text-center text-[13px] font-medium text-white/75 [text-shadow:0_1px_12px_rgba(12,74,110,0.3)]"
-        >
-          Free forever · No credit card required · Cancel anytime
-        </motion.p>
-
-        {/* Floating glass showcase — scroll parallax + mouse tilt */}
-        <motion.div
-          initial={reduced ? false : { opacity: 0, y: 44 }}
-          animate={reduced ? undefined : { opacity: 1, y: 0 }}
-          transition={{ duration: 0.95, delay: 0.42, ease: [0.22, 1, 0.36, 1] }}
-          className="relative mx-auto mt-20 w-full max-w-5xl [perspective:1400px]"
-        >
+      <div className="container-x relative z-10 grid items-center gap-14 lg:grid-cols-[1.05fr_0.95fr]">
+        {/* ── Left: copy ───────────────────────────────────────── */}
+        <div className="text-center lg:text-left">
           <motion.div
-            style={
-              reduced
-                ? undefined
-                : {
-                    y: showcaseY,
-                    rotateX: rotX,
-                    rotateY: rotY,
-                    transformPerspective: 1400,
-                  }
-            }
-            className="relative grid grid-cols-1 items-end gap-6 [transform-style:preserve-3d] md:grid-cols-[1fr_300px] md:gap-10"
+            initial={reduced ? false : { opacity: 0, y: 10 }}
+            animate={reduced ? undefined : { opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.06] px-4 py-2 text-[13px] font-semibold text-white/75 backdrop-blur"
           >
-            <BrowserMockup />
-            <PhoneMockup />
+            <span className="text-flame-400">✦</span>
+            Your second brain — trusted to never forget
           </motion.div>
+
+          <motion.h1
+            initial={reduced ? false : { opacity: 0, y: 18 }}
+            animate={reduced ? undefined : { opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.06, ease: [0.22, 1, 0.36, 1] }}
+            className="mt-7 text-[clamp(2.6rem,6.4vw,5.2rem)] font-extrabold leading-[1.0] tracking-[-0.03em] text-white"
+          >
+            You weren’t built
+            <br />
+            <span className="font-serif text-[0.96em] font-medium italic text-white/40">
+              to remember everything.
+            </span>
+          </motion.h1>
+
+          <motion.p
+            initial={reduced ? false : { opacity: 0, y: 14 }}
+            animate={reduced ? undefined : { opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="mx-auto mt-7 max-w-md text-[18px] leading-relaxed text-white/65 lg:mx-0"
+          >
+            That’s why we built Feru AI. So you don’t have to.
+          </motion.p>
+
+          {/* Works on */}
+          <motion.div
+            initial={reduced ? false : { opacity: 0 }}
+            animate={reduced ? undefined : { opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.32 }}
+            className="mt-8 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 lg:justify-start"
+          >
+            <span className="text-[13px] font-semibold uppercase tracking-wider text-white/45">
+              Works on
+            </span>
+            <div className="flex items-center gap-2.5">
+              {WORKS_ON.map((b) => (
+                <span
+                  key={b}
+                  className="grid h-9 w-9 place-items-center rounded-xl border border-white/10 bg-white/[0.06] backdrop-blur"
+                >
+                  <BrandLogo name={b} size={20} />
+                </span>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* CTAs */}
+          <motion.div
+            initial={reduced ? false : { opacity: 0, y: 12 }}
+            animate={reduced ? undefined : { opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.42 }}
+            className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row lg:justify-start"
+          >
+            <GradientButton href="#pricing" variant="primary" size="lg">
+              Get started →
+            </GradientButton>
+            <a
+              href="#how-it-works"
+              className="inline-flex items-center justify-center gap-2 rounded-full border border-white/15 bg-white/[0.06] px-6 py-3 text-[15px] font-semibold text-white backdrop-blur transition-colors hover:bg-white/[0.12]"
+            >
+              <Play size={14} className="fill-current" />
+              Watch demo
+            </a>
+          </motion.div>
+        </div>
+
+        {/* ── Right: glassy hero card ──────────────────────────── */}
+        <motion.div
+          initial={reduced ? false : { opacity: 0, scale: 0.94, y: 24 }}
+          animate={reduced ? undefined : { opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 0.9, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+          className="relative mx-auto w-full max-w-[460px]"
+        >
+          {/* glowing orb */}
+          <motion.div
+            aria-hidden
+            className="pointer-events-none absolute -left-10 -top-12 h-[150px] w-[150px] rounded-full blur-[6px]"
+            style={{
+              background:
+                "radial-gradient(circle at 35% 30%, #ffe3c2, #fb923c 42%, #ea580c 72%, #9a3412)",
+              boxShadow: "0 0 80px 10px rgba(249,115,22,0.45)",
+            }}
+            animate={reduced ? undefined : { y: [0, -16, 0] }}
+            transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+          />
+
+          <div className="relative overflow-hidden rounded-[34px] border border-white/15 bg-white/[0.04] p-3 shadow-[0_40px_120px_-30px_rgba(0,0,0,0.8)] backdrop-blur-xl">
+            {/* inner warm-sky panel */}
+            <div
+              className="relative h-[320px] overflow-hidden rounded-[26px]"
+              style={{
+                background:
+                  "linear-gradient(160deg,#ffd9a8 0%,#fcb874 45%,#fb923c 100%)",
+              }}
+            >
+              <Cloud className="left-5 top-7 h-10 w-24" reduced={reduced} delay={0} />
+              <Cloud className="right-6 top-16 h-8 w-20 opacity-80" reduced={reduced} delay={-2} />
+              <Cloud className="left-10 bottom-10 h-9 w-24 opacity-90" reduced={reduced} delay={-4} />
+              <div className="absolute inset-0 grid place-items-center">
+                <div className="text-center">
+                  <div className="display-tight text-[64px] leading-none text-white drop-shadow-[0_6px_24px_rgba(154,52,18,0.45)]">
+                    Saved.
+                  </div>
+                  <div className="mt-2 text-[14px] font-semibold text-white/85">
+                    one message — never forgotten
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* mini caption bar */}
+            <div className="mt-3 flex items-center gap-2.5 rounded-2xl bg-white/[0.06] px-3.5 py-2.5">
+              <span className="grid h-7 w-7 place-items-center rounded-full bg-gradient-primary text-[12px] font-extrabold text-white">
+                F
+              </span>
+              <span className="text-[13px] text-white/80">
+                “remind me to call mom at 6pm”
+              </span>
+              <span className="ml-auto text-[13px] text-emerald-300">✓ done</span>
+            </div>
+          </div>
         </motion.div>
       </div>
     </section>
   );
 }
 
-function FloatingOrbs() {
+function Cloud({
+  className,
+  reduced,
+  delay,
+}: {
+  className: string;
+  reduced: boolean | null;
+  delay: number;
+}) {
   return (
-    <>
-      {/* Decorative mascots — z-20 keeps them in front of the mockups */}
-      <div className="pointer-events-none absolute left-[5%] top-[30%] z-20 hidden animate-float-slow lg:block">
-        <Mascot variant="glasses" size={92} />
-      </div>
-      <div className="pointer-events-none absolute right-[4%] top-[24%] z-20 hidden animate-float-slower lg:block">
-        <Mascot variant="goggles" size={108} hueShift={-12} />
-      </div>
-      <div className="pointer-events-none absolute right-[6%] top-[58%] z-20 hidden animate-float-fast lg:block">
-        <Mascot variant="hat" size={70} />
-      </div>
-      <div className="pointer-events-none absolute left-[7%] bottom-[14%] z-20 hidden animate-float-slow xl:block">
-        <Mascot variant="wink" size={78} />
-      </div>
-    </>
-  );
-}
-
-
-function BrowserMockup() {
-  return (
-    <div className="group relative animate-float-slow">
-      <div className="absolute -inset-6 rounded-3xl bg-[radial-gradient(circle_at_30%_30%,rgba(56,189,248,0.4),transparent_65%)] blur-2xl" />
-      <div className="relative overflow-hidden rounded-2xl border border-white/70 bg-white shadow-[0_40px_90px_-30px_rgba(20,60,110,0.5)]">
-        <div className="flex items-center gap-2 border-b border-ink/8 bg-bg-tint px-4 py-3">
-          <span className="h-2.5 w-2.5 rounded-full bg-red-400" />
-          <span className="h-2.5 w-2.5 rounded-full bg-yellow-400" />
-          <span className="h-2.5 w-2.5 rounded-full bg-emerald-400" />
-          <div className="ml-3 flex h-6 flex-1 items-center rounded-md border border-ink/8 bg-white px-3 text-[11px] text-ink/55">
-            app.feru.ai/dashboard
-          </div>
-        </div>
-
-        <div className="grid grid-cols-[180px_1fr] gap-0 p-5 text-left">
-          <aside className="space-y-1 border-r border-ink/8 pr-4">
-            {["Dashboard", "Reminders", "Calendar", "Channels"].map((l, i) => (
-              <div
-                key={l}
-                className={`flex items-center gap-2 rounded-lg px-2.5 py-2 text-[12px] ${
-                  i === 0
-                    ? "border-l-2 border-flame-500 bg-flame-100/60 text-flame-700 font-semibold"
-                    : "text-ink/55"
-                }`}
-              >
-                <span className="h-1.5 w-1.5 rounded-full bg-current opacity-60" />
-                {l}
-              </div>
-            ))}
-          </aside>
-          <div className="pl-5">
-            <div className="mb-3 text-[12px] font-semibold uppercase tracking-wider text-ink/55">
-              Today
-            </div>
-            <div className="space-y-2">
-              {[
-                { t: "Call James about the Q3 roadmap", time: "3:00 PM", done: false },
-                { t: "Review brand guidelines", time: "4:30 PM", done: false },
-                { t: "Pick up dry cleaning", time: "6:00 PM", done: true },
-              ].map((r) => (
-                <div
-                  key={r.t}
-                  className="flex items-center justify-between rounded-xl border border-ink/8 bg-bg-tint/50 px-3 py-2.5"
-                >
-                  <div className="flex items-center gap-2.5">
-                    <span
-                      className={`grid h-4 w-4 place-items-center rounded-[5px] border ${
-                        r.done
-                          ? "border-flame-500 bg-flame-500"
-                          : "border-ink/20 bg-white"
-                      }`}
-                    >
-                      {r.done && <Check size={10} className="text-white" strokeWidth={3} />}
-                    </span>
-                    <span
-                      className={`text-[12.5px] ${
-                        r.done ? "text-ink/45 line-through" : "text-ink"
-                      }`}
-                    >
-                      {r.t}
-                    </span>
-                  </div>
-                  <span className="text-[11px] text-ink/55">{r.time}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function PhoneMockup() {
-  return (
-    <div className="relative mx-auto w-[260px] animate-float-slower">
-      <div className="absolute -inset-6 rounded-[40px] bg-[radial-gradient(circle_at_70%_30%,rgba(125,211,252,0.5),transparent_65%)] blur-2xl" />
-      <div className="relative rounded-[36px] border border-white/60 bg-ink p-2 shadow-[0_40px_80px_-24px_rgba(20,60,110,0.55)]">
-        <div
-          className="relative h-[500px] overflow-hidden rounded-[28px]"
-          style={WA_CHAT_STYLE}
-        >
-          <WaHeader />
-          <div className="flex flex-col gap-1.5 px-3 pt-3">
-            <WaOut time="9:40">Remind me to call James tomorrow at 3pm</WaOut>
-            <WaIn time="9:40">
-              Got it. I’ll ping you at <b>3:00 PM tomorrow</b> on WhatsApp. ✅
-            </WaIn>
-            <WaOut time="9:41">And every Friday — standup prep at 9am</WaOut>
-            <WaIn time="9:41">Done. Recurring weekly · Fridays · 9:00 AM 🔁</WaIn>
-          </div>
-          <WaInputBar />
-        </div>
-      </div>
-    </div>
+    <motion.div
+      aria-hidden
+      className={`absolute rounded-full bg-white blur-[2px] ${className}`}
+      style={{
+        boxShadow:
+          "16px 6px 0 -2px rgba(255,255,255,0.95), -18px 8px 0 -4px rgba(255,255,255,0.9)",
+      }}
+      animate={reduced ? undefined : { x: [0, 10, 0] }}
+      transition={{ duration: 9, repeat: Infinity, ease: "easeInOut", delay }}
+    />
   );
 }

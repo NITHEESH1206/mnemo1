@@ -3,9 +3,11 @@ import { cn } from "@/lib/utils";
 export function Logo({
   className,
   showText = true,
+  dark = false,
 }: {
   className?: string;
   showText?: boolean;
+  dark?: boolean;
 }) {
   return (
     <span className={cn("inline-flex items-center gap-2", className)}>
@@ -33,7 +35,12 @@ export function Logo({
         </svg>
       </span>
       {showText && (
-        <span className="text-[19px] font-extrabold tracking-tight text-ink">
+        <span
+          className={cn(
+            "text-[19px] font-extrabold tracking-tight",
+            dark ? "text-white" : "text-ink",
+          )}
+        >
           Feru AI
         </span>
       )}

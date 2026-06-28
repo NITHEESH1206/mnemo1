@@ -17,15 +17,22 @@ const BUBBLES: Bubble[] = [
 
 export function Overload() {
   return (
-    <section className="section relative overflow-hidden bg-white">
-      <div className="ambient-warm opacity-60" aria-hidden />
+    <section className="section relative overflow-hidden bg-[#0b0a12]">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(80% 60% at 50% 0%, rgba(249,115,22,0.14), transparent 60%)",
+        }}
+      />
       <div className="container-x relative z-10 text-center">
         <motion.p
           initial={{ opacity: 0, y: 14 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.6 }}
-          className="mx-auto max-w-2xl text-[20px] font-bold leading-snug text-ink sm:text-[24px]"
+          className="mx-auto max-w-2xl text-[20px] font-bold leading-snug text-white sm:text-[24px]"
         >
           You’re juggling a hundred things at once.
           <br className="hidden sm:block" /> No brain was built to hold them all.
@@ -56,7 +63,7 @@ export function Overload() {
             whileInView={{ opacity: 1, y: 0, scale: 1 }}
             viewport={{ once: true, margin: "-60px" }}
             transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-            className="display-tight relative z-10 px-2 py-12 text-center text-[clamp(64px,14vw,168px)] leading-[0.9] text-ink sm:py-16"
+            className="display-tight relative z-10 px-2 py-12 text-center text-[clamp(64px,14vw,168px)] leading-[0.9] text-white sm:py-16"
           >
             Too much to hold<span className="text-flame-500">.</span>
           </motion.h2>
@@ -78,7 +85,7 @@ export function Overload() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-60px" }}
           transition={{ duration: 0.6 }}
-          className="relative z-10 mx-auto mt-6 max-w-xl text-[17px] text-ink/60"
+          className="relative z-10 mx-auto mt-6 max-w-xl text-[17px] text-white/55"
         >
           So we built a memory that never overflows — and lives right in your
           WhatsApp.
@@ -104,7 +111,7 @@ function WorryPill({
       viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.5, delay, ease: [0.22, 1, 0.36, 1] }}
       style={{ rotate: `${rot}deg` }}
-      className="inline-flex rounded-full border border-ink/8 bg-ink/[0.04] px-4 py-2 text-[13.5px] font-medium text-ink/55 shadow-[0_8px_20px_-12px_rgba(15,12,9,0.25)] backdrop-blur-sm"
+      className="inline-flex rounded-full border border-white/10 bg-white/[0.05] px-4 py-2 text-[13.5px] font-medium text-white/60 shadow-[0_8px_20px_-12px_rgba(0,0,0,0.4)] backdrop-blur-sm"
     >
       {text}
     </motion.div>

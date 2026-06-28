@@ -57,8 +57,8 @@ export function Navbar() {
       <header
         className={cn(
           "mx-auto flex max-w-3xl items-center justify-between gap-3 rounded-full px-3 py-2 transition-all duration-300",
-          "glass-strong",
-          scrolled && "shadow-[0_24px_60px_-24px_rgba(20,60,110,0.4)]",
+          "border border-white/10 bg-[#16131f]/85 backdrop-blur-xl",
+          scrolled && "shadow-[0_24px_60px_-24px_rgba(0,0,0,0.7)]",
         )}
       >
         <Link
@@ -72,7 +72,7 @@ export function Navbar() {
             }
           }}
         >
-          <Logo />
+          <Logo dark />
         </Link>
 
         <nav className="hidden items-center gap-1 md:flex" aria-label="Primary">
@@ -80,7 +80,7 @@ export function Navbar() {
             <a
               key={l.href}
               href={l.href}
-              className="relative inline-flex items-center rounded-full px-3.5 py-2 text-[14px] font-semibold text-ink/80 transition-colors hover:text-ink"
+              className="relative inline-flex items-center rounded-full px-3.5 py-2 text-[14px] font-semibold text-white/70 transition-colors hover:text-white"
             >
               {l.label}
             </a>
@@ -93,18 +93,18 @@ export function Navbar() {
             <>
               <a
                 href="/api/auth/logout"
-                className="rounded-full px-3 py-2 text-[13.5px] font-semibold text-ink/55 transition-colors hover:text-ink"
+                className="rounded-full px-3 py-2 text-[13.5px] font-semibold text-white/55 transition-colors hover:text-white"
               >
                 Log out
               </a>
               <Link
                 href="/dashboard"
-                className="flex items-center gap-2 rounded-full bg-white/70 py-1 pl-1 pr-3.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_4px_14px_-6px_rgba(20,60,110,0.3)] ring-1 ring-white/70 transition-transform hover:-translate-y-[1px]"
+                className="flex items-center gap-2 rounded-full bg-white/10 py-1 pl-1 pr-3.5 ring-1 ring-white/15 transition-transform hover:-translate-y-[1px]"
               >
                 <span className="grid h-7 w-7 place-items-center rounded-full bg-gradient-primary text-[12px] font-extrabold text-white">
                   {initial}
                 </span>
-                <span className="max-w-[120px] truncate text-[13.5px] font-bold text-ink">
+                <span className="max-w-[120px] truncate text-[13.5px] font-bold text-white">
                   {user.name}
                 </span>
               </Link>
@@ -113,7 +113,7 @@ export function Navbar() {
             <>
               <a
                 href="/api/auth/google/login"
-                className="rounded-full px-3 py-2 text-[14px] font-semibold text-ink/80 hover:text-ink"
+                className="rounded-full px-3 py-2 text-[14px] font-semibold text-white/70 hover:text-white"
               >
                 Log in
               </a>
@@ -132,7 +132,7 @@ export function Navbar() {
         <button
           aria-label={open ? "Close menu" : "Open menu"}
           onClick={() => setOpen((v) => !v)}
-          className="md:hidden btn-glass h-10 w-10 !p-0"
+          className="grid h-10 w-10 place-items-center rounded-full border border-white/10 bg-white/10 text-white md:hidden"
         >
           {open ? <X size={18} /> : <Menu size={18} />}
         </button>
@@ -145,7 +145,7 @@ export function Navbar() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-            className="md:hidden mx-auto mt-3 max-w-md glass-strong rounded-3xl p-4"
+            className="mx-auto mt-3 max-w-md rounded-3xl border border-white/10 bg-[#16131f]/95 p-4 backdrop-blur-xl md:hidden"
           >
             <div className="flex flex-col gap-1">
               {NAV_LINKS.map((l) => (
@@ -153,12 +153,12 @@ export function Navbar() {
                   key={l.href}
                   href={l.href}
                   onClick={() => setOpen(false)}
-                  className="rounded-2xl px-4 py-3 text-[15px] font-semibold text-ink/80 transition-colors hover:bg-white/60 hover:text-ink"
+                  className="rounded-2xl px-4 py-3 text-[15px] font-semibold text-white/80 transition-colors hover:bg-white/10 hover:text-white"
                 >
                   {l.label}
                 </a>
               ))}
-              <div className="mt-3 flex flex-col gap-2 border-t border-ink/10 pt-3">
+              <div className="mt-3 flex flex-col gap-2 border-t border-white/10 pt-3">
                 {user ? (
                   <>
                     <div className="flex items-center gap-2.5 px-2 py-1">
@@ -166,10 +166,10 @@ export function Navbar() {
                         {initial}
                       </span>
                       <div className="min-w-0">
-                        <div className="truncate text-[14px] font-bold text-ink">
+                        <div className="truncate text-[14px] font-bold text-white">
                           {user.name}
                         </div>
-                        <div className="truncate text-[12px] text-ink/55">
+                        <div className="truncate text-[12px] text-white/55">
                           {user.email}
                         </div>
                       </div>

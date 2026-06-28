@@ -20,9 +20,9 @@ export function BigStatement() {
   // Sweep in from the right → settle dead-centre by 40% → hold centred while
   // you keep scrolling, then the pin releases into the next section.
   const x = useTransform(scrollYProgress, [0, 0.4], ["50vw", "0vw"]);
-  // Once centred, zoom out a touch so the whole sentence (first + last word)
-  // is comfortably in view during the hold.
-  const scale = useTransform(scrollYProgress, [0.4, 0.6], [1.12, 0.92]);
+  // Keep it on ONE line at all sizes; once centred, zoom out so the whole
+  // sentence (first + last word) comes fully into view — including on mobile.
+  const scale = useTransform(scrollYProgress, [0.4, 0.62], [1.18, 0.7]);
   const glow = useTransform(scrollYProgress, [0, 0.4, 1], [0.25, 0.7, 0.55]);
   const subO = useTransform(scrollYProgress, [0.5, 0.68], [0, 1]);
   const subY = useTransform(scrollYProgress, [0.5, 0.68], [36, 0]);
