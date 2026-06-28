@@ -67,7 +67,8 @@
       "Bash(git commit -q -m 'Hero headline -> '\\\\''your second brain, always on'\\\\''; richer Superpowers tints *)",
       "Bash(git commit -q -m 'Proactive follow-ups: re-ping un-done one-off reminders *)",
       "Bash(git commit -q -m 'Landing polish: pricing CTAs to plans, plan-colour hover, mobile demo, headings centred *)",
-      "Bash(git commit -q -m 'Redesign: dark footer + Final CTA to pricing \\(Memorae bookend\\) *)"
+      "Bash(git commit -q -m 'Redesign: dark footer + Final CTA to pricing \\(Memorae bookend\\) *)",
+      "Bash(git commit -q -m 'Redesign: add '\\\\''Built for every kind of brain'\\\\'' persona-tabs section *)"
     ]
   }
 }

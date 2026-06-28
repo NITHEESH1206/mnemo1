@@ -7,6 +7,7 @@ import { Features } from "@/components/landing/Features";
 import { BigStatement } from "@/components/landing/BigStatement";
 import { StopForgetting } from "@/components/landing/StopForgetting";
 import { WhyFeru } from "@/components/landing/WhyFeru";
+import { EveryBrain } from "@/components/landing/EveryBrain";
 import { Stats } from "@/components/landing/Stats";
 import { Testimonials } from "@/components/landing/Testimonials";
 import { Pricing } from "@/components/landing/Pricing";
@@ -26,6 +27,7 @@ export default function HomePage() {
         <BigStatement />
         <StopForgetting />
         <WhyFeru />
+        <EveryBrain />
         <Stats />
         <Testimonials />
         <Pricing />
